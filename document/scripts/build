@@ -1,0 +1,6 @@
+#!/bin/bash
+
+pdflatex -interaction nonstopmode CdC.tex > /dev/null
+./buildAux > /dev/null
+pdflatex -interaction nonstopmode CdC.tex > /dev/null
+#pdflatex CdC.tex
