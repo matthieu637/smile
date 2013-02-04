@@ -12,4 +12,17 @@
 *.la
 *.a
 
+# mac filesystem
 .DS_Store
+
+# useless latex files
+*.toc
+*.log
+*.bbl
+*.blg
+*.out
+*~
+*.aux
+*.gz
+*.backup
+
