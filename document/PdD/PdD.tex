@@ -149,57 +149,76 @@
     \subsection{Activités globales}
       \paragraph{Scripts} Maintenir et développer un ensemble de script permettant de compiler, installer, nettoyer, lancer
       des tests et faciliter l'ensemble du developpement du projet.
-      
-      \paragraph{Documentation} Gérer et 
-      
+     
       \paragraph{Intégration Linux} Maintenir la compatibilité des sources sous le système Linux.
       
       \paragraph{Intégration Mac} Maintenir la compatibilité des sources sous le système Mac.
 
     \subsection{Tâches jalonnées}
     
-      \paragraph{Conception bibliothèque} Réfléchir aux différentes classes et méthodes nécessaire pour concevoir une
+      \paragraph{Prise connaissances APR} Lire les 2 premiers chapitres de \cite{PDMIA} et se familiariser avec 
+      l'apprentissage par renforcement. Sans oublier le chapitre dédié de \cite{IntArt}.
+      
+      \paragraph{Compréhension Robot TORCS} Comprendre la structure des les fichiers nécessaire pour concevoir un robot 
+      dans TORCS. Déterminer les perceptions disponibles et les actions possibles pour le robot.
+    
+      \paragraph{Etablissement CdC/PdD} Définir le cahier des charges avec les encadrants, découper le projet en plusieurs
+      tâches, assigner les rôles de chacun.
+    
+      \paragraph{Analyse et Conception} Réfléchir aux différentes classes et méthodes nécessaire pour concevoir une
       bibliothèque réutilisable. Concevoir les diagrammes de classe.
       
       \paragraph{Implémentation Q-learning} Implémenter l'algorithme Q-learning dans la bibliothèque de façon générique
       et réutilisable.
       
-      \paragraph{Implémentation SARSA}  Implémenter l'algorithme SARSA dans la bibliothèque de façon générique
+      \paragraph{Implémentation SARSA} Implémenter l'algorithme SARSA dans la bibliothèque de façon générique
       et réutilisable.
       
-      \paragraph{Interfacer Q-learning - Env. Réduit}
+      \paragraph{Implémenter fonction de Récompenses} Coder des fonctions qui permettront de donner une valeur à un état,
+      pour ça il faut retrouver les informations données par TORCS et y appliquer quelques formules mathématiques.
       
-      \paragraph{Interfacer SARSA - Env. Réduit}
+      \paragraph{Interfacer Q-learning - Env. Réduit} Il s'agit de faire le lien entre la fonction générique Q-learning
+      codée dans la bibliothèque et le robot dans l'environnement réduit de TORCS. 
       
-      \paragraph{Implémentation fonction d'approximation}
+      \paragraph{Interfacer SARSA - Env. Réduit} Il s'agit de faire le lien entre la fonction générique SARSA
+      codée dans la bibliothèque et le robot dans l'environnement réduit de TORCS. 
       
-      \paragraph{Interfacer Q-learning - Env. Complexe}
+      \paragraph{Implémentation fonction d'approximation} Etant donné que dans les environnements complexes il y a une
+      explotion combinatoire, il nous faut developper des moyens pour réduire le nombre d'états de nos agent. C'est le
+      rôle de cette tâche.
       
-      \paragraph{Interfacer SARSA - Env. Complexe}
+      \paragraph{Interfacer Q-learning - Env. Complexe} Il s'agit de faire le lien entre la fonction générique Q-learning
+      codée dans la bibliothèque et le robot dans l'environnement réduit de TORCS. 
       
-      \paragraph{Implémenter mesure de Perf.}
+      \paragraph{Interfacer SARSA - Env. Complexe} Il s'agit de faire le lien entre la fonction générique SARSA
+      codée dans la bibliothèque et le robot dans l'environnement réduit de TORCS. 
       
-      \paragraph{Implémenter fonction de Récompenses}
+      \paragraph{Implémenter mesure de Perf.} Pour permettre de comparer les différents algorithmes et les différents 
       
-      \paragraph{Modifier interface TORCS}
-    
-    \subsection{Rôles et responsabilités} test
-	    
-    \subsection{Calendrier} 
-      \begin{figure}[h!]
-	\centerline{\includegraphics[width=20cm, clip=true, trim= 0 450 0 72]{../images/Gantt.pdf} }
-	\caption{Diagramme de Gantt \scriptsize{(zoomer pour meilleur qualité)}}
-      \end{figure}
-
-      \begin{figure}[h!]
-	\centerline{\includegraphics[width=20cm, clip=true, trim= 0 450 0 72]{../images/GanttR.pdf} }
-	\caption{Diagramme de Gantt par Ressource \scriptsize{(zoomer pour meilleur qualité)}}
-      \end{figure}
-	
-      \begin{figure}[h!]
+      \paragraph{Modifier interface TORCS} Intégrer les retours positifs/négatifs de l'expert.
+      
+      \paragraph{Fonctionnalités additionnelles} Continuer le développement parmi les fonctions facultatives dont nous
+      avons parlé dans \cite{CdC}.
+      
+      \begin{figure}[H]
 	\centerline{\includegraphics[width=19cm, clip=true, trim= 0 0 0 0]{../images/Gantt_PERT.png} }
 	\caption{Diagramme de PERT \scriptsize{(zoomer pour meilleur qualité)}}
       \end{figure}
+    
+    \subsection{Rôles et responsabilités} 
+      \begin{figure}[H]
+	\centerline{\includegraphics[width=20cm, clip=true, trim= 0 480 0 72]{../images/GanttR.pdf} }
+	\caption{Diagramme de Gantt par Ressource \scriptsize{(zoomer pour meilleur qualité)}}
+      \end{figure}
+    \subsection{Calendrier} 
+      \begin{figure}[H]
+	\centerline{\includegraphics[width=20cm, clip=true, trim= 0 440 0 72]{../images/Gantt.pdf} }
+	\caption{Diagramme de Gantt \scriptsize{(zoomer pour meilleur qualité)}}
+      \end{figure}
+
+
+	
+
 	
 \begin{center}
 
