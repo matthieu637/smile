@@ -2,16 +2,6 @@
 
 function rmb(){
 
-svn del --force *.toc
-svn del --force *.log
-svn del --force *.bbl
-svn del --force *.blg
-svn del --force *.out
-svn del --force *.aux
-svn del --force *~
-svn del --force *.gz
-svn del --force *.backup
-
 rm *.toc
 rm *.log
 rm *.bbl
