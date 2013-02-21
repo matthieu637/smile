@@ -15,6 +15,12 @@
 # mac filesystem
 .DS_Store
 
+# linux 
+.directory/
+*~
+*.swp
+*.kate-swp
+
 # useless latex files
 *.toc
 *.log
@@ -25,4 +31,9 @@
 *.aux
 *.gz
 *.backup
+
+#TORCS sources too big
+torcs.base/
+torcs-1.3.4/
+torcs-1.3.4.tar.bz2
 
