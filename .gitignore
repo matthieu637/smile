@@ -12,6 +12,7 @@
 *.la
 *.a
 
+# mac filesystem
 .DS_Store
 
 # linux 
@@ -19,3 +20,14 @@
 *~
 *.swp
 *.kate-swp
+
+# useless latex files
+*.toc
+*.log
+*.bbl
+*.blg
+*.out
+*~
+*.aux
+*.gz
+*.backup
