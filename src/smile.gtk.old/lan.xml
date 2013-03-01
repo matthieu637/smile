@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    file                 : lan.xml
+-->
+<!DOCTYPE params SYSTEM "../../libs/tgf/params.dtd">
+
+<params name="lan" type="robotdef">
+  <section name="Robots">
+    <section name="index">
+
+      <section name="0">
+        <attstr name="name" val="lan_1"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="lan"></attstr>
+        <attstr name="author" val="matt"></attstr>
+        <attstr name="car name" val="car1-stock1"></attstr>
+        <attnum name="race number" val="1"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.0"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
+      </section>
+
+    </section>
+  </section>
+</params>
