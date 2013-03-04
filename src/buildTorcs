@@ -15,4 +15,11 @@ make > /dev/null
 echo "compil done"
 sudo make install > /dev/null
 sudo make datainstall > /dev/null
+echo "install done"
+
+cd ..
+mkdir -p ~/.torcs/config/raceman/
+cp xml/*.xml ~/.torcs/config/
+mv ~/.torcs/config/quickrace.xml ~/.torcs/config/raceman/
+echo "config done"
 
