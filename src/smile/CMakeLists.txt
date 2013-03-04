@@ -1,0 +1,29 @@
+cmake_minimum_required(VERSION 2.8)
+
+#Nom du projet
+project(SmileLib CXX)
+
+find_package(Boost COMPONENTS system REQUIRED)
+
+
+include_directories(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS} )
+
+
+file ( GLOB_RECURSE sources src/*.cpp include/*.hpp)
+
+set(CMAKE_CXX_FLAGS "-g -DDEBUG -Wall -Wextra -std=c++11 -fPIC -fno-strict-aliasing -O2 -DUSE_RANDR_EXT -DGL_GLEXT_PROTOTYPES -D_SVID_SOURCE -D_BSD_SOURCE -DSHM -DHAVE_CONFIG_H")
+set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/lib")
+
+set(TYPE_LIB STATIC CACHE STRING "(STATIC or SHARED)")
+
+if(TYPE_LIB MATCHES SHARED)
+  add_library(smile SHARED ${sources})
+else()
+  add_library(smile STATIC ${sources})
+endif()
+
+target_link_libraries(smile ${Boost_LIBRARIES})
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+  set_target_properties(smile PROPERTIES DEBUG_POSTFIX -d)
+endif()
