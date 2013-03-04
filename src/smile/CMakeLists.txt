@@ -11,7 +11,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS} )
 
 file ( GLOB_RECURSE sources src/*.cpp include/*.hpp)
 
-set(CMAKE_CXX_FLAGS "-g -DDEBUG -Wall -Wextra -std=c++11 -fPIC -fno-strict-aliasing -O2 -DUSE_RANDR_EXT -DGL_GLEXT_PROTOTYPES -D_SVID_SOURCE -D_BSD_SOURCE -DSHM -DHAVE_CONFIG_H")
+set(CMAKE_CXX_FLAGS "-g -DDEBUG -Wall -Wextra -std=c++11 -fPIC -fno-strict-aliasing -DUSE_RANDR_EXT -DGL_GLEXT_PROTOTYPES -D_SVID_SOURCE -D_BSD_SOURCE -DSHM -DHAVE_CONFIG_H")
 set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/lib")
 
 set(TYPE_LIB STATIC CACHE STRING "(STATIC or SHARED)")
