@@ -9,7 +9,7 @@ echo "remove done"
 cp -r torcs.base torcs-1.3.4
 echo "cp done"
 cd torcs-1.3.4
-cp -r ../lan src/drivers/lan
+cp -r ../driver src/drivers/smile
 ./configure --enable-debug > /dev/null
 make > /dev/null
 echo "compil done"
