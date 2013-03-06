@@ -31,11 +31,11 @@
 #define NBBOTS 1
 
 static const char* botname[NBBOTS] = {
-	"smile_1"
+    "smile_1"
 };
 
 static const char* botdesc[NBBOTS] = {
-	"Discretize Q learning"
+    "Discretize Q learning"
 };
 
 static Driver *driver[NBBOTS];
@@ -52,21 +52,21 @@ static void endRace(int index, tCarElt *car, tSituation *s);
 /* Module entry point */
 extern "C" int smile(tModInfo *modInfo)
 {
-	int i;
+    int i;
 
-	/* clear all structures */
-	
-	memset(modInfo, 0, 10*sizeof(tModInfo));
+    /* clear all structures */
 
-	for (i = 0; i < NBBOTS; i++) {
-		modInfo[i].name    = strdup(botname[i]);	/* name of the module (short) */
-		modInfo[i].desc    = strdup(botdesc[i]);	/* description of the module (can be long) */
-		modInfo[i].fctInit = InitFuncPt;			/* init function */
-		modInfo[i].gfId    = ROB_IDENT;				/* supported framework version */
-		modInfo[i].index   = i;						/* indices from 0 to 9 */
-	}
-	
-	return 0;
+    memset(modInfo, 0, 10*sizeof(tModInfo));
+
+    for (i = 0; i < NBBOTS; i++) {
+        modInfo[i].name    = strdup(botname[i]);	/* name of the module (short) */
+        modInfo[i].desc    = strdup(botdesc[i]);	/* description of the module (can be long) */
+        modInfo[i].fctInit = InitFuncPt;			/* init function */
+        modInfo[i].gfId    = ROB_IDENT;				/* supported framework version */
+        modInfo[i].index   = i;						/* indices from 0 to 9 */
+    }
+
+    return 0;
 }
 
 
@@ -74,42 +74,41 @@ extern "C" int smile(tModInfo *modInfo)
 static int InitFuncPt(int index, void *pt)
 {
 
-  tRobotItf *itf = (tRobotItf *)pt;
+    tRobotItf *itf = (tRobotItf *)pt;
 
-	/* create robot instance for index */
-	driver[index] = new QLearnDiscr(index);
-	itf->rbNewTrack = initTrack;	/* Give the robot the track view called */
-	itf->rbNewRace  = newRace;		/* Start a new race */
-	itf->rbDrive    = drive;		/* Drive during race */
-	itf->rbPitCmd   = NULL;		/* Pit commands */
-	itf->rbEndRace  = endRace;		/* End of the current race */
-	itf->rbShutdown = shutdown;		/* Called before the module is unloaded */
-	itf->index      = index;		/* Index used if multiple interfaces */
-  
-	return 0;
+    /* create robot instance for index */
+    driver[index] = new QLearnDiscr(index);
+    itf->rbNewTrack = initTrack;	/* Give the robot the track view called */
+    itf->rbNewRace  = newRace;		/* Start a new race */
+    itf->rbDrive    = drive;		/* Drive during race */
+    itf->rbPitCmd   = NULL;		/* Pit commands */
+    itf->rbEndRace  = endRace;		/* End of the current race */
+    itf->rbShutdown = shutdown;		/* Called before the module is unloaded */
+    itf->index      = index;		/* Index used if multiple interfaces */
+
+    return 0;
 }
 
 
 /* Called for every track change or new race. */
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s)
 {
-	*carParmHandle = NULL; 
-	driver[index]->initTrack(track, carHandle, carParmHandle, s);
+    driver[index]->initTrack(track, carHandle, carParmHandle, s);
 }
 
 
 /* Start a new race. */
 static void newRace(int index, tCarElt* car, tSituation *s)
 {
-	driver[index]->newRace(car, s);
+    driver[index]->newRace(car, s);
 }
 
 
 /* Drive during race. */
 static void drive(int index, tCarElt* car, tSituation *s)
 {
-	(void) car;
-	driver[index]->drive(s);
+    (void) car;
+    driver[index]->drive(s);
 }
 
 
@@ -123,14 +122,14 @@ static void drive(int index, tCarElt* car, tSituation *s)
 /* End of the current race */
 static void endRace(int index, tCarElt *car, tSituation *s)
 {
-	(void) car;
-	driver[index]->endRace(s);
+    (void) car;
+    driver[index]->endRace(s);
 }
 
 
 /* Called before the module is unloaded */
 static void shutdown(int index)
 {
-	delete driver[index];
+    delete driver[index];
 }
 

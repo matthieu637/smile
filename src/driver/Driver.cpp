@@ -16,6 +16,9 @@ Driver::Driver(int index, int intervalAction)
     INDEX = index;
     INTERVAL_ACTION = intervalAction;
     UNSTUCK_TIME_LIMIT = 2.0/INTERVAL_ACTION;				/* [s] */
+    
+    decision_each = 0;
+    stuck = 0;
 }
 
 Driver::~Driver()
@@ -34,7 +37,7 @@ void Driver::endRace(tSituation* s)
 void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituation *s)
 {
     track = t;
-   // *carParmHandle = NULL; 
+    *carParmHandle = NULL; //until it will bug with GfParmCheckHandle
     (void) carHandle;
     (void) s;
 }
@@ -59,6 +62,12 @@ void Driver::drive(tSituation *s)
     //memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
     update(s);
+
+    if(decision_each > INTERVAL_ACTION)
+    {
+        decision();
+        decision_each=0;
+    }
 }
 
 
@@ -107,12 +116,7 @@ void Driver::update(tSituation *s)
     angle = trackangle - car->_yaw;
     NORM_PI_PI(angle);
 
-    if(decision_each == INTERVAL_ACTION)
-    {
-        decision();
-        decision_each=0;
-    }
-    else decision_each++;
+    decision_each++;
 }
 
 

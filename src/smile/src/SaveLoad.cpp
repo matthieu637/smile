@@ -69,20 +69,19 @@ void SaveLoad::readQ(float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACT
 {
     named_mutex mutex( open_or_create, "qsync_mutex");
     mutex.lock();
-
+    
     FILE *fp = fopen("matrix.txt", "r");
     for(int i = 0; i < STATES_ALPHA; i++)
         for(int j = 0; j < STATES_DISTANCE; j++)
             for(int k = 0; k < ACTIONS_ACC; k++)
                 for(int m = 0; m < ACTIONS_DIRECTION; m++)
                     fscanf(fp, "%f", &Q[i][j][k][m]);
+    
     fclose(fp);
     mutex.unlock();
 }
 
 void SaveLoad::initializeQ(float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION) {
-
-    srand((unsigned)time(0));
 
     FILE *fp = fopen("matrix.txt", "r");
     if(fp != NULL)
@@ -92,8 +91,7 @@ void SaveLoad::initializeQ(float**** Q, int STATES_ALPHA, int STATES_DISTANCE, i
             for(int j = 0; j < STATES_DISTANCE; j++)
                 for(int k = 0; k < ACTIONS_ACC; k++)
                     for(int m = 0; m < ACTIONS_DIRECTION; m++)
-                        Q[i][j][k][m] = 0;
-
+                        Q[i][j][k][m] = 0.;
 
 }
 

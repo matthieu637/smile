@@ -27,7 +27,7 @@ public:
     float reward();
     void decision();
     ~QLearnDiscr();
-    virtual void newRace(tCarElt* car, tSituation *s);
+    void newRace(tCarElt* car, tSituation *s);
 
 private:
   DState discretize(const State& st);

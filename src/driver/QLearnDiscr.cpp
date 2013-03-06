@@ -9,8 +9,10 @@ QLearnDiscr::QLearnDiscr(int index):Driver(index, DECISION_EACH)
 }
 
 QLearnDiscr::~QLearnDiscr()
-{
+{ 
     sml::SaveLoad::writeQ(Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
+    
+    delete Q;//TODO:improve
 }
 
 float QLearnDiscr::reward() {
@@ -73,8 +75,6 @@ void QLearnDiscr::decision()
             (float) Q[lastState.alpha][lastState.distance][lastAction.acc][lastAction.direc] + //alpha*N[lastState.alpha][lastState.distance][lastAction.acc][lastAction.direc]*
             lrate*(r+discount*Q[dst.alpha][dst.distance][dac.acc][dac.direc] - Q[lastState.alpha][lastState.distance][lastAction.acc][lastAction.direc] );
 
-
-
     }
 
     if(sml::Utils::rand01() < espilon ) {
@@ -93,7 +93,20 @@ void QLearnDiscr::decision()
 
 void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
     Driver::newRace(car,s);
-    Q = (float****) new float[STATES_ALPHA][STATES_DISTANCE][ACTIONS_ACC][ACTIONS_DIRECTION];
+    
+    
+    Q = new float***[STATES_ALPHA];//[STATES_DISTANCE][ACTIONS_ACC][ACTIONS_DIRECTION];
+    for(int i = 0; i < STATES_ALPHA; i++) {
+        Q[i] = new float**[STATES_DISTANCE];
+        for(int j = 0; j < STATES_DISTANCE; j++) {
+            Q[i][j] = new float*[ACTIONS_ACC];
+            for(int k = 0; k < ACTIONS_ACC; k++) {
+                Q[i][j][k] = new float[ACTIONS_DIRECTION];
+            }
+        }
+    }
+    
+  
     sml::SaveLoad::initializeQ(Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
 }
 
