@@ -27,15 +27,16 @@
 #include <math.h>
 
 #include "QLearnDiscr.hpp"
+#include <QLearnDiscr2.hpp>
 
-#define NBBOTS 1
+#define NBBOTS 2
 
 static const char* botname[NBBOTS] = {
-    "smile_1"
+    "smile_0", "smile_1"
 };
 
 static const char* botdesc[NBBOTS] = {
-    "Discretize Q learning"
+    "Discretize Q learning", "Discretize Q learning without geering"
 };
 
 static Driver *driver[NBBOTS];
@@ -77,7 +78,16 @@ static int InitFuncPt(int index, void *pt)
     tRobotItf *itf = (tRobotItf *)pt;
 
     /* create robot instance for index */
-    driver[index] = new QLearnDiscr(index);
+
+    switch(index) {
+    case 0:
+        driver[index] = new QLearnDiscr(index);
+        break;
+    case 1:
+        driver[index] = new QLearnDiscr2(index);
+        break;
+    }
+    
     itf->rbNewTrack = initTrack;	/* Give the robot the track view called */
     itf->rbNewRace  = newRace;		/* Start a new race */
     itf->rbDrive    = drive;		/* Drive during race */

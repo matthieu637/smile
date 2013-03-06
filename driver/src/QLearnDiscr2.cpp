@@ -1,21 +1,21 @@
-#include "QLearnDiscr.hpp"
+#include "QLearnDiscr2.hpp"
 #include <sml/SaveLoad.hpp>
 #include <sml/Utils.hpp>
 #include <iostream>
 
-QLearnDiscr::QLearnDiscr(int index):Driver(index, DECISION_EACH)
+QLearnDiscr2::QLearnDiscr2(int index):Driver(index, DECISION_EACH)
 {
 
 }
 
-QLearnDiscr::~QLearnDiscr()
+QLearnDiscr2::~QLearnDiscr2()
 { 
-    sml::SaveLoad::writeQ("smile0.data", Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
+    sml::SaveLoad::writeQ("smile1.data", Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
     
     delete Q;//TODO:improve
 }
 
-float QLearnDiscr::reward() {
+float QLearnDiscr2::reward() {
     float distanceMilieu = 10. - abs( car->_trkPos.toMiddle );
     float distParcourue;
     float dammageGet = car->_dammage - lastDammage;
@@ -60,7 +60,7 @@ float QLearnDiscr::reward() {
     return r;
 }
 
-void QLearnDiscr::decision()
+void QLearnDiscr2::decision()
 {
 
     float r = reward();
@@ -91,7 +91,7 @@ void QLearnDiscr::decision()
 
 }
 
-void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
+void QLearnDiscr2::newRace(tCarElt* car, tSituation *s) {
     Driver::newRace(car,s);
     
     
@@ -107,11 +107,11 @@ void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
     }
     
   
-    sml::SaveLoad::initializeQ("smile0.data", Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
+    sml::SaveLoad::initializeQ("smile1.data", Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
 }
 
 
-DState QLearnDiscr::discretize(const State& st) {
+DState QLearnDiscr2::discretize(const State& st) {
     //pointer me
     DState dst = {0,0} ; //init me pls or bug
 
@@ -139,7 +139,7 @@ DState QLearnDiscr::discretize(const State& st) {
     return dst;
 }
 
-DAction QLearnDiscr::bestQVal(const DState& dst) {
+DAction QLearnDiscr2::bestQVal(const DState& dst) {
 
 
     DAction imax= {rand() % ACTIONS_ACC, rand() % ACTIONS_DIRECTION}; //pointer me
@@ -160,7 +160,7 @@ DAction QLearnDiscr::bestQVal(const DState& dst) {
     return imax;
 }
 
-void QLearnDiscr::applyActionOn(const DAction& ac, tCarElt* car) {
+void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
     float smin = -0.4;
     float smax = 0.4;
 
@@ -187,16 +187,8 @@ void QLearnDiscr::applyActionOn(const DAction& ac, tCarElt* car) {
     {
         accel -= 4;
         accel = 3 - accel;
-        car->ctrl.gear = 1;
+        car->ctrl.gear = getGear();
         car->ctrl.brakeCmd = 0;
         car->ctrl.accelCmd = accel / 4.;
-    }
-    else
-    {
-        accel -= 7;
-        accel = 3 - accel;
-        car->ctrl.gear = 2;
-        car->ctrl.brakeCmd = 0;
-        car->ctrl.accelCmd = 1. - (accel / 4.);
     }
 }
