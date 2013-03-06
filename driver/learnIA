@@ -1,19 +1,23 @@
 #!/bin/bash
 
+
 launch(){
 
-torcs -r ~/.torcs/config/raceman/dtmrace.xml > /dev/null
+index=$1
+nbCPU=$2
+file="smile${index}.data"
 
-nbCPU=$1
+torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null
+
 for i in {1..1000}
 do 
-  lsize=`cat /usr/local/share/games/torcs/matrix.txt | grep -v '0[.]0' | wc -l`
+  lsize=`cat /usr/local/share/games/torcs/$file | grep -v '0[.]0' | wc -l`
   episod=`expr $i \* 3 \* $nbCPU`
   echo "iter : $i | state learned : $lsize | simulated races :  $episod"
   pid=""
   for ((q=1; q <= $nbCPU ; q++))
   do
-    torcs -r ~/.torcs/config/raceman/dtmrace.xml > /dev/null &
+    torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null
     pid="$pid $!"
   done
   for p in $pid
@@ -25,11 +29,10 @@ done
 }
 
 
-if [ $# -eq 0 ] ; then
-  nbCPU=`cat /proc/cpuinfo | grep processor | wc -l`
-  launch $nbCPU
+if [ ! $# -eq 2 ] ; then
+	echo "Usage : $0 <index> <cpu>"
 else
-  launch $1
+  launch $1 $2
 fi
 
 

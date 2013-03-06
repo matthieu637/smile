@@ -18,7 +18,7 @@ void SaveLoad::syncQ(const string& chemin, float**** Q, int STATES_ALPHA, int ST
     named_mutex mutex( open_or_create, chemin.c_str());
     mutex.lock();
 
-    FILE *fp = fopen("matrix.txt", "w+");
+    FILE *fp = fopen(chemin.c_str(), "w+");
 
     //si le fichier n'existe pas, pas de sync
     fseek(fp, 0, SEEK_END);
@@ -55,7 +55,7 @@ void SaveLoad::writeQ(const string& chemin, float**** Q, int STATES_ALPHA, int S
     named_mutex mutex( open_or_create, chemin.c_str());
     mutex.lock();
 
-    FILE *fp = fopen("matrix.txt", "w");
+    FILE *fp = fopen(chemin.c_str(), "w");
     for(int i = 0; i < STATES_ALPHA; i++)
         for(int j = 0; j < STATES_DISTANCE; j++)
             for(int k = 0; k < ACTIONS_ACC; k++)
@@ -71,7 +71,7 @@ void SaveLoad::readQ(const string& chemin, float**** Q, int STATES_ALPHA, int ST
     named_mutex mutex( open_or_create, chemin.c_str());
     mutex.lock();
     
-    FILE *fp = fopen("matrix.txt", "r");
+    FILE *fp = fopen(chemin.c_str(), "r");
     for(int i = 0; i < STATES_ALPHA; i++)
         for(int j = 0; j < STATES_DISTANCE; j++)
             for(int k = 0; k < ACTIONS_ACC; k++)
@@ -84,7 +84,7 @@ void SaveLoad::readQ(const string& chemin, float**** Q, int STATES_ALPHA, int ST
 
 void SaveLoad::initializeQ(const string& chemin, float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION) {
 
-    FILE *fp = fopen("matrix.txt", "r");
+    FILE *fp = fopen(chemin.c_str(), "r");
     if(fp != NULL)
         readQ(chemin, Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
     else

@@ -9,7 +9,7 @@
     <section name="index">
 
       <section name="0">
-        <attstr name="name" val="smile_1"></attstr>
+        <attstr name="name" val="smile_0"></attstr>
         <attstr name="desc" val="Q learning discretize"></attstr>
         <attstr name="team" val="smile"></attstr>
         <attstr name="author" val="lanmatt"></attstr>
@@ -19,6 +19,20 @@
         <attnum name="green" val="0.0"></attnum>
         <attnum name="blue" val="1.0"></attnum>
       </section>
+
+      <section name="1">
+        <attstr name="name" val="smile_1"></attstr>
+        <attstr name="desc" val="Q learning discretize without geering"></attstr>
+        <attstr name="team" val="smile"></attstr>
+        <attstr name="author" val="lanmatt"></attstr>
+        <attstr name="car name" val="car1-stock1"></attstr>
+        <attnum name="race number" val="1"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.0"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
+      </section>
+
+
 
     </section>
   </section>
