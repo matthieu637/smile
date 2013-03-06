@@ -10,7 +10,7 @@
 
       <section name="0">
         <attstr name="name" val="smile_1"></attstr>
-        <attstr name="desc" val="Q learning discretize"></attstr>
+        <attstr name="desc" val=""></attstr>
         <attstr name="team" val="smile"></attstr>
         <attstr name="author" val="lanmatt"></attstr>
         <attstr name="car name" val="car1-stock1"></attstr>
