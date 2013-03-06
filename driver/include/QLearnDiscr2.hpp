@@ -29,15 +29,17 @@ private:
     static const int ACTIONS_DIRECTION = 10;
 
     float ****Q;//[STATES_ALPHA][STATES_DISTANCE][ACTIONS_ACC][ACTIONS_DIRECTION];
+    float ****N;
     
     float lastDist = -1;
     float lastDammage = 0;
     DState lastState={-1,-1};
     DAction lastAction;
     
-    const float lrate = 0.05;
-    const float discount = 0.35;
-    const float espilon = 0.05;
+    const float lamba = 0.8;
+    const float lrate = 0.2;
+    const float discount = 0.2;
+    const float espilon = 0.025;
 };
 
 #endif // QLEARNDISCR_HPP

@@ -49,8 +49,8 @@ private:
     DState lastState={-1,-1};
     DAction lastAction;
     
-    const float lrate = 0.05;
-    const float discount = 0.35;
+    const float lrate = 0.2;
+    const float discount = 0.2;
     const float espilon = 0.05;
 };
 
