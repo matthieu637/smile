@@ -1,3 +1,0 @@
-gcc -fPIC `pkg-config --cflags gtk+-2.0` -c test.c
-c++ -g -O2 -Wall -fPIC -fno-strict-aliasing -O2 -DUSE_RANDR_EXT -DGL_GLEXT_PROTOTYPES -Wall -fPIC -fno-strict-aliasing -O2 -DUSE_RANDR_EXT -DGL_GLEXT_PROTOTYPES -D_SVID_SOURCE -D_BSD_SOURCE -DSHM -DHAVE_CONFIG_H -I/home/matthieu/workspace/cpp/torcs/torcs-1.3.4/export/include -I. `pkg-config --cflags gtk+-2.0` -c smile.cpp
-g++ -shared test.o smile.o -lgtk-x11-2.0 -lgdk-x11-2.0 -lpangocairo-1.0 -latk-1.0 -lcairo -lgdk_pixbuf-2.0 -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lfreetype -lfontconfig -L/usr/lib
