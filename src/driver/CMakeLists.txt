@@ -17,5 +17,9 @@ file ( GLOB_RECURSE SOURCE *.cpp *.c)
 add_library(driver SHARED ${HEADER} ${SOURCE})
 target_link_libraries(driver ${SMILE_LIBRARY} ${Boost_LIBRARIES} )
 
-#file(RENAME build/libdriver.so build/smile.so)
+#install 
 install(FILES build/libdriver.so DESTINATION /usr/local/lib/torcs/drivers/smile/ RENAME smile.so)
+
+#install data
+file(GLOB_RECURSE files "${CMAKE_SOURCE_DIR}/data/*.xml" "${CMAKE_SOURCE_DIR}/data/*.rgb")
+install(FILES ${files} DESTINATION /usr/local/share/games/torcs/drivers/smile/)
