@@ -7,14 +7,15 @@
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/interprocess/sync/named_mutex.hpp>
 
+
 namespace sml{
 
 using namespace boost::interprocess;
 
-void SaveLoad::syncQ(float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION)
+void SaveLoad::syncQ(const string& chemin, float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION)
 {
 
-    named_mutex mutex( open_or_create, "qsync_mutex");
+    named_mutex mutex( open_or_create, chemin.c_str());
     mutex.lock();
 
     FILE *fp = fopen("matrix.txt", "w+");
@@ -49,9 +50,9 @@ void SaveLoad::syncQ(float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACT
 }
 
 
-void SaveLoad::writeQ(float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION)
+void SaveLoad::writeQ(const string& chemin, float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION)
 {
-    named_mutex mutex( open_or_create, "qsync_mutex");
+    named_mutex mutex( open_or_create, chemin.c_str());
     mutex.lock();
 
     FILE *fp = fopen("matrix.txt", "w");
@@ -65,9 +66,9 @@ void SaveLoad::writeQ(float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int AC
 }
 
 
-void SaveLoad::readQ(float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION)
+void SaveLoad::readQ(const string& chemin, float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION)
 {
-    named_mutex mutex( open_or_create, "qsync_mutex");
+    named_mutex mutex( open_or_create, chemin.c_str());
     mutex.lock();
     
     FILE *fp = fopen("matrix.txt", "r");
@@ -81,11 +82,11 @@ void SaveLoad::readQ(float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACT
     mutex.unlock();
 }
 
-void SaveLoad::initializeQ(float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION) {
+void SaveLoad::initializeQ(const string& chemin, float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION) {
 
     FILE *fp = fopen("matrix.txt", "r");
     if(fp != NULL)
-        readQ(Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION );
+        readQ(chemin, Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
     else
         for(int i = 0; i < STATES_ALPHA; i++)
             for(int j = 0; j < STATES_DISTANCE; j++)

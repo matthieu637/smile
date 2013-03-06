@@ -10,7 +10,7 @@ QLearnDiscr::QLearnDiscr(int index):Driver(index, DECISION_EACH)
 
 QLearnDiscr::~QLearnDiscr()
 { 
-    sml::SaveLoad::writeQ(Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
+    sml::SaveLoad::writeQ("matrixQLearnDiscr.txt", Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
     
     delete Q;//TODO:improve
 }
@@ -107,7 +107,7 @@ void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
     }
     
   
-    sml::SaveLoad::initializeQ(Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
+    sml::SaveLoad::initializeQ("matrixQLearnDiscr.txt", Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
 }
 
 
