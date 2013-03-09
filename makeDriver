@@ -1,0 +1,34 @@
+#!/bin/bash
+
+debug='-D CMAKE_BUILD_TYPE=Debug'    # debug='' pour build en release
+
+#Trouve le nombre de core
+core=`grep -c ^processor /proc/cpuinfo`
+jobs=`expr $core + 1`
+
+if [ ! -e ./library ]; then
+	echo "Placez vous dans risk/"
+	exit 1
+fi
+
+if [ ! -e library/build ]; then
+	mkdir library/build
+fi
+
+if [ ! -e driver/build ]; then
+	mkdir driver/build
+fi
+
+cd library/build
+cmake $debug ..
+if [ $? -ne 0 ]; then exit 1 ; fi 
+make -j$jobs
+if [ $? -ne 0 ]; then exit 1 ; fi 
+
+cd ../../driver/build
+cmake $debug ..
+if [ $? -ne 0 ]; then exit 1 ; fi 
+make -j$jobs
+if [ $? -ne 0 ]; then exit 1 ; fi 
+
+

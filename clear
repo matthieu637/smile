@@ -1,0 +1,5 @@
+rm -rf driver/build/*
+rm -rf library/build/*
+rm -rf library/lib/*
+
+
