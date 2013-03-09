@@ -4,6 +4,10 @@
 
 namespace sml{
 
+ActionTemplate::ActionTemplate(){
+  
+}
+  
 ActionTemplate::ActionTemplate(const std::list<string>& names, const std::list<int>& sizes): actionNames(names.size()), sizes(sizes) {
     assert(names.size() == sizes.size());
 

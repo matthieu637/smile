@@ -22,7 +22,7 @@ private:
 class DAction {
 
 public:
-    //DAction();
+    DAction();//empty constructor for serialization
     DAction(const ActionTemplate* temp, const std::list<int>& vals);
     DAction(const ActionTemplate* temp, int value);
     ~DAction();
@@ -44,9 +44,26 @@ public:
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
+          boost::serialization::split_member(ar, *this, version);
+    }
+    
+    template<class Archive>
+    void save(Archive& ar, const unsigned int version) const{
       (void) version;
+      ar << make_nvp("Template", this->templ);
+      
       for(int i = 0 ; i< templ->actionNumber(); i++)
-	ar & make_nvp("values", values[i]);
+	ar << make_nvp("values", values[i]);
+    }
+    
+    template<class Archive>
+    void load(Archive& ar, const unsigned int version){
+      (void) version;
+      ar >> make_nvp("Template", this->templ);
+      
+      values = new int[this->templ->actionNumber()];
+      for(int i = 0 ; i< templ->actionNumber(); i++)
+	ar >> make_nvp("values", values[i]);
     }
 
 private:

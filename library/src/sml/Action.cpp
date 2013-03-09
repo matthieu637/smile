@@ -4,6 +4,9 @@
 
 namespace sml {
 
+DAction::DAction(){
+}
+  
 DAction::DAction(const ActionTemplate* temp, const std::list< int>& vals)
 {
     assert((int)vals.size() == temp->actionNumber());

@@ -41,7 +41,6 @@ private:
     boost::unordered_map< DState,  boost::unordered_map<DAction, double, DAction::hashfunctor> , DState::hashfunctor> *map;
     //TODO: could be slightly improve argmax performance with using multiset and hashmap
     //boost::unordered_map< DState,  std::multiset<DAction, double> , DState::hashfunctor> *map;
-
 };
 
 }

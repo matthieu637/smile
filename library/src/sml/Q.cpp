@@ -13,7 +13,7 @@ using namespace boost::interprocess;
 
 namespace sml {
 
-QTable::QTable(const StateTemplate* stmp, const ActionTemplate* atmp) {
+QTable::QTable(const StateTemplate* stmp, const ActionTemplate* atmp) { 
     map = new boost::unordered_map< DState,  boost::unordered_map<DAction, double, DAction::hashfunctor> , DState::hashfunctor>(stmp->sizeNeeded());
 
     boost::unordered_map<DAction, double, DAction::hashfunctor> actions(atmp->sizeNeeded());
@@ -27,18 +27,15 @@ QTable::QTable(const StateTemplate* stmp, const ActionTemplate* atmp) {
         DState st(stmp, i);
         (*map)[st] = actions;
     }
-    /*
-    DAction a(atmp, {2,2});
-    DState st(stmp, {2, 2});
-    LOG_DEBUG((*map)[st][a]);*/
 }
 
 void QTable::write(const string& chemin)
 {
     named_mutex mutex( open_or_create, chemin.c_str());
+//     mutex.unlock();
     mutex.lock();
 
-    bib::XMLEngine::save< boost::unordered_map< DState,  boost::unordered_map<DAction, double, DAction::hashfunctor> , DState::hashfunctor> >(*map, "map", chemin);
+    bib::XMLEngine::save< boost::unordered_map< DState,  boost::unordered_map<DAction, double, DAction::hashfunctor> , DState::hashfunctor> >(*map, "QTable", chemin);
 
     mutex.unlock();
 }
@@ -46,10 +43,10 @@ void QTable::write(const string& chemin)
 void QTable::read(const string& chemin)
 {
     named_mutex mutex( open_or_create, chemin.c_str());
+//     mutex.unlock();
     mutex.lock();
 
-    // QTable* q2 = bib::XMLEngine::load<QTable>("QTable", chemin);
-    // this->map = q2->map;
+    map = bib::XMLEngine::load< boost::unordered_map< DState,  boost::unordered_map<DAction, double, DAction::hashfunctor> , DState::hashfunctor> >("QTable", chemin);
 
     mutex.unlock();
 }
