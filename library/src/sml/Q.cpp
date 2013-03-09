@@ -12,7 +12,7 @@ namespace sml {
 QTable::QTable(){
   map = new std::unordered_map< DState,  std::unordered_map<DAction, double, DAction::hashfunc> , DState::hashfunc>(10);
   
-  sml::StateTemplate* omg = new sml::StateTemplate({"t"});
+  sml::StateTemplate* omg = new sml::StateTemplate({"t"},{3});
   DAction a(omg, {3});
   
   std::unordered_map<DAction, double,  DAction::hashfunc> op;

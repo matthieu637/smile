@@ -6,8 +6,9 @@ namespace sml {
 
 
 
-ActionTemplate::ActionTemplate(const std::initializer_list<string>& names): actionNames(names.size()) {
-
+ActionTemplate::ActionTemplate(const std::initializer_list<string>& names, const std::initializer_list<int>& sizes): actionNames(names.size()), sizes(sizes) {
+    assert(names.size() == sizes.size());
+  
     unsigned int i=0;
     for(std::initializer_list<string>::const_iterator it = names.begin(); it != names.end(); ++it)
     {
@@ -27,7 +28,11 @@ int ActionTemplate::actionNumber() const {
 }
 
 bool ActionTemplate::operator==(const ActionTemplate& ac) const{
-    return actionNames == ac.actionNames;
+    return actionNames == ac.actionNames && sizes == ac.sizes;
+}
+
+const std::list<int>* ActionTemplate::sizesActions() const{
+    return &this->sizes;
 }
 
 
