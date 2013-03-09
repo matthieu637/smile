@@ -1,4 +1,6 @@
 #include "sml/SaveLoad.hpp"
+#include <sml/Q.hpp>
+#include <bib/XMLEngine.hpp>
 
 
 #include <stdio.h>
@@ -48,6 +50,7 @@ void SaveLoad::syncQ(const string& chemin, float**** Q, int STATES_ALPHA, int ST
 
     mutex.unlock();
 }
+
 
 
 void SaveLoad::writeQ(const string& chemin, float**** Q, int STATES_ALPHA, int STATES_DISTANCE, int ACTIONS_ACC, int ACTIONS_DIRECTION)
