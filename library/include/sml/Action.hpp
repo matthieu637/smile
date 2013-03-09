@@ -19,6 +19,7 @@ public:
   ActionTemplate(const std::initializer_list<string>& names);
   int indexFor(const string& name) const;
   int actionNumber() const;
+  bool operator==(const ActionTemplate& ac) const;
 private :
   //std::list<string> actionNames;
   std::unordered_map< string, int> actionNames;

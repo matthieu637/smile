@@ -7,7 +7,7 @@ namespace sml {
 
 
 ActionTemplate::ActionTemplate(const std::initializer_list<string>& names): actionNames(names.size()) {
-    
+
     unsigned int i=0;
     for(std::initializer_list<string>::const_iterator it = names.begin(); it != names.end(); ++it)
     {
@@ -16,58 +16,63 @@ ActionTemplate::ActionTemplate(const std::initializer_list<string>& names): acti
     }
 }
 
-int ActionTemplate::indexFor(const string& name) const{
+int ActionTemplate::indexFor(const string& name) const {
 //     LOG_DEBUG(name << " " << actionNames.size());
     assert(name.size() > 0 && actionNames.find(name) != actionNames.end());
     return actionNames.at(name);
 }
 
-int ActionTemplate::actionNumber() const{
+int ActionTemplate::actionNumber() const {
     return actionNames.size();
+}
+
+bool ActionTemplate::operator==(const ActionTemplate& ac) const{
+    return actionNames == ac.actionNames;
 }
 
 
 DAction::DAction(const ActionTemplate* temp, const std::initializer_list< int>& vals)
 {
-  assert(vals.size() == temp->actionNumber());
-  
-  this->templ = temp;
-  
-  values = new int[templ->actionNumber()];
-  int i = 0;
-  for(std::initializer_list< int>::const_iterator it = vals.begin(); it != vals.end(); ++it)
-  {
-    values[i]= *it;
-    i++;
-  }
+    assert((int)vals.size() == temp->actionNumber());
+
+    this->templ = temp;
+
+    values = new int[templ->actionNumber()];
+    int i = 0;
+    for(std::initializer_list< int>::const_iterator it = vals.begin(); it != vals.end(); ++it)
+    {
+        values[i]= *it;
+        i++;
+    }
 }
 
-DAction::~DAction(){//FIXME
+DAction::~DAction() { //FIXME
 //   if(values != nullptr)
 //     delete[] values;
 }
 
- int DAction::get(const string& name) const{
+int DAction::get(const string& name) const {
     return values[templ->indexFor(name)];
 }
 
-int DAction::operator[](const string& name) const{
+int DAction::operator[](const string& name) const {
     return get(name);
 }
 
-int& DAction::operator[](const string& name){ //cannot be inline
+int& DAction::operator[](const string& name) { //cannot be inline
     return values[templ->indexFor(name)];
 }
 
-bool DAction::operator==(const DAction& ac) const{
-//     if(*(ac.templ) != *(templ)) FIXME
-//       return false;
-  
-    for(int i=0;i<templ->actionNumber();i++)
-      if(values[i] != ac.values[i])
-	return false;
-      
-    return true;
+bool DAction::operator==(const DAction& ac) const {
+    if(*(ac.templ) == *(templ)) {
+
+        for(int i=0; i<templ->actionNumber(); i++)
+            if(values[i] != ac.values[i])
+                return false;
+
+        return true;
+    }
+    return false;
 }
 
 }
