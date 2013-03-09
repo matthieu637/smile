@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 #Nom du projet
 project(SmileLib CXX)
 
-find_package(Boost COMPONENTS system REQUIRED)
+find_package(Boost COMPONENTS system serialization REQUIRED)
 
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS} )
