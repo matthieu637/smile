@@ -13,30 +13,33 @@
 
 using boost::serialization::make_nvp;
 using std::string;
+using std::vector;
 
 namespace sml {
 
-typedef boost::unordered_map<DAction, double, DAction::hashfunctor> ActionsTable;
-typedef boost::unordered_map< DState,  ActionsTable , DState::hashfunctor> StateTable;
+typedef vector<double> hashmap;
   
 class QTable
 {
 public: 
     QTable(const StateTemplate* stmp, const ActionTemplate* atmp);
     
-    const ActionsTable* operator[](const DState& name) const; 
-    const DAction* argmax(const DState& name) const;
+    const hashmap* operator[](const DState& name) const; 
+    DAction* argmax(const DState& name) const;
     
     double operator()(const DState& s, const DAction& a) const;
     double& operator()(const DState& s, const DAction& a);
+    
+    double operator()(unsigned int s, unsigned int a) const;
+    double& operator()(unsigned int s, unsigned int a);
 
     void write(const string& chemin);
     void read(const string& chemin);
     
-    StateTable* getWholeCouple();
+    hashmap* getWholeCouple();
 
 private:
-    StateTable *map;
+    hashmap *map;
     //TODO: could be slightly improve argmax performance by using multiset and hashmap together
     
     const StateTemplate* stmpl;

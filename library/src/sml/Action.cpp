@@ -20,6 +20,8 @@ DAction::DAction(const ActionTemplate* temp, const std::list< int>& vals)
         values[i]= *it;
         i++;
     }
+    
+    computehash();
 }
 
 DAction::DAction(const ActionTemplate* temp, int value) {
@@ -41,6 +43,8 @@ DAction::DAction(const ActionTemplate* temp, int value) {
         for(int j=0; j < (templ->actionNumber() -1) - (i + 1); j++) //refill
             it--;
     }
+    
+    hashmem = value;
 }
 
 DAction::~DAction() { //FIXME
@@ -56,11 +60,17 @@ int DAction::operator[](const string& name) const {
     return get(name);
 }
 
-int& DAction::operator[](const string& name) { //cannot be inline
-    return values[templ->indexFor(name)];
+void DAction::set(const string& name, int value){
+  values[templ->indexFor(name)] = value;
+  computehash();
 }
 
 unsigned int DAction::hash() const
+{
+    return hashmem;
+}
+
+void DAction::computehash()
 {
     unsigned int hash = 0;
     list<int>::const_iterator it = templ->sizesActions()->begin();
@@ -78,7 +88,7 @@ unsigned int DAction::hash() const
             it--;
     }
 
-    return hash;
+    hashmem = hash;
 }
 
 bool DAction::operator==(const DAction& ac) const {

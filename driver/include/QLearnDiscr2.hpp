@@ -15,15 +15,15 @@ class QLearnDiscr2 : public Driver
 
 public:
     QLearnDiscr2(int index);
-    float reward();
+    double reward();
     void decision();
     ~QLearnDiscr2();
     void newRace(tCarElt* car, tSituation *s);
 
 private:
   struct State {
-    float alpha; //direction
-    float distance;
+    double alpha; //direction
+    double distance;
   };
   
   DState* discretize(const State& st);
@@ -41,19 +41,19 @@ private:
     static const sml::StateTemplate STATE_TEMPLATE;
     
     
-    //float ****Q;//[STATES_ALPHA][STATES_DISTANCE][ACTIONS_ACC][ACTIONS_DIRECTION];
+    //double ****Q;//[STATES_ALPHA][STATES_DISTANCE][ACTIONS_ACC][ACTIONS_DIRECTION];
     QTable Q, N;
     
-    float lastDist = -1;
-    float lastDammage = 0;
+    double lastDist = -1;
+    double lastDammage = 0;
     bool init = false;
     DState* lastState;
     const DAction* lastAction;
     
-    const float lamba = 0.8;
-    const float lrate = 0.2;
-    const float discount = 0.2;
-    const float espilon = 0.025;
+    const double lamba = 0.8;
+    const double lrate = 0.2;
+    const double discount = 0.2;
+    const double espilon = 0.025;
 };
 
 #endif // QLEARNDISCR_HPP

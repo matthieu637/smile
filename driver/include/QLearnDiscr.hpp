@@ -4,21 +4,6 @@
 
 #include "Driver.hpp"
 
-struct State {
-    float alpha; //direction
-    float distance;
-};
-
-struct DState {
-    int alpha;
-    int distance;
-};
-
-struct DAction {
-    int acc;
-    int direc;
-};
-
 class QLearnDiscr : public Driver
 {
 
@@ -30,6 +15,21 @@ public:
     void newRace(tCarElt* car, tSituation *s);
 
 private:
+  struct State {
+    float alpha; //direction
+    float distance;
+  };
+
+  struct DState {
+      int alpha;
+      int distance;
+  };
+
+  struct DAction {
+      int acc;
+      int direc;
+  };
+  
   DState discretize(const State& st);
   DAction bestQVal(const DState& dst);
   void applyActionOn(const DAction& ac, tCarElt* car);

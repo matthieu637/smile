@@ -29,16 +29,10 @@ public:
 //   int get( int index) const;
     int get(const string& name) const;
     int operator[](const string& name) const;
-    int& operator[](const string& name);
+    void set(const string& name, int value);
     bool operator==(const DAction& ac) const;
     bool operator<(const DAction& ac) const;
     unsigned int hash() const;
-
-    struct hashfunctor {
-        size_t operator() (const DAction& ac) const {
-            return ac.hash();
-        }
-    };
 
     
     template<class Archive>
@@ -67,8 +61,11 @@ public:
     }
 
 private:
+    void computehash();
+    
     int *values = nullptr;
     const ActionTemplate *templ;
+    int hashmem;
 };
 
 typedef DAction DState;

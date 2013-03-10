@@ -111,7 +111,7 @@ void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
 }
 
 
-DState QLearnDiscr::discretize(const State& st) {
+QLearnDiscr::DState QLearnDiscr::discretize(const State& st) {
     //pointer me
     DState dst = {0,0} ; //init me pls or bug
 
@@ -139,7 +139,7 @@ DState QLearnDiscr::discretize(const State& st) {
     return dst;
 }
 
-DAction QLearnDiscr::bestQVal(const DState& dst) {
+QLearnDiscr::DAction QLearnDiscr::bestQVal(const DState& dst) {
 
 
     DAction imax= {rand() % ACTIONS_ACC, rand() % ACTIONS_DIRECTION}; //pointer me
