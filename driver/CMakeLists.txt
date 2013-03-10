@@ -7,7 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set(SMILE_PATH "${CMAKE_SOURCE_DIR}/../library/" CACHE PATH "Chemin vers la librarie Bibliothèque")
 find_package(Smile REQUIRED)
-find_package(Boost COMPONENTS system serialization REQUIRED)
+find_package(Boost COMPONENTS system serialization filesystem REQUIRED)
 
 include_directories(include ../torcs/torcs-1.3.4/export/include ${SMILE_INCLUDE_DIRS} )
 

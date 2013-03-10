@@ -16,31 +16,31 @@ using std::string;
 
 namespace sml {
 
+typedef boost::unordered_map<DAction, double, DAction::hashfunctor> ActionsTable;
+typedef boost::unordered_map< DState,  ActionsTable , DState::hashfunctor> StateTable;
+  
 class QTable
 {
-public:
+public: 
     QTable(const StateTemplate* stmp, const ActionTemplate* atmp);
-  
-//     template<class Archive>
-//     void serialize(Archive& ar, const unsigned int version)
-//     {
-//         (void) version;
-//       //  ar & make_nvp("map", *map);
-//     }
-   
     
-    const boost::unordered_map<DAction, double, DAction::hashfunctor>* operator[](const DState& name) const; 
+    const ActionsTable* operator[](const DState& name) const; 
+    const DAction* argmax(const DState& name) const;
     
     double operator()(const DState& s, const DAction& a) const;
     double& operator()(const DState& s, const DAction& a);
 
     void write(const string& chemin);
     void read(const string& chemin);
+    
+    StateTable* getWholeCouple();
 
 private:
-    boost::unordered_map< DState,  boost::unordered_map<DAction, double, DAction::hashfunctor> , DState::hashfunctor> *map;
-    //TODO: could be slightly improve argmax performance with using multiset and hashmap
-    //boost::unordered_map< DState,  std::multiset<DAction, double> , DState::hashfunctor> *map;
+    StateTable *map;
+    //TODO: could be slightly improve argmax performance by using multiset and hashmap together
+    
+    const StateTemplate* stmpl;
+    const ActionTemplate* atmpl;
 };
 
 }
