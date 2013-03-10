@@ -128,13 +128,13 @@ QLearnDiscr::DState QLearnDiscr::discretize(const State& st) {
     float dismax = 6.;
 
     for(int i=0; i<STATES_DISTANCE; i++)
-        if(st.distance < dismin + (dismax-dismin/(float)STATES_DISTANCE)*(float)i) {
+        if(st.distance < dismin + ((dismax-dismin)/(float)STATES_DISTANCE)*(float)i) {
             dst.distance = i;
             break;
         }
 
-    //std::cout << "etat " << dst.alpha << " "<< dst.distance << " " << std::endl;
-    //std::cout << std::flush;
+//     std::cout << "etat " << dst.alpha << " "<< dst.distance << " " << std::endl;
+//     std::cout << std::flush;
 
     return dst;
 }

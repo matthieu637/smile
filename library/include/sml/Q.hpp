@@ -22,6 +22,7 @@ typedef vector<double> hashmap;
 class QTable
 {
 public: 
+    friend class boost::serialization::access;
     QTable(const StateTemplate* stmp, const ActionTemplate* atmp);
     
     const hashmap* operator[](const DState& name) const; 
@@ -37,14 +38,17 @@ public:
     void read(const string& chemin);
     
     hashmap* getWholeCouple();
+    void init();
 
 private:
-    hashmap *map;
+    hashmap *map = nullptr;
     //TODO: could be slightly improve argmax performance by using multiset and hashmap together
     
     const StateTemplate* stmpl;
     const ActionTemplate* atmpl;
 };
+
+
 
 }
 

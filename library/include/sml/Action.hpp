@@ -4,7 +4,7 @@
 
 #include <string>
 #include <boost/serialization/nvp.hpp>
-#include <boost/serialization/map.hpp>
+#include <boost/serialization/split_member.hpp>
 #include "sml/ActionTemplate.hpp"
 
 using std::string;
@@ -22,6 +22,7 @@ private:
 class DAction {
 
 public:
+    friend class boost::serialization::access;
     DAction();//empty constructor for serialization
     DAction(const ActionTemplate* temp, const std::list<int>& vals);
     DAction(const ActionTemplate* temp, int value);
@@ -35,12 +36,7 @@ public:
     unsigned int hash() const;
 
     
-    template<class Archive>
-    void serialize(Archive& ar, const unsigned int version)
-    {
-          boost::serialization::split_member(ar, *this, version);
-    }
-    
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
     template<class Archive>
     void save(Archive& ar, const unsigned int version) const{
       (void) version;

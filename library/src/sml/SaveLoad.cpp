@@ -36,7 +36,7 @@ void SaveLoad::syncQ(const string& chemin, float**** Q, int STATES_ALPHA, int ST
                         if(q != 0.0 && Q[i][j][k][m] == 0.0)
                             Q[i][j][k][m] = q;
                         else if( q != 0.0 && Q[i][j][k][m] != 0.0 )
-                            Q[i][j][k][m] = ( Q[i][j][k][m] + q*3. )/4.; //les valeurs déjà apprisent ont plus de poids
+                            Q[i][j][k][m] = ( Q[i][j][k][m] + q*2. )/3.; //les valeurs déjà apprisent ont plus de poids
                     }
     }
     rewind(fp);

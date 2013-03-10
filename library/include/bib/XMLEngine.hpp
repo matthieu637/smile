@@ -42,6 +42,7 @@ public:
     ofstream outputFile(file_name);
     xml_oarchive xml(outputFile);
     xml << make_nvp(name, object);
+    outputFile.close();
   }
 
 ///
@@ -58,6 +59,7 @@ public:
     ifstream inputFile(file_name);
     xml_iarchive xml(inputFile);
     xml >> make_nvp(name, object);
+    inputFile.close();
     return object;
   }
 };

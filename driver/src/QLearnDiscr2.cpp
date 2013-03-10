@@ -82,25 +82,44 @@ void QLearnDiscr2::decision()
     DState sp = *Psp;
 
     //Choose a' from s' using policy derived from Q
-    const DAction* PaP = Q.argmax(sp); //TODO:memory leak
+    DAction* PaP = Q.argmax(sp); //TODO:memory leak
     DAction ap = *PaP;
     DAction as = ap; //if a' ties for the max, then a* <- a'
-    if(sml::Utils::rand01() < espilon )
-        ap = DAction(&ACTION_TEMPLATE, {rand() % ACTIONS_ACC, rand() % ACTIONS_DIRECTION});
+    if(sml::Utils::rand01() < espilon ){
+        PaP = new DAction(&ACTION_TEMPLATE, {rand() % ACTIONS_ACC, rand() % ACTIONS_DIRECTION});//TODO:memory
+	ap = *PaP;
+    }
 
 
     if(init) {
         double delta = r + discount*Q(sp, as) - Q(s,a);
         N(s,a) = N(s, a) + 1.;
 
+	/*
         for(unsigned int sa = 0; sa < STATE_TEMPLATE.sizeNeeded(); sa++)
             for(unsigned int aa = 0; aa < ACTION_TEMPLATE.sizeNeeded(); aa++) {
-                Q(sa,aa) = Q(sa,aa) + lrate * delta * N(sa,aa);
+		  Q(sa,aa) = Q(sa,aa) + lrate * delta * N(sa,aa);
                 if(ap == as)
                     N(sa, aa) = discount*lamba*N(sa,aa);
                 else
                     N(sa, aa) = 0.;
-            }
+            }*/
+            
+        for(std::list< std::pair<DState* , DAction* > >::iterator it = history.begin(); it != history.end(); ++it ){
+	    DState sa = *(*it).first;
+	    DState aa = *(*it).second;
+	    Q(sa,aa) = Q(sa,aa) + lrate * delta * N(sa,aa);
+	    if(ap == as)
+	      N(sa, aa) = discount*lamba*N(sa,aa);
+	    else
+	      N(sa, aa) = 0.;
+	}
+            
+        if(ap == as);
+	else
+	  history.clear();
+            
+	history.push_back(std::pair<DState* , DAction* >(Psp, PaP));
     }
 
 
@@ -117,7 +136,9 @@ void QLearnDiscr2::decision()
 
 void QLearnDiscr2::newRace(tCarElt* car, tSituation *s) {
     Driver::newRace(car,s);
-
+    
+    Q.init();
+    N.init();
     Q.read("smile1.data");
 
     lastState = new DState(&STATE_TEMPLATE, 0);
@@ -129,7 +150,7 @@ DState* QLearnDiscr2::discretize(const State& st) {
     DState* dst = new DState(&STATE_TEMPLATE, 0) ;
 
     for(int i=0; i<STATES_ALPHA; i++)
-        if(st.distance < -M_PI +(M_PI/8*i) ) {
+        if(st.alpha < -M_PI +(M_PI/((double)STATES_ALPHA/2.))*i ) {
             dst->set(AGL,i);
             break;
         }
@@ -137,24 +158,24 @@ DState* QLearnDiscr2::discretize(const State& st) {
 //	std::cout << "[DST] " << st.[DST] << " "<< dst.[DST] << std::endl;
 //	std::cout << std::flush;
 
-    double dismin = -6.;
-    double dismax = 6.;
+    double dismin = -8.;
+    double dismax = 8.;
 
     for(int i=0; i<STATES_DISTANCE; i++)
-        if(st.distance < dismin + (dismax-dismin/(double)STATES_DISTANCE)*(double)i) {
+        if(st.distance < dismin + ((dismax-dismin)/(double)STATES_DISTANCE)*(double)i) {
             dst->set(DST, i);
             break;
         }
 
-    //std::cout << "etat " << dst[AGL] << " "<< dst.[DST] << " " << std::endl;
-    //std::cout << std::flush;
+//     std::cout << "etat " << (*dst)[AGL] << " "<< (*dst)[DST] << " " << st.distance << std::endl;
+//     std::cout << std::flush;
 
     return dst;
 }
 
 void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
-    double smin = -0.4;
-    double smax = 0.4;
+    double smin = -0.5;
+    double smax = 0.5;
 
 
     car->ctrl.steer =  smin+((double)ac[DIR]/(double)ACTIONS_DIRECTION)*(smax-smin);
