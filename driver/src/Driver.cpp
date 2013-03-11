@@ -15,7 +15,7 @@ Driver::Driver(int index, int intervalAction)
 {
     INDEX = index;
     INTERVAL_ACTION = intervalAction;
-    UNSTUCK_TIME_LIMIT = 2.0/INTERVAL_ACTION;				/* [s] */
+    UNSTUCK_TIME_LIMIT = 2.0;				/* [s] */
     
     decision_each = 0;
     stuck = 0;
@@ -68,6 +68,9 @@ void Driver::drive(tSituation *s)
         decision();
         decision_each=0;
     }
+    
+    lastDistance = car->_distFromStartLine;
+    lastDammage = car->_dammage;
 }
 
 
@@ -115,13 +118,30 @@ void Driver::update(tSituation *s)
     float trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
     angle = trackangle - car->_yaw;
     NORM_PI_PI(angle);
-
+        
+    updateStuck();
+    
     decision_each++;
 }
 
 
+void Driver::updateStuck()
+{
+    if (fabs(angle) > MAX_UNSTUCK_ANGLE &&
+            car->_speed_x < MAX_UNSTUCK_SPEED &&
+            fabs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST) {
+        if (stuck > MAX_UNSTUCK_COUNT && car->_trkPos.toMiddle*angle < 0.0) {
+            ;
+        } else {
+             stuck++;
+        }
+    } else {
+         stuck = 0;
+    }
+}
+
 /* Check if I'm stuck */
-bool Driver::isStuck()
+bool Driver::isStuck() const
 {
     if (fabs(angle) > MAX_UNSTUCK_ANGLE &&
             car->_speed_x < MAX_UNSTUCK_SPEED &&
@@ -129,12 +149,29 @@ bool Driver::isStuck()
         if (stuck > MAX_UNSTUCK_COUNT && car->_trkPos.toMiddle*angle < 0.0) {
             return true;
         } else {
-            stuck++;
+//             stuck++;
             return false;
         }
     } else {
-        stuck = 0;
+//         stuck = 0;
         return false;
     }
 }
 
+const tCarElt* Driver::getCar() const{
+    return car;
+}
+
+double Driver::getDamageGet() const{
+    return car->_dammage - lastDammage;
+}
+
+double Driver::getCoveredDistance() const{
+    double distParcourue = 0;
+    
+    if(lastDistance != -1)
+        distParcourue = car->_distFromStartLine - lastDistance;
+    if(distParcourue > 1000|| distParcourue < -1000) //passe ligne bug?
+        distParcourue = 20;
+    return distParcourue;
+}

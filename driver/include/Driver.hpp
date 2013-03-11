@@ -27,21 +27,31 @@ public:
     virtual void endRace(tSituation *s);
 
     virtual void decision() = 0;
-protected:
+    
+    const tCarElt* getCar() const;
+    double getDamageGet() const;
+    double getCoveredDistance() const;
+
     /* utility functions */
-    bool isStuck();
+    bool isStuck() const;
+protected:
     int getGear();
     float getDistToSegEnd();
 
-    void update(tSituation *s);
+    
 
     /* per robot global data */
     int stuck;
     int decision_each;
     float angle;			/* the angle of the car relative to the current segment */
     tCarElt *car;			/* pointer to tCarElt struct */
+    float lastDistance = -1;
+    float lastDammage = 0;
 
 private:
+    void update(tSituation *s);
+    void updateStuck();
+  
     /* data that should stay constant after first initialization */
     int MAX_UNSTUCK_COUNT;
     int INDEX;

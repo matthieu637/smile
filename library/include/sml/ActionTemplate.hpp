@@ -4,12 +4,12 @@
 #include <string>
 #include <list>
 #include <boost/unordered/unordered_map.hpp>
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/list.hpp>
+// #include <boost/serialization/nvp.hpp>
+// #include <boost/serialization/list.hpp>
 
 using std::list;
 using std::string;
-using boost::serialization::make_nvp;
+//using boost::serialization::make_nvp;
 
 namespace sml{
 
@@ -22,7 +22,7 @@ public:
     const std::list<int>* sizesActions() const;
     bool operator==(const ActionTemplate& ac) const;
     unsigned int sizeNeeded() const;
-    
+    /*
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
@@ -30,9 +30,8 @@ public:
       ar & make_nvp("ActionName", actionNames);
       ar & make_nvp("Sizes", sizes);
       
-    }
+    }*/
 private :
-    //std::list<string> actionNames;
     boost::unordered_map< string, int> actionNames;
     std::list<int> sizes;
 };

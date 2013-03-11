@@ -2,16 +2,10 @@
 #ifndef Q_HPP
 #define Q_HPP
 
+#include <string>
+#include <vector>
 #include "sml/Action.hpp"
 
-#include <string>
-#include <list>
-#include <unordered_map>
-#include <set>
-#include <boost/serialization/nvp.hpp>
-#include <boost/unordered/unordered_map.hpp>
-
-using boost::serialization::make_nvp;
 using std::string;
 using std::vector;
 
@@ -22,7 +16,6 @@ typedef vector<double> hashmap;
 class QTable
 {
 public: 
-    friend class boost::serialization::access;
     QTable(const StateTemplate* stmp, const ActionTemplate* atmp);
     
     const hashmap* operator[](const DState& name) const; 

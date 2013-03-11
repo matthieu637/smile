@@ -7,7 +7,7 @@ class Utils
 {
 public : 
   static float rand01();
-  
+  static double abs(double x);
 };
 
 }

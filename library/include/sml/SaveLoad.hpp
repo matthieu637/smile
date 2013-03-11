@@ -2,7 +2,6 @@
 #define SAVELOAD_HPP
 
 #include <string>
-#include "Q.hpp"
 
 using std::string;
 

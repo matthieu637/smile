@@ -1,4 +1,5 @@
 #include "QLearnDiscr2.hpp"
+#include <TWorld.hpp>
 #include <sml/SaveLoad.hpp>
 #include <sml/Utils.hpp>
 #include <iostream>
@@ -25,58 +26,13 @@ QLearnDiscr2::~QLearnDiscr2()
     Q.write("smile1.data");
 }
 
-double QLearnDiscr2::reward() {
-    double distanceMilieu = 10. - abs( car->_trkPos.toMiddle );
-    double distParcourue;
-    double dammageGet = car->_dammage - lastDammage;
-
-    if(lastDist==-1)
-        distParcourue = 0;
-    else
-        distParcourue = car->_distFromStartLine - lastDist;
-    if(distParcourue > 1000|| distParcourue < -1000) //passe ligne
-        distParcourue = 20;
-    double r = distanceMilieu*distParcourue;
-    if (r < 1 )
-        r = -10;
-    if(isStuck() && car->ctrl.gear == -1)
-        r = 15;
-    else if(distParcourue < 0.5) {
-        r = -40;
-        if(isStuck())
-            r -= 45;
-    }
-    else if(distanceMilieu < 0. || distParcourue < 0.)
-        r = -r;
-    else r = r*r/4.;
-
-    r-=dammageGet;
-
-    if(car->_trkPos.toRight < 0. )
-        r += 15*car->_trkPos.toRight ;
-    else if (car->_trkPos.toLeft < 0.)
-        r += 15*car->_trkPos.toLeft ;
-    /*
-    if(r > 0)
-       if((angle < M_PI/16 && angle >= 0) || (angle > -M_PI/16 && angle <= 0 ))
-    r += 40;*/
-
-    //std::cout << "recompense " << [DST]Milieu << " "<< distParcourue << " " << r << " -- "  << car->_distFromStartLine << " " << lastDist << std::endl;
-    //std::cout << std::flush;
-
-    lastDist = car->_distFromStartLine;
-    lastDammage = car->_dammage;
-
-    return r;
-}
-
 void QLearnDiscr2::decision()
 {
     DState s = *lastState;
 
     //Take action a, observe r, s'
     DAction a = *lastAction;
-    double r = reward();
+    double r = TWorld::reward(*this);
     State st = { angle , car->_trkPos.toMiddle };
     DState* Psp = discretize(st);//TODO:memory leak
     DState sp = *Psp;
@@ -115,11 +71,10 @@ void QLearnDiscr2::decision()
 	      N(sa, aa) = 0.;
 	}
             
-        if(ap == as);
+        if(ap == as)
+	  history.push_back(std::pair<DState* , DAction* >(lastState, lastAction));
 	else
 	  history.clear();
-            
-	history.push_back(std::pair<DState* , DAction* >(Psp, PaP));
     }
 
 
@@ -148,37 +103,13 @@ void QLearnDiscr2::newRace(tCarElt* car, tSituation *s) {
 
 DState* QLearnDiscr2::discretize(const State& st) {
     DState* dst = new DState(&STATE_TEMPLATE, 0) ;
-
-    for(int i=0; i<STATES_ALPHA; i++)
-        if(st.alpha < -M_PI +(M_PI/((double)STATES_ALPHA/2.))*i ) {
-            dst->set(AGL,i);
-            break;
-        }
-
-//	std::cout << "[DST] " << st.[DST] << " "<< dst.[DST] << std::endl;
-//	std::cout << std::flush;
-
-    double dismin = -8.;
-    double dismax = 8.;
-
-    for(int i=0; i<STATES_DISTANCE; i++)
-        if(st.distance < dismin + ((dismax-dismin)/(double)STATES_DISTANCE)*(double)i) {
-            dst->set(DST, i);
-            break;
-        }
-
-//     std::cout << "etat " << (*dst)[AGL] << " "<< (*dst)[DST] << " " << st.distance << std::endl;
-//     std::cout << std::flush;
-
+    dst->set(AGL, TWorld::discretizeAngle(st.alpha, STATES_ALPHA));
+    dst->set(DST, TWorld::discretizeDistanceFromMiddle(st.distance, STATES_DISTANCE, -6., 6.));
     return dst;
 }
 
 void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
-    double smin = -0.5;
-    double smax = 0.5;
-
-
-    car->ctrl.steer =  smin+((double)ac[DIR]/(double)ACTIONS_DIRECTION)*(smax-smin);
+    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.3, 0.3);
 
     //std::cout << "steer " << car->ctrl.steer << " " << ac[DIR] << " " << (double)(ac[DIR]/ACTIONS_DIRECTION) << " " << (smax-smin) <<" "<< (double)smin+((double)(ac[DIR]/ACTIONS_DIRECTION))*(smax-smin) << std::endl;
     //std::cout << std::flush;
@@ -200,7 +131,8 @@ void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
     {
         accel -= 4;
         accel = 3 - accel;
-        car->ctrl.gear = getGear();
+        //car->ctrl.gear = getGear();
+	car->ctrl.gear = 1;
         car->ctrl.brakeCmd = 0;
         car->ctrl.accelCmd = accel / 4.;
     }

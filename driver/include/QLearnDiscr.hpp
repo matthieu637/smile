@@ -9,7 +9,6 @@ class QLearnDiscr : public Driver
 
 public:
     QLearnDiscr(int index);
-    float reward();
     void decision();
     ~QLearnDiscr();
     void newRace(tCarElt* car, tSituation *s);
@@ -44,14 +43,12 @@ private:
 
     float ****Q;//[STATES_ALPHA][STATES_DISTANCE][ACTIONS_ACC][ACTIONS_DIRECTION];
     
-    float lastDist = -1;
-    float lastDammage = 0;
     DState lastState={-1,-1};
     DAction lastAction;
     
-    const float lrate = 0.05;
+    const float lrate = 0.1;
     const float discount = 0.35;
-    const float espilon = 0.05;
+    const float espilon = 0.03;
 };
 
 #endif // QLEARNDISCR_HPP

@@ -1,12 +1,13 @@
 
 #include "sml/Q.hpp"
 
-#include <bib/XMLEngine.hpp>
+//#include <bib/XMLEngine.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/interprocess/sync/named_mutex.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/filesystem.hpp>
-
+#include <fstream>
+#include "bib/Logger.hpp"
 
 using namespace boost::interprocess;
 

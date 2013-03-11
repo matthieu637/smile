@@ -1,4 +1,5 @@
 #include "QLearnDiscr.hpp"
+#include <TWorld.hpp>
 #include <sml/SaveLoad.hpp>
 #include <sml/Utils.hpp>
 #include <iostream>
@@ -15,55 +16,10 @@ QLearnDiscr::~QLearnDiscr()
     delete Q;//TODO:improve
 }
 
-float QLearnDiscr::reward() {
-    float distanceMilieu = 10. - abs( car->_trkPos.toMiddle );
-    float distParcourue;
-    float dammageGet = car->_dammage - lastDammage;
-
-    if(lastDist==-1)
-        distParcourue = 0;
-    else
-        distParcourue = car->_distFromStartLine - lastDist;
-    if(distParcourue > 1000|| distParcourue < -1000) //passe ligne
-        distParcourue = 20;
-    float r = distanceMilieu*distParcourue;
-    if (r < 1 )
-        r = -10;
-    if(isStuck() && car->ctrl.gear == -1)
-        r = 15;
-    else if(distParcourue < 0.5) {
-        r = -40;
-        if(isStuck())
-            r -= 45;
-    }
-    else if(distanceMilieu < 0. || distParcourue < 0.)
-        r = -r;
-    else r = r*r/4.;
-
-    r-=dammageGet;
-
-    if(car->_trkPos.toRight < 0. )
-        r += 15*car->_trkPos.toRight ;
-    else if (car->_trkPos.toLeft < 0.)
-        r += 15*car->_trkPos.toLeft ;
-    /*
-    if(r > 0)
-       if((angle < M_PI/16 && angle >= 0) || (angle > -M_PI/16 && angle <= 0 ))
-    r += 40;*/
-
-    //std::cout << "recompense " << distanceMilieu << " "<< distParcourue << " " << r << " -- "  << car->_distFromStartLine << " " << lastDist << std::endl;
-    //std::cout << std::flush;
-
-    lastDist = car->_distFromStartLine;
-    lastDammage = car->_dammage;
-
-    return r;
-}
-
 void QLearnDiscr::decision()
 {
 
-    float r = reward();
+    float r = TWorld::reward(*this);
 
     State st = { angle , car->_trkPos.toMiddle };
     DState dst = discretize(st);
@@ -113,29 +69,9 @@ void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
 
 QLearnDiscr::DState QLearnDiscr::discretize(const State& st) {
     //pointer me
-    DState dst = {0,0} ; //init me pls or bug
-
-    for(int i=0; i<STATES_ALPHA; i++)
-        if(st.alpha < -M_PI +(M_PI/8*i) ) {
-            dst.alpha = i;
-            break;
-        }
-
-//	std::cout << "distance " << st.distance << " "<< dst.distance << std::endl;
-//	std::cout << std::flush;
-
-    float dismin = -6.;
-    float dismax = 6.;
-
-    for(int i=0; i<STATES_DISTANCE; i++)
-        if(st.distance < dismin + ((dismax-dismin)/(float)STATES_DISTANCE)*(float)i) {
-            dst.distance = i;
-            break;
-        }
-
-//     std::cout << "etat " << dst.alpha << " "<< dst.distance << " " << std::endl;
-//     std::cout << std::flush;
-
+    DState dst = {0,0} ;
+    dst.alpha = TWorld::discretizeAngle(st.alpha, STATES_ALPHA);
+    dst.distance = TWorld::discretizeDistanceFromMiddle(st.distance, STATES_DISTANCE, -6., 6.);
     return dst;
 }
 
@@ -161,14 +97,7 @@ QLearnDiscr::DAction QLearnDiscr::bestQVal(const DState& dst) {
 }
 
 void QLearnDiscr::applyActionOn(const DAction& ac, tCarElt* car) {
-    float smin = -0.4;
-    float smax = 0.4;
-
-
-    car->ctrl.steer =  smin+((float)ac.direc/(float)ACTIONS_DIRECTION)*(smax-smin);
-
-    //std::cout << "steer " << car->ctrl.steer << " " << ac.direc << " " << (float)(ac.direc/ACTIONS_DIRECTION) << " " << (smax-smin) <<" "<< (float)smin+((float)(ac.direc/ACTIONS_DIRECTION))*(smax-smin) << std::endl;
-    //std::cout << std::flush;
+    car->ctrl.steer = TWorld::computeSteering(ac.direc, ACTIONS_DIRECTION, -0.3, 0.3);
 
     int accel = ac.acc;
 

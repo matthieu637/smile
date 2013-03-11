@@ -20,7 +20,7 @@ do
     torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null &
     pid="$pid $!"
   done
-  for p in $pid
+  for p in "$pid"
   do
 	  wait $p
   done
