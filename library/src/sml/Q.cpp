@@ -14,10 +14,6 @@ using namespace boost::interprocess;
 namespace sml {
 
 QTable::QTable(const StateTemplate* stmp, const ActionTemplate* atmp):stmpl(stmp), atmpl(atmp) {
-
-}
-
-void QTable::init() {
     map = new hashmap(stmpl->sizeNeeded() * atmpl->sizeNeeded());
 
     for(unsigned int i=0; i< stmpl->sizeNeeded(); i++) {
@@ -53,12 +49,14 @@ double& QTable::operator()(const DState& s, const DAction& a)
 double QTable::operator()(unsigned int s, unsigned int a) const {
     unsigned int beginRange = s * atmpl->sizeNeeded();
 
+//     LOG_DEBUG("acces at " << beginRange + a);
     return (*map)[beginRange + a];
 }
 
 double& QTable::operator()(unsigned int s, unsigned int a) {
     unsigned int beginRange = s * atmpl->sizeNeeded();
 
+//     LOG_DEBUG("set at " << beginRange + a);
     return (*map)[beginRange + a];
 }
 

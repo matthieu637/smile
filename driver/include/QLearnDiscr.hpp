@@ -3,6 +3,14 @@
 #define QLEARNDISCR_HPP
 
 #include "Driver.hpp"
+#include <sml/Action.hpp>
+#include <sml/Q.hpp>
+
+using sml::DAction;
+using sml::DState;
+using sml::QTable;
+
+class State;
 
 class QLearnDiscr : public Driver
 {
@@ -13,24 +21,8 @@ public:
     ~QLearnDiscr();
     void newRace(tCarElt* car, tSituation *s);
 
-private:
-  struct State {
-    float alpha; //direction
-    float distance;
-  };
-
-  struct DState {
-      int alpha;
-      int distance;
-  };
-
-  struct DAction {
-      int acc;
-      int direc;
-  };
-  
-  DState discretize(const State& st);
-  DAction bestQVal(const DState& dst);
+private:  
+  DState* discretize(const State& st);
   void applyActionOn(const DAction& ac, tCarElt* car);
     
 private:
@@ -40,15 +32,19 @@ private:
     static const int STATES_DISTANCE = 12;
     static const int ACTIONS_ACC = 7;
     static const int ACTIONS_DIRECTION = 10;
-
-    float ****Q;//[STATES_ALPHA][STATES_DISTANCE][ACTIONS_ACC][ACTIONS_DIRECTION];
     
-    DState lastState={-1,-1};
-    DAction lastAction;
-    
-    const float lrate = 0.1;
+    const float lrate = 0.05;
     const float discount = 0.35;
-    const float espilon = 0.03;
+    const float espilon = 0.025;
+    
+    static const sml::ActionTemplate ACTION_TEMPLATE;
+    static const sml::StateTemplate STATE_TEMPLATE;
+
+    QTable Q;
+    
+    bool init = false;
+    DState* lastState;
+    DAction* lastAction;
 };
 
 #endif // QLEARNDISCR_HPP

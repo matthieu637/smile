@@ -10,12 +10,12 @@ double TWorld::reward(const Driver& d) {
     double distParcourue = d.getCoveredDistance();
     double dammageGet = d.getDamageGet();
 
-    double r = distanceMilieu*distParcourue;
+    double r = distanceMilieu*(distParcourue);
     if (r < 1 )
         r = -10;
-    if(d.isStuck() && d.getCar()->ctrl.gear == -1)
+    if(d.isStuck() && d.getCar()->ctrl.gear == -1 && d.getCar()->ctrl.accelCmd > 0.2 && d.getCar()->ctrl.brakeCmd < 0.1)
         r = 15;
-    else if(distParcourue < 0.05) {
+    else if(distParcourue < 0.1) {
         r = -40;
         if(d.isStuck())
             r -= 45;
@@ -28,15 +28,17 @@ double TWorld::reward(const Driver& d) {
 
     r-=dammageGet;
 
-    if(d.getCar()->_trkPos.toRight < 0. )
-        r += 5*d.getCar()->_trkPos.toRight ;
-    else if (d.getCar()->_trkPos.toLeft < 0.)
-        r += 5*d.getCar()->_trkPos.toLeft ;
+//     LOG_DEBUG(d.getCar()->_trkPos.toRight);
+    
+    if(d.getCar()->_trkPos.toRight < 1. )
+        r += 10*d.getCar()->_trkPos.toRight ;
+    else if (d.getCar()->_trkPos.toLeft < 1.)
+        r += 10*d.getCar()->_trkPos.toLeft ;
  
-    /*
-    if(r > 0)
-       if((angle < M_PI/16 && angle >= 0) || (angle > -M_PI/16 && angle <= 0 ))
-    r += 40;*/
+    
+    if(r > 0 && !d.isStuck())
+       if((d.getAngle() < M_PI/8 && d.getAngle() >= 0) || (d.getAngle() > -M_PI/8 && d.getAngle() <= 0 ))
+	 r += 40;
 
 //     LOG_DEBUG("recompense " << distanceMilieu << " "<< distParcourue << " " << r << " -- "  << d.getCar()->_distFromStartLine << " ");
 

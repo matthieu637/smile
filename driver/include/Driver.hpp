@@ -31,6 +31,7 @@ public:
     const tCarElt* getCar() const;
     double getDamageGet() const;
     double getCoveredDistance() const;
+    float getAngle() const;
 
     /* utility functions */
     bool isStuck() const;

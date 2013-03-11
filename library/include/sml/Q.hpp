@@ -31,7 +31,6 @@ public:
     void read(const string& chemin);
     
     hashmap* getWholeCouple();
-    void init();
 
 private:
     hashmap *map = nullptr;

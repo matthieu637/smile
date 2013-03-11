@@ -3,103 +3,94 @@
 #include <sml/SaveLoad.hpp>
 #include <sml/Utils.hpp>
 #include <iostream>
+#include <bib/Logger.hpp>
 
-QLearnDiscr::QLearnDiscr(int index):Driver(index, DECISION_EACH)
+#define ACC "acceleration"
+#define DIR "direction"
+#define AGL "angle"
+#define DST "distance"
+#define SPD "speed"
+
+const sml::ActionTemplate QLearnDiscr::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIR}, {QLearnDiscr::ACTIONS_ACC, QLearnDiscr::ACTIONS_DIRECTION});
+const sml::StateTemplate QLearnDiscr::STATE_TEMPLATE = sml::StateTemplate( {AGL, DST}, {QLearnDiscr::STATES_ALPHA, QLearnDiscr::STATES_DISTANCE}); //, SPD});
+
+
+QLearnDiscr::QLearnDiscr(int index):Driver(index, DECISION_EACH), Q(&STATE_TEMPLATE, &ACTION_TEMPLATE)
 {
-
+//   DAction a(&ACTION_TEMPLATE, {3,2});
+//   LOG_DEBUG(a.hash());
+//   DAction b(&ACTION_TEMPLATE, a.hash());
+//   LOG_DEBUG(b.get(0) << " " << b.get(1));
+//   LOG_DEBUG(b.hash());
+//   LOG_DEBUG(Q(a, b));
+//   LOG_DEBUG(Q(a, b));
+//   Q(a, b) = 180;
+//   LOG_DEBUG(Q(a, b));
+//   LOG_DEBUG(Q(a, DAction(&ACTION_TEMPLATE, {0,0})));
+//   LOG_DEBUG(Q(a, DAction(&ACTION_TEMPLATE, {0,1})));
+//   LOG_DEBUG(Q.argmax(a)->get(0) << " " << Q.argmax(a)->get(1));
+//   exit(1);
 }
 
 QLearnDiscr::~QLearnDiscr()
-{ 
-    sml::SaveLoad::writeQ("smile0.data", Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
-    
-    delete Q;//TODO:improve
+{
+    Q.write("smile0.data");
 }
 
 void QLearnDiscr::decision()
 {
-
-    float r = TWorld::reward(*this);
+    DAction a = *lastAction;
+    DState s = *lastState;
+    double r = TWorld::reward(*this);
 
     State st = { angle , car->_trkPos.toMiddle };
-    DState dst = discretize(st);
-    DAction dac = bestQVal(dst);
+    DState* Psp = discretize(st);
+    DState sp = *Psp;
+    DAction* Pap = Q.argmax(sp);
+    DAction ap = *Pap;
 
-    //update Q value with lastState
-    if(lastState.alpha != -1 && lastState.distance != -1) {
-        Q[lastState.alpha][lastState.distance][lastAction.acc][lastAction.direc] =
-            (float) Q[lastState.alpha][lastState.distance][lastAction.acc][lastAction.direc] + //alpha*N[lastState.alpha][lastState.distance][lastAction.acc][lastAction.direc]*
-            lrate*(r+discount*Q[dst.alpha][dst.distance][dac.acc][dac.direc] - Q[lastState.alpha][lastState.distance][lastAction.acc][lastAction.direc] );
+                 //update Q value with lastState
+    if(init) {
+        Q(s,a) = Q(s,a) + lrate*(r+discount*Q(sp, ap) - Q(s, a) );
+
+        if(sml::Utils::rand01() < espilon ) {
+// 	    LOG_DEBUG("epsi-greedy");
+            Pap = new DAction(&ACTION_TEMPLATE, {rand() % ACTIONS_ACC, rand() % ACTIONS_DIRECTION});//TODO:memory
+	    ap = *Pap;
+        }
 
     }
+    init=true;
+    
+    lastAction = Pap;
+    lastState = Psp;
 
-    if(sml::Utils::rand01() < espilon ) {
-        dac = {rand() % ACTIONS_ACC, rand() % ACTIONS_DIRECTION};
-    }
-
-    lastAction = dac;
-    lastState = dst;
-
-    std::cout << "etat " << dst.alpha << " "<< dst.distance << " action " << dac.acc << " "<< dac.direc << "   recomp : " << r << " : "  << angle << std::endl;
+    std::cout << "etat " << sp[AGL] << " "<< sp[DST] << " action " << ap[ACC] << " "<< ap[DIR] << "   recomp : " << r << " : "  << Q(s, a) << std::endl;
     std::cout << std::flush;
 
-    applyActionOn(dac, car);
-
+    applyActionOn(ap, car);
 }
 
 void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
     Driver::newRace(car,s);
-    
-    
-    Q = new float***[STATES_ALPHA];//[STATES_DISTANCE][ACTIONS_ACC][ACTIONS_DIRECTION];
-    for(int i = 0; i < STATES_ALPHA; i++) {
-        Q[i] = new float**[STATES_DISTANCE];
-        for(int j = 0; j < STATES_DISTANCE; j++) {
-            Q[i][j] = new float*[ACTIONS_ACC];
-            for(int k = 0; k < ACTIONS_ACC; k++) {
-                Q[i][j][k] = new float[ACTIONS_DIRECTION];
-            }
-        }
-    }
-    
-  
-    sml::SaveLoad::initializeQ("smile0.data", Q, STATES_ALPHA, STATES_DISTANCE, ACTIONS_ACC, ACTIONS_DIRECTION);
+
+    Q.read("smile0.data");
+    lastState = new DState(&STATE_TEMPLATE, 0);
+    lastAction = new DAction(&ACTION_TEMPLATE, 0);
 }
+ 
 
-
-QLearnDiscr::DState QLearnDiscr::discretize(const State& st) {
-    //pointer me
-    DState dst = {0,0} ;
-    dst.alpha = TWorld::discretizeAngle(st.alpha, STATES_ALPHA);
-    dst.distance = TWorld::discretizeDistanceFromMiddle(st.distance, STATES_DISTANCE, -6., 6.);
+DState* QLearnDiscr::discretize(const State& st) {
+    DState* dst = new DState(&STATE_TEMPLATE, 0) ;
+    dst->set(AGL, TWorld::discretizeAngle(st.alpha, STATES_ALPHA));
+    dst->set(DST, TWorld::discretizeDistanceFromMiddle(st.distance, STATES_DISTANCE, -6., 6.));
     return dst;
 }
 
-QLearnDiscr::DAction QLearnDiscr::bestQVal(const DState& dst) {
-
-
-    DAction imax= {rand() % ACTIONS_ACC, rand() % ACTIONS_DIRECTION}; //pointer me
-    for(int i=0; i<ACTIONS_ACC; i++)
-        for(int k=0; k<ACTIONS_DIRECTION; k++) {
-            //std::cout << dst.alpha << " "<< dst.distance <<" "<< i <<" " << j << " " << k << std::endl;
-            //std::cout << std::flush;
-            if(Q[dst.alpha][dst.distance][i][k] > Q[dst.alpha][dst.distance][imax.acc][imax.direc])
-            {
-                imax.acc = i;
-                imax.direc = k;
-            }
-        }
-
-//	std::cout << "action " << imax.acc << " "<< imax.direc << " " << imax.stop << std::endl;
-//	std::cout << std::flush;
-
-    return imax;
-}
-
 void QLearnDiscr::applyActionOn(const DAction& ac, tCarElt* car) {
-    car->ctrl.steer = TWorld::computeSteering(ac.direc, ACTIONS_DIRECTION, -0.3, 0.3);
+    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.4, 0.4);
 
-    int accel = ac.acc;
+    int accel = ac[ACC];
 
     if(accel < 2) {
         accel = 2 - accel;

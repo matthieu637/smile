@@ -27,7 +27,7 @@ public:
     DAction(const ActionTemplate* temp, const std::list<int>& vals);
     DAction(const ActionTemplate* temp, int value);
     ~DAction();
-//   int get( int index) const;
+    int get( int index) const;
     int get(const string& name) const;
     int operator[](const string& name) const;
     void set(const string& name, int value);
@@ -35,30 +35,30 @@ public:
     bool operator<(const DAction& ac) const;
     unsigned int hash() const;
 
-    
+
     BOOST_SERIALIZATION_SPLIT_MEMBER()
     template<class Archive>
-    void save(Archive& ar, const unsigned int version) const{
-      (void) version;
-      ar << make_nvp("Template", this->templ);
-      
-      for(int i = 0 ; i< templ->actionNumber(); i++)
-	ar << make_nvp("values", values[i]);
+    void save(Archive& ar, const unsigned int version) const {
+        (void) version;
+        ar << make_nvp("Template", this->templ);
+
+        for(int i = 0 ; i< templ->actionNumber(); i++)
+            ar << make_nvp("values", values[i]);
     }
-    
+
     template<class Archive>
-    void load(Archive& ar, const unsigned int version){
-      (void) version;
-      ar >> make_nvp("Template", this->templ);
-      
-      values = new int[this->templ->actionNumber()];
-      for(int i = 0 ; i< templ->actionNumber(); i++)
-	ar >> make_nvp("values", values[i]);
+    void load(Archive& ar, const unsigned int version) {
+        (void) version;
+        ar >> make_nvp("Template", this->templ);
+
+        values = new int[this->templ->actionNumber()];
+        for(int i = 0 ; i< templ->actionNumber(); i++)
+            ar >> make_nvp("values", values[i]);
     }
 
 private:
     void computehash();
-    
+
     int *values = nullptr;
     const ActionTemplate *templ;
     int hashmem;

@@ -27,6 +27,7 @@ DAction::DAction(const ActionTemplate* temp, const std::list< int>& vals)
 DAction::DAction(const ActionTemplate* temp, int value) {
     this->templ = temp;
 
+    hashmem = value;
     values = new int[templ->actionNumber()];
 
     list<int>::const_iterator it = templ->sizesActions()->begin();
@@ -43,17 +44,19 @@ DAction::DAction(const ActionTemplate* temp, int value) {
         for(int j=0; j < (templ->actionNumber() -1) - (i + 1); j++) //refill
             it--;
     }
-    
-    hashmem = value;
 }
 
-DAction::~DAction() { //FIXME
-//   if(values != nullptr)
+DAction::~DAction() {
+//   if(values != nullptr) FIXME
 //     delete[] values;
 }
 
 int DAction::get(const string& name) const {
     return values[templ->indexFor(name)];
+}
+
+int DAction::get(int index) const {
+    return values[index];
 }
 
 int DAction::operator[](const string& name) const {

@@ -92,8 +92,6 @@ void QLearnDiscr2::decision()
 void QLearnDiscr2::newRace(tCarElt* car, tSituation *s) {
     Driver::newRace(car,s);
     
-    Q.init();
-    N.init();
     Q.read("smile1.data");
 
     lastState = new DState(&STATE_TEMPLATE, 0);
@@ -109,7 +107,7 @@ DState* QLearnDiscr2::discretize(const State& st) {
 }
 
 void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
-    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.3, 0.3);
+    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.4, 0.4);
 
     //std::cout << "steer " << car->ctrl.steer << " " << ac[DIR] << " " << (double)(ac[DIR]/ACTIONS_DIRECTION) << " " << (smax-smin) <<" "<< (double)smin+((double)(ac[DIR]/ACTIONS_DIRECTION))*(smax-smin) << std::endl;
     //std::cout << std::flush;

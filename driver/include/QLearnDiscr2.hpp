@@ -5,6 +5,7 @@
 #include "Driver.hpp"
 #include <sml/Action.hpp>
 #include <sml/Q.hpp>
+#include "TWorld.hpp"
 
 using sml::DAction;
 using sml::DState;
@@ -20,11 +21,6 @@ public:
     void newRace(tCarElt* car, tSituation *s);
 
 private:
-  struct State {
-    double alpha; //direction
-    double distance;
-  };
-  
   DState* discretize(const State& st);
   void applyActionOn(const DAction& ac, tCarElt* car);
     
@@ -34,24 +30,23 @@ private:
     static const int STATES_ALPHA = 16;
     static const int STATES_DISTANCE = 12;
     static const int ACTIONS_ACC = 7;
-    static const int ACTIONS_DIRECTION = 10;
+    static const int ACTIONS_DIRECTION = 12;
+    
+    const double lamba = 0.2;
+    const double lrate = 0.05;
+    const double discount = 0.35;
+    const double espilon = 0.025;
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
     static const sml::StateTemplate STATE_TEMPLATE;
     
     
-    //double ****Q;//[STATES_ALPHA][STATES_DISTANCE][ACTIONS_ACC][ACTIONS_DIRECTION];
     QTable Q, N;
     std::list< std::pair<DState*, DAction*> > history;
 
     bool init = false;
     DState* lastState;
     DAction* lastAction;
-    
-    const double lamba = 0.5;
-    const double lrate = 0.2;
-    const double discount = 0.35;
-    const double espilon = 0.1;
 };
 
 #endif // QLEARNDISCR_HPP
