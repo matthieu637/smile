@@ -1,17 +1,18 @@
 cmake_minimum_required(VERSION 2.8)
 
 #Nom du projet
-project(SmileLib CXX)
+project(SmileLib CXX C)
 
 find_package(Boost COMPONENTS system serialization filesystem REQUIRED)
-
+find_package (Threads)
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS} )
 
 
-file ( GLOB_RECURSE sources src/*.cpp include/*.hpp)
+file ( GLOB_RECURSE sources src/bib/*.cpp include/bib/*.hpp src/sml/*.cpp include/sml/*.hpp )
+file ( GLOB_RECURSE sources_test src/test/*.cpp include/test/*.hpp)
 
-set(CMAKE_CXX_FLAGS "-g -DDEBUG -Wall -Wextra -std=c++11 -fPIC -fno-strict-aliasing -DUSE_RANDR_EXT -DGL_GLEXT_PROTOTYPES -D_SVID_SOURCE -D_BSD_SOURCE -DSHM -DHAVE_CONFIG_H")
+set(CMAKE_CXX_FLAGS "-g -DDEBUG -Wall -Wextra -std=c++11 -fPIC")
 set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/lib")
 
 set(TYPE_LIB STATIC CACHE STRING "(STATIC or SHARED)")
@@ -22,7 +23,10 @@ else()
   add_library(smile STATIC ${sources})
 endif()
 
-target_link_libraries(smile ${Boost_LIBRARIES})
+target_link_libraries(smile ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(stest ${sources_test} ${sources})
+target_link_libraries(stest ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
   set_target_properties(smile PROPERTIES DEBUG_POSTFIX -d)

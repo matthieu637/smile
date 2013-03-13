@@ -11,7 +11,7 @@ torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null
 
 for i in {1..10000}
 do 
-  lsize=`cat /usr/local/share/games/torcs/$file | grep -ve '\([^0-9]\|^\)0\([.]\|$\)' | wc -l`
+  lsize=`cat /usr/local/share/games/torcs/$file | grep -ve '\([^0-9]\|^\)0\([.]\|<\)' | wc -l`
   episod=`expr $i \* $nbCPU`
   echo "iter : $i | state learned : $lsize | simulated races :  $episod"
   pid=""

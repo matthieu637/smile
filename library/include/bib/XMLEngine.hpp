@@ -40,6 +40,7 @@ public:
     LOG_INFO("Enregistrement du fichier XML " << file_name);
     
     ofstream outputFile(file_name);
+    assert(outputFile.good());
     xml_oarchive xml(outputFile);
     xml << make_nvp(name, object);
     outputFile.close();
@@ -57,8 +58,9 @@ public:
     
     T* object = new T;
     ifstream inputFile(file_name);
+    assert(inputFile.good());
     xml_iarchive xml(inputFile);
-    xml >> make_nvp(name, object);
+    xml >> make_nvp(name, *object);
     inputFile.close();
     return object;
   }

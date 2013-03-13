@@ -1,7 +1,7 @@
 
 #include "sml/Q.hpp"
 
-//#include <bib/XMLEngine.hpp>
+#include <bib/XMLEngine.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/interprocess/sync/named_mutex.hpp>
 #include <boost/serialization/vector.hpp>
@@ -21,6 +21,14 @@ QTable::QTable(const StateTemplate* stmp, const ActionTemplate* atmp):stmpl(stmp
             map->at(i*atmpl->sizeNeeded() + j) = 0.L;
         }
     }
+}
+
+QTable::QTable(const ActionTemplate* atmp):atmpl(atmp) {
+    stmpl = new StateTemplate({""}, {1});
+    map = new hashmap(atmpl->sizeNeeded());
+
+    for(unsigned int j=0; j< atmpl->sizeNeeded(); j++) 
+        map->at(j) = 0.L;
 }
 
 DAction* QTable::argmax(const DState& name) const {
@@ -68,18 +76,10 @@ hashmap* QTable::getWholeCouple() {
 void QTable::write(const string& chemin)
 {
     named_mutex mutex( open_or_create, chemin.c_str());
-//     mutex.unlock();
     mutex.lock();
 
-    //FIXME: CANNOT USE BOOST SERIALIZATION WHY?
-//     bib::XMLEngine::save< hashmap >(*map, "QTable", chemin);
-    std::ofstream outputFile(chemin);
-
-    for(unsigned int sa = 0; sa < stmpl->sizeNeeded(); sa++)
-        for(unsigned int aa = 0; aa < atmpl->sizeNeeded(); aa++)
-            outputFile << this->operator()(sa,aa) << std::endl;
-
-    outputFile.close();
+    bib::XMLEngine::save< hashmap >(*map, "QTable", chemin);
+    
     mutex.unlock();
 }
 
@@ -90,18 +90,9 @@ void QTable::read(const string& chemin)
     }
     else {
         named_mutex mutex( open_or_create, chemin.c_str());
-//     mutex.unlock();
         mutex.lock();
 
-        // map = bib::XMLEngine::load< hashmap >("QTable", chemin);
-        std::ifstream inputFile(chemin);
-
-        for(unsigned int sa = 0; sa < stmpl->sizeNeeded(); sa++)
-            for(unsigned int aa = 0; aa < atmpl->sizeNeeded(); aa++){
-                inputFile >> this->operator()(sa,aa);
-	    }
-
-        inputFile.close();
+        map = bib::XMLEngine::load< hashmap >("QTable", chemin);
 
         mutex.unlock();
     }

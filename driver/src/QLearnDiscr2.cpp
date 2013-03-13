@@ -5,14 +5,6 @@
 #include <iostream>
 #include <bib/Logger.hpp>
 
-#define ACC "acceleration"
-#define DIR "direction"
-#define AGL "angle"
-#define DST "distance"
-#define SPD "speed"
-
-
-
 const sml::ActionTemplate QLearnDiscr2::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIR}, {QLearnDiscr2::ACTIONS_ACC, QLearnDiscr2::ACTIONS_DIRECTION});
 const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {AGL, DST}, {QLearnDiscr2::STATES_ALPHA, QLearnDiscr2::STATES_DISTANCE}); //, SPD});
 
@@ -33,7 +25,7 @@ void QLearnDiscr2::decision()
     //Take action a, observe r, s'
     DAction a = *lastAction;
     double r = TWorld::reward(*this);
-    State st = { angle , car->_trkPos.toMiddle };
+    State st = *TWorld::observe(*this);
     DState* Psp = discretize(st);//TODO:memory leak
     DState sp = *Psp;
 
@@ -82,7 +74,7 @@ void QLearnDiscr2::decision()
     lastState = Psp;
     init=true;
 
-    std::cout << "etat " << sp[AGL] << " "<< sp[DST] << " action " << ap[ACC] << " "<< ap[DIR] << "   recomp : " << r << " : "  << angle << std::endl;
+    std::cout << "etat " << sp[AGL] << " "<< sp[DST] << " action " << ap[ACC] << " "<< ap[DIR] << "   recomp : " << r << " : "  << isStuck() << std::endl;
     std::cout << std::flush;
 
     applyActionOn(ap, car);
@@ -101,16 +93,13 @@ void QLearnDiscr2::newRace(tCarElt* car, tSituation *s) {
 
 DState* QLearnDiscr2::discretize(const State& st) {
     DState* dst = new DState(&STATE_TEMPLATE, 0) ;
-    dst->set(AGL, TWorld::discretizeAngle(st.alpha, STATES_ALPHA));
-    dst->set(DST, TWorld::discretizeDistanceFromMiddle(st.distance, STATES_DISTANCE, -6., 6.));
+    dst->set(AGL, TWorld::discretizeAngle(st.angle, STATES_ALPHA));
+    dst->set(DST, TWorld::discretizeDistance(st.distanceFromMiddle, STATES_DISTANCE, -6., 6.));
     return dst;
 }
 
 void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
     car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.4, 0.4);
-
-    //std::cout << "steer " << car->ctrl.steer << " " << ac[DIR] << " " << (double)(ac[DIR]/ACTIONS_DIRECTION) << " " << (smax-smin) <<" "<< (double)smin+((double)(ac[DIR]/ACTIONS_DIRECTION))*(smax-smin) << std::endl;
-    //std::cout << std::flush;
 
     unsigned int accel = ac[ACC];
 
@@ -133,13 +122,13 @@ void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
 	car->ctrl.gear = 1;
         car->ctrl.brakeCmd = 0;
         car->ctrl.accelCmd = accel / 4.;
+    } else
+    {
+        accel -= 7;
+        accel = 3 - accel;
+        car->ctrl.gear = 2;
+        car->ctrl.brakeCmd = 0;
+        car->ctrl.accelCmd = 1. - (accel / 4.);
     }
 }
-
-#undef ACC
-#undef DIR
-#undef AGL
-#undef DST
-#undef SPD
-
 

@@ -16,11 +16,11 @@ double TWorld::reward(const Driver& d) {
     if(d.isStuck() && d.getCar()->ctrl.gear == -1 && d.getCar()->ctrl.accelCmd > 0.2 && d.getCar()->ctrl.brakeCmd < 0.1)
         r = 15;
     else if(distParcourue < 0.1) {
-        r = -40;
+        r = -100;
         if(d.isStuck())
-            r -= 45;
+            r -= 350;
 	else if(distParcourue < 0)
-	  r -= 100;
+	  r -= 600;
     }
     else if(distanceMilieu < 0. || distParcourue < 0.)
         r = -r;
@@ -45,6 +45,18 @@ double TWorld::reward(const Driver& d) {
     return r;
 }
 
+State* TWorld::observe(const Driver& d){
+    const tCarElt* car = d.getCar();
+    State* s = new State;
+    s->stuck = d.isStuck();
+    s->angle = d.getAngle();
+    s->speed = car->_speed_x;
+    s->distanceFromMiddle = car->_trkPos.toMiddle;
+    s->leftDistance = car->_trkPos.toLeft;
+    s->rightDistance = car->_trkPos.toRight;
+    return s;
+}
+
 unsigned int TWorld::discretizeAngle(float angle, unsigned int cardinal){
      unsigned int d = 0;
      
@@ -57,7 +69,7 @@ unsigned int TWorld::discretizeAngle(float angle, unsigned int cardinal){
      return d;
 }
 
-unsigned int TWorld::discretizeDistanceFromMiddle(float distance, unsigned int cardinal, double dismin, double dismax){
+unsigned int TWorld::discretizeDistance(float distance, unsigned int cardinal, double dismin, double dismax){
     int d = -1;
       
     for(unsigned int i=0; i<cardinal; i++)

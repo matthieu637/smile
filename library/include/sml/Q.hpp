@@ -17,6 +17,7 @@ class QTable
 {
 public: 
     QTable(const StateTemplate* stmp, const ActionTemplate* atmp);
+    QTable(const ActionTemplate* atmp);
     
     const hashmap* operator[](const DState& name) const; 
     DAction* argmax(const DState& name) const;

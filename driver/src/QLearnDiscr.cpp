@@ -5,12 +5,6 @@
 #include <iostream>
 #include <bib/Logger.hpp>
 
-#define ACC "acceleration"
-#define DIR "direction"
-#define AGL "angle"
-#define DST "distance"
-#define SPD "speed"
-
 const sml::ActionTemplate QLearnDiscr::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIR}, {QLearnDiscr::ACTIONS_ACC, QLearnDiscr::ACTIONS_DIRECTION});
 const sml::StateTemplate QLearnDiscr::STATE_TEMPLATE = sml::StateTemplate( {AGL, DST}, {QLearnDiscr::STATES_ALPHA, QLearnDiscr::STATES_DISTANCE}); //, SPD});
 
@@ -43,15 +37,17 @@ void QLearnDiscr::decision()
     DState s = *lastState;
     double r = TWorld::reward(*this);
 
-    State st = { angle , car->_trkPos.toMiddle };
+    State st = *TWorld::observe(*this);
     DState* Psp = discretize(st);
     DState sp = *Psp;
     DAction* Pap = Q.argmax(sp);
     DAction ap = *Pap;
 
-                 //update Q value with lastState
+    //update Q value with lastState
     if(init) {
+// 	LOG_DEBUG("Q(s,a) = " << Q(s,a) << " |  Q(sp, ap) = " << Q(sp, ap) << " | r = " << r);
         Q(s,a) = Q(s,a) + lrate*(r+discount*Q(sp, ap) - Q(s, a) );
+// 	LOG_DEBUG("new Q(s,a) = " << Q(s,a));
 
         if(sml::Utils::rand01() < espilon ) {
 // 	    LOG_DEBUG("epsi-greedy");
@@ -65,8 +61,10 @@ void QLearnDiscr::decision()
     lastAction = Pap;
     lastState = Psp;
 
-    std::cout << "etat " << sp[AGL] << " "<< sp[DST] << " action " << ap[ACC] << " "<< ap[DIR] << "   recomp : " << r << " : "  << Q(s, a) << std::endl;
-    std::cout << std::flush;
+//     std::cout << "etat " << sp[AGL] << " "<< sp[DST] << " action " << ap[ACC] << " "<< ap[DIR] << "   recomp : " << r << std::endl;
+//     std::cout << std::flush;
+    
+//     LOG_DEBUG(car->_speed_x << " " << car->_speed_y);
 
     applyActionOn(ap, car);
 }
@@ -74,7 +72,8 @@ void QLearnDiscr::decision()
 void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
     Driver::newRace(car,s);
 
-    Q.read("smile0.data");
+    Q.read("smile0.data");    
+    
     lastState = new DState(&STATE_TEMPLATE, 0);
     lastAction = new DAction(&ACTION_TEMPLATE, 0);
 }
@@ -82,8 +81,8 @@ void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
 
 DState* QLearnDiscr::discretize(const State& st) {
     DState* dst = new DState(&STATE_TEMPLATE, 0) ;
-    dst->set(AGL, TWorld::discretizeAngle(st.alpha, STATES_ALPHA));
-    dst->set(DST, TWorld::discretizeDistanceFromMiddle(st.distance, STATES_DISTANCE, -6., 6.));
+    dst->set(AGL, TWorld::discretizeAngle(st.angle, STATES_ALPHA));
+    dst->set(DST, TWorld::discretizeDistance(st.distanceFromMiddle, STATES_DISTANCE, -6., 6.));
     return dst;
 }
 
