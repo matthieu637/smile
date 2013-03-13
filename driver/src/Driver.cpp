@@ -9,13 +9,14 @@ const float Driver::MIN_UNSTUCK_DIST = 3.0;					/* [m] */
 
 const float Driver::SHIFT = 0.9;							/* [-] (% of rpmredline) */
 const float Driver::SHIFT_MARGIN = 4.0;						/* [m/s] */
+const float Driver::UNSTUCK_TIME_LIMIT = 2.0;				/* [s] */
 
 
 Driver::Driver(int index, int intervalAction)
 {
     INDEX = index;
     INTERVAL_ACTION = intervalAction;
-    UNSTUCK_TIME_LIMIT = 2.0;				/* [s] */
+    
     
     decision_each = 0;
     stuck = 0;

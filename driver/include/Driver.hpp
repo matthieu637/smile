@@ -57,12 +57,12 @@ private:
     int MAX_UNSTUCK_COUNT;
     int INDEX;
     int INTERVAL_ACTION;
-    float UNSTUCK_TIME_LIMIT;
 
     /* class constants */
     static const float MAX_UNSTUCK_ANGLE;
     static const float MAX_UNSTUCK_SPEED;
     static const float MIN_UNSTUCK_DIST;
+    static const float UNSTUCK_TIME_LIMIT;
 
     static const float SHIFT;
     static const float SHIFT_MARGIN;
