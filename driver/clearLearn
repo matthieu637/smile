@@ -1,3 +1,5 @@
-rm /usr/local/share/games/torcs/smile*
+#!/bin/bash
+
+rm -i /usr/local/share/games/torcs/smile*
 rm /dev/shm/sem.smile*
 

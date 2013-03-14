@@ -26,12 +26,12 @@ private:
   void applyActionOn(const DAction& ac, tCarElt* car);
     
 private:
-    static const int DECISION_EACH = 10;
+    static const int DECISION_EACH = 2;
 
     static const int STATES_ALPHA = 16;
-    static const int STATES_DISTANCE = 12;
+    static const int STATES_DISTANCE = 10;
     static const int ACTIONS_ACC = 7;
-    static const int ACTIONS_DIRECTION = 12;
+    static const int ACTIONS_DIRECTION = 10;
     
     const double lamba = 0.2;
     const double lrate = 0.4;

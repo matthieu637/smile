@@ -88,7 +88,7 @@ DState* QLearnDiscr::discretize(const State& st) {
 }
 
 void QLearnDiscr::applyActionOn(const DAction& ac, tCarElt* car) {
-    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.4, 0.4);
+    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.8, 0.8);
 
     int accel = ac[ACC];
 
