@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <bib/Logger.hpp>
 #include "Driver.hpp"
 
 const float Driver::MAX_UNSTUCK_ANGLE = 15.0/180.0*PI;		/* [radians] */
@@ -16,8 +17,8 @@ Driver::Driver(int index, int intervalAction)
 {
     INDEX = index;
     INTERVAL_ACTION = intervalAction;
-    
-    
+
+
     decision_each = 0;
     stuck = 0;
 }
@@ -25,13 +26,6 @@ Driver::Driver(int index, int intervalAction)
 Driver::~Driver()
 {
 
-}
-
-void Driver::endRace(tSituation* s)
-{
-	(void) s;
-	std::cout << "End Race" << std::endl;
-	std::cout << std::flush;
 }
 
 /* Called for every track change or new race. */
@@ -66,10 +60,14 @@ void Driver::drive(tSituation *s)
 
     if(decision_each > INTERVAL_ACTION)
     {
+        if (car->_trkPos.toRight != car->_trkPos.toRight) { //fix bug during simulation ?
+            endRace();
+            exit(1);
+        }
         decision();
         decision_each=0;
-	lastDammage = car->_dammage;
-	lastDistance = car->_distFromStartLine;
+        lastDammage = car->_dammage;
+        lastDistance = car->_distFromStartLine;
     }
 }
 
@@ -118,9 +116,9 @@ void Driver::update(tSituation *s)
     float trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
     angle = trackangle - car->_yaw;
     NORM_PI_PI(angle);
-        
+
     updateStuck();
-    
+
     decision_each++;
 }
 
@@ -133,10 +131,10 @@ void Driver::updateStuck()
         if (stuck > MAX_UNSTUCK_COUNT && car->_trkPos.toMiddle*angle < 0.0) {
             ;
         } else {
-             stuck++;
+            stuck++;
         }
     } else {
-         stuck = 0;
+        stuck = 0;
     }
 }
 
@@ -158,17 +156,17 @@ bool Driver::isStuck() const
     }
 }
 
-const tCarElt* Driver::getCar() const{
+const tCarElt* Driver::getCar() const {
     return car;
 }
 
-double Driver::getDamageGet() const{
+double Driver::getDamageGet() const {
     return car->_dammage - lastDammage;
 }
 
-double Driver::getCoveredDistance() const{
+double Driver::getCoveredDistance() const {
     double distParcourue = 0;
-    
+
     if(lastDistance != -1)
         distParcourue = car->_distFromStartLine - lastDistance;
     if(distParcourue > 1000|| distParcourue < -1000) //passe ligne bug?
@@ -176,6 +174,6 @@ double Driver::getCoveredDistance() const{
     return distParcourue;
 }
 
-float Driver::getAngle() const{
+float Driver::getAngle() const {
     return angle;
 }

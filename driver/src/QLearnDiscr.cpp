@@ -28,6 +28,10 @@ QLearnDiscr::QLearnDiscr(int index):Driver(index, DECISION_EACH), Q(&STATE_TEMPL
 
 QLearnDiscr::~QLearnDiscr()
 {
+
+}
+
+void QLearnDiscr::endRace() {
     Q.write("smile0.data");
 }
 
@@ -52,18 +56,18 @@ void QLearnDiscr::decision()
         if(sml::Utils::rand01() < espilon ) {
 // 	    LOG_DEBUG("epsi-greedy");
             Pap = new DAction(&ACTION_TEMPLATE, {rand() % ACTIONS_ACC, rand() % ACTIONS_DIRECTION});//TODO:memory
-	    ap = *Pap;
+            ap = *Pap;
         }
 
     }
     init=true;
-    
+
     lastAction = Pap;
     lastState = Psp;
 
 //     std::cout << "etat " << sp[AGL] << " "<< sp[DST] << " action " << ap[ACC] << " "<< ap[DIR] << "   recomp : " << r << std::endl;
 //     std::cout << std::flush;
-    
+
 //     LOG_DEBUG(car->_speed_x << " " << car->_speed_y);
 
     applyActionOn(ap, car);
@@ -72,12 +76,12 @@ void QLearnDiscr::decision()
 void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
     Driver::newRace(car,s);
 
-    Q.read("smile0.data");    
-    
+    Q.read("smile0.data");
+
     lastState = new DState(&STATE_TEMPLATE, 0);
     lastAction = new DAction(&ACTION_TEMPLATE, 0);
 }
- 
+
 
 DState* QLearnDiscr::discretize(const State& st) {
     DState* dst = new DState(&STATE_TEMPLATE, 0) ;

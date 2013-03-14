@@ -19,13 +19,14 @@ public:
     void decision();
     ~QLearnDiscr2();
     void newRace(tCarElt* car, tSituation *s);
+    void endRace();
 
 private:
   DState* discretize(const State& st);
   void applyActionOn(const DAction& ac, tCarElt* car);
     
 private:
-    static const int DECISION_EACH = 20;
+    static const int DECISION_EACH = 10;
 
     static const int STATES_ALPHA = 16;
     static const int STATES_DISTANCE = 12;
@@ -35,7 +36,7 @@ private:
     const double lamba = 0.2;
     const double lrate = 0.4;
     const double discount = 0.35;
-    const double espilon = 0.05;
+    const double espilon = 0.1;
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
     static const sml::StateTemplate STATE_TEMPLATE;

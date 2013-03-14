@@ -6,7 +6,10 @@
 #include <bib/Logger.hpp>
 
 const sml::ActionTemplate QLearnDiscr2::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIR}, {QLearnDiscr2::ACTIONS_ACC, QLearnDiscr2::ACTIONS_DIRECTION});
-const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {AGL, DST}, {QLearnDiscr2::STATES_ALPHA, QLearnDiscr2::STATES_DISTANCE}); //, SPD});
+
+const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {STK, AGL, LDST, RDST, SPD},
+							{2,QLearnDiscr2::STATES_ALPHA, QLearnDiscr2::STATES_DISTANCE, QLearnDiscr2::STATES_DISTANCE, 6});
+
 
 QLearnDiscr2::QLearnDiscr2(int index):Driver(index, DECISION_EACH), Q(&STATE_TEMPLATE, &ACTION_TEMPLATE), N(&STATE_TEMPLATE, &ACTION_TEMPLATE)
 {
@@ -15,6 +18,10 @@ QLearnDiscr2::QLearnDiscr2(int index):Driver(index, DECISION_EACH), Q(&STATE_TEM
 
 QLearnDiscr2::~QLearnDiscr2()
 {
+
+}
+
+void QLearnDiscr2::endRace() {
     Q.write("smile1.data");
 }
 
@@ -33,9 +40,9 @@ void QLearnDiscr2::decision()
     DAction* PaP = Q.argmax(sp); //TODO:memory leak
     DAction ap = *PaP;
     DAction as = ap; //if a' ties for the max, then a* <- a'
-    if(sml::Utils::rand01() < espilon ){
+    if(sml::Utils::rand01() < espilon ) {
         PaP = new DAction(&ACTION_TEMPLATE, {rand() % ACTIONS_ACC, rand() % ACTIONS_DIRECTION});//TODO:memory
-	ap = *PaP;
+        ap = *PaP;
     }
 
 
@@ -43,30 +50,30 @@ void QLearnDiscr2::decision()
         double delta = r + discount*Q(sp, as) - Q(s,a);
         N(s,a) = N(s, a) + 1.;
 
-	/*
-        for(unsigned int sa = 0; sa < STATE_TEMPLATE.sizeNeeded(); sa++)
-            for(unsigned int aa = 0; aa < ACTION_TEMPLATE.sizeNeeded(); aa++) {
-		  Q(sa,aa) = Q(sa,aa) + lrate * delta * N(sa,aa);
-                if(ap == as)
-                    N(sa, aa) = discount*lamba*N(sa,aa);
-                else
-                    N(sa, aa) = 0.;
-            }*/
-            
-        for(std::list< std::pair<DState* , DAction* > >::iterator it = history.begin(); it != history.end(); ++it ){
-	    DState sa = *(*it).first;
-	    DState aa = *(*it).second;
-	    Q(sa,aa) = Q(sa,aa) + lrate * delta * N(sa,aa);
-	    if(ap == as)
-	      N(sa, aa) = discount*lamba*N(sa,aa);
-	    else
-	      N(sa, aa) = 0.;
-	}
-            
+        /*
+            for(unsigned int sa = 0; sa < STATE_TEMPLATE.sizeNeeded(); sa++)
+                for(unsigned int aa = 0; aa < ACTION_TEMPLATE.sizeNeeded(); aa++) {
+        	  Q(sa,aa) = Q(sa,aa) + lrate * delta * N(sa,aa);
+                    if(ap == as)
+                        N(sa, aa) = discount*lamba*N(sa,aa);
+                    else
+                        N(sa, aa) = 0.;
+                }*/
+
+        for(std::list< std::pair<DState* , DAction* > >::iterator it = history.begin(); it != history.end(); ++it ) {
+            DState sa = *(*it).first;
+            DState aa = *(*it).second;
+            Q(sa,aa) = Q(sa,aa) + lrate * delta * N(sa,aa);
+            if(ap == as)
+                N(sa, aa) = discount*lamba*N(sa,aa);
+            else
+                N(sa, aa) = 0.;
+        }
+
         if(ap == as)
-	  history.push_back(std::pair<DState* , DAction* >(lastState, lastAction));
-	else
-	  history.clear();
+            history.push_back(std::pair<DState* , DAction* >(lastState, lastAction));
+        else
+            history.clear();
     }
 
 
@@ -74,8 +81,8 @@ void QLearnDiscr2::decision()
     lastState = Psp;
     init=true;
 
-    std::cout << "etat " << sp[AGL] << " "<< sp[DST] << " action " << ap[ACC] << " "<< ap[DIR] << "   recomp : " << r << " : "  << isStuck() << std::endl;
-    std::cout << std::flush;
+//     std::cout << "etat " << sp[AGL] << " "<< sp[DST] << " action " << ap[ACC] << " "<< ap[DIR] << "   recomp : " << r << " : "  << isStuck() << std::endl;
+//     std::cout << std::flush;
 
     applyActionOn(ap, car);
 
@@ -83,7 +90,7 @@ void QLearnDiscr2::decision()
 
 void QLearnDiscr2::newRace(tCarElt* car, tSituation *s) {
     Driver::newRace(car,s);
-    
+
     Q.read("smile1.data");
 
     lastState = new DState(&STATE_TEMPLATE, 0);
@@ -93,8 +100,11 @@ void QLearnDiscr2::newRace(tCarElt* car, tSituation *s) {
 
 DState* QLearnDiscr2::discretize(const State& st) {
     DState* dst = new DState(&STATE_TEMPLATE, 0) ;
+    dst->set(STK, st.stuck);
     dst->set(AGL, TWorld::discretizeAngle(st.angle, STATES_ALPHA));
-    dst->set(DST, TWorld::discretizeDistance(st.distanceFromMiddle, STATES_DISTANCE, -6., 6.));
+    dst->set(LDST, TWorld::discretizeDistance(st.leftDistance, STATES_DISTANCE, -8., 8.));
+    dst->set(RDST, TWorld::discretizeDistance(st.rightDistance, STATES_DISTANCE, -8., 8.));
+    dst->set(SPD, TWorld::discretizeDistance(st.speed, 6, -40., 40.));
     return dst;
 }
 
@@ -119,7 +129,7 @@ void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
         accel -= 4;
         accel = 3 - accel;
         //car->ctrl.gear = getGear();
-	car->ctrl.gear = 1;
+        car->ctrl.gear = 1;
         car->ctrl.brakeCmd = 0;
         car->ctrl.accelCmd = accel / 4.;
     } else

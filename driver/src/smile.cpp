@@ -47,7 +47,7 @@ static void drive(int index, tCarElt* car, tSituation *s);
 /*static int pitcmd(int index, tCarElt* car, tSituation *s);*/
 static void shutdown(int index);
 static int InitFuncPt(int index, void *pt);
-static void endRace(int index, tCarElt *car, tSituation *s);
+// static void endRace(int index, tCarElt *car, tSituation *s);
 
 
 /* Module entry point */
@@ -92,7 +92,7 @@ static int InitFuncPt(int index, void *pt)
     itf->rbNewRace  = newRace;		/* Start a new race */
     itf->rbDrive    = drive;		/* Drive during race */
     itf->rbPitCmd   = NULL;		/* Pit commands */
-    itf->rbEndRace  = endRace;		/* End of the current race */
+    itf->rbEndRace  = NULL;		/* End of the current race */
     itf->rbShutdown = shutdown;		/* Called before the module is unloaded */
     itf->index      = index;		/* Index used if multiple interfaces */
 
@@ -130,16 +130,16 @@ static void drive(int index, tCarElt* car, tSituation *s)
 */
 
 /* End of the current race */
-static void endRace(int index, tCarElt *car, tSituation *s)
-{
-    (void) car;
-    driver[index]->endRace(s);
-}
+// static void endRace(int index, tCarElt *car, tSituation *s)
+// {
+//   
+// }
 
 
 /* Called before the module is unloaded */
 static void shutdown(int index)
 {
+    driver[index]->endRace();
     delete driver[index];
 }
 

@@ -1,13 +1,15 @@
 #ifndef TWORLD_HPP
 #define TWORLD_HPP
 
-#define ACC "acceleration"
-#define DIR "direction"
+#define STK "stuck"
 #define AGL "angle"
 #define DST "distanceFromMiddle"
 #define LDST "leftDistance"
 #define RDST "rightDistance"
 #define SPD "speed"
+
+#define ACC "acceleration"
+#define DIR "direction"
 
 class Driver;
 

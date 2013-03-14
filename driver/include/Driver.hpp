@@ -24,7 +24,7 @@ public:
     void initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituation *s);
     virtual void newRace(tCarElt* car, tSituation *s);
     virtual void drive(tSituation *s);
-    virtual void endRace(tSituation *s);
+    virtual void endRace() = 0;
 
     virtual void decision() = 0;
     

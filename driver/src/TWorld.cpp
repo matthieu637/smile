@@ -28,15 +28,14 @@ double TWorld::reward(const Driver& d) {
 
     r-=dammageGet;
 
-//     LOG_DEBUG(d.getCar()->_trkPos.toRight);
-    
-    if(d.getCar()->_trkPos.toRight < 1. )
-        r += 10*d.getCar()->_trkPos.toRight ;
-    else if (d.getCar()->_trkPos.toLeft < 1.)
-        r += 10*d.getCar()->_trkPos.toLeft ;
+  
+    if(d.getCar()->_trkPos.toRight < 0.5 )
+        r -= sml::Utils::abs(10.*d.getCar()->_trkPos.toRight);
+    else if (d.getCar()->_trkPos.toLeft < 0.5)
+        r -= sml::Utils::abs(10.*d.getCar()->_trkPos.toLeft) ;
  
     
-    if(r > 0 && !d.isStuck())
+     if(r > 0 && !d.isStuck() && d.getCar()->_trkPos.toRight > 0.5 &&  d.getCar()->_trkPos.toLeft > 0.5) //not out or stuck
        if((d.getAngle() < M_PI/8 && d.getAngle() >= 0) || (d.getAngle() > -M_PI/8 && d.getAngle() <= 0 ))
 	 r += 40;
 
@@ -86,3 +85,4 @@ unsigned int TWorld::discretizeDistance(float distance, unsigned int cardinal, d
 float TWorld::computeSteering(unsigned int discetized, unsigned int cardinal, double smin, double smax){
     return smin+((float)discetized/(float)cardinal)*(smax-smin);
 }
+
