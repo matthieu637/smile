@@ -4,9 +4,9 @@
 
 namespace sml {
 
-DAction::DAction(){
+DAction::DAction() {
 }
-  
+
 DAction::DAction(const ActionTemplate* temp, const std::list< int>& vals)
 {
     assert((int)vals.size() == temp->actionNumber());
@@ -20,7 +20,7 @@ DAction::DAction(const ActionTemplate* temp, const std::list< int>& vals)
         values[i]= *it;
         i++;
     }
-    
+
     computehash();
 }
 
@@ -39,7 +39,7 @@ DAction::DAction(const ActionTemplate* temp, int value) {
             multiplier *= *it;
 
         values[i] = (int) (value / multiplier);
-	value -= values[i]*multiplier;
+        value -= values[i]*multiplier;
 
         for(int j=0; j < (templ->actionNumber() -1) - (i + 1); j++) //refill
             it--;
@@ -63,9 +63,9 @@ int DAction::operator[](const string& name) const {
     return get(name);
 }
 
-void DAction::set(const string& name, int value){
-  values[templ->indexFor(name)] = value;
-  computehash();
+void DAction::set(const string& name, int value) {
+    values[templ->indexFor(name)] = value;
+    computehash();
 }
 
 unsigned int DAction::hash() const
@@ -108,6 +108,22 @@ bool DAction::operator==(const DAction& ac) const {
 
 bool DAction::operator<(const DAction& ac) const {
     return hash() < ac.hash();
+}
+
+void DAction::print(std::ostream &flux) const {
+    flux << "{";
+    for(int i=0; i<templ->actionNumber(); i++) {
+        flux << values[i];
+        if(i+1 < templ->actionNumber())
+            flux << "," ;
+    }
+    flux << "}" ;
+}
+
+std::ostream& operator<<(std::ostream& stream,
+                         const sml::DAction& ac) {
+    ac.print(stream);
+    return stream;
 }
 
 }

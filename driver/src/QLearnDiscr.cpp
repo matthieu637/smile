@@ -65,10 +65,7 @@ void QLearnDiscr::decision()
     lastAction = Pap;
     lastState = Psp;
 
-//     std::cout << "etat " << sp[AGL] << " "<< sp[DST] << " action " << ap[ACC] << " "<< ap[DIR] << "   recomp : " << r << std::endl;
-//     std::cout << std::flush;
-
-//     LOG_DEBUG(car->_speed_x << " " << car->_speed_y);
+//     LOG_DEBUG("etat " << sp << " action " << ap << " recomp : " << r);
 
     applyActionOn(ap, car);
 }

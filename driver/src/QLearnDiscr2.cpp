@@ -7,8 +7,8 @@
 
 const sml::ActionTemplate QLearnDiscr2::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIR}, {QLearnDiscr2::ACTIONS_ACC, QLearnDiscr2::ACTIONS_DIRECTION});
 
-const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {STK, AGL, LDST, RDST, SPD},
-							{2,QLearnDiscr2::STATES_ALPHA, QLearnDiscr2::STATES_DISTANCE, QLearnDiscr2::STATES_DISTANCE, 6});
+const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {STK, AGL, DST, SPD},
+							{2,QLearnDiscr2::STATES_ALPHA, QLearnDiscr2::STATES_DISTANCE, 6});
 
 
 QLearnDiscr2::QLearnDiscr2(int index):Driver(index, DECISION_EACH), Q(&STATE_TEMPLATE, &ACTION_TEMPLATE), N(&STATE_TEMPLATE, &ACTION_TEMPLATE)
@@ -81,8 +81,7 @@ void QLearnDiscr2::decision()
     lastState = Psp;
     init=true;
 
-//     std::cout << "etat " << sp[AGL] << " "<< sp[DST] << " action " << ap[ACC] << " "<< ap[DIR] << "   recomp : " << r << " : "  << isStuck() << std::endl;
-//     std::cout << std::flush;
+    LOG_DEBUG("etat " << sp << " action " << ap << " recomp : " << r);
 
     applyActionOn(ap, car);
 
@@ -102,8 +101,7 @@ DState* QLearnDiscr2::discretize(const State& st) {
     DState* dst = new DState(&STATE_TEMPLATE, 0) ;
     dst->set(STK, st.stuck);
     dst->set(AGL, TWorld::discretizeAngle(st.angle, STATES_ALPHA));
-    dst->set(LDST, TWorld::discretizeDistance(st.leftDistance, STATES_DISTANCE, -8., 8.));
-    dst->set(RDST, TWorld::discretizeDistance(st.rightDistance, STATES_DISTANCE, -8., 8.));
+    dst->set(DST, TWorld::discretizeDistance(st.distanceFromMiddle, STATES_DISTANCE, -8., 8.));
     dst->set(SPD, TWorld::discretizeDistance(st.speed, 6, -40., 40.));
     return dst;
 }

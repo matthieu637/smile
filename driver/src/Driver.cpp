@@ -67,7 +67,7 @@ void Driver::drive(tSituation *s)
         decision();
         decision_each=0;
         lastDammage = car->_dammage;
-        lastDistance = car->_distFromStartLine;
+        lastDistance = car->_distRaced;
     }
 }
 
@@ -168,9 +168,7 @@ double Driver::getCoveredDistance() const {
     double distParcourue = 0;
 
     if(lastDistance != -1)
-        distParcourue = car->_distFromStartLine - lastDistance;
-    if(distParcourue > 1000|| distParcourue < -1000) //passe ligne bug?
-        distParcourue = 20;
+        distParcourue = car->_distRaced - lastDistance;
     return distParcourue;
 }
 

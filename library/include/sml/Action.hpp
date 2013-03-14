@@ -34,6 +34,7 @@ public:
     bool operator==(const DAction& ac) const;
     bool operator<(const DAction& ac) const;
     unsigned int hash() const;
+    void print(std::ostream &flux) const;
 
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -63,6 +64,8 @@ private:
     const ActionTemplate *templ;
     int hashmem;
 };
+
+std::ostream& operator<< (std::ostream& stream, const sml::DAction& ac);
 
 typedef DAction DState;
 
