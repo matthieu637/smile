@@ -19,8 +19,8 @@ double TWorld::reward(const Driver& d) {
         r = -100;
         if(d.isStuck())
             r -= 350;
-	else if(distParcourue < 0)
-	  r -= 600;
+        else if(distParcourue < 0)
+            r -= 600;
     }
     else if(distanceMilieu < 0. || distParcourue < 0.)
         r = -r;
@@ -28,23 +28,23 @@ double TWorld::reward(const Driver& d) {
 
     r-=dammageGet;
 
-  
+
     if(d.getCar()->_trkPos.toRight < 0.5 )
         r -= sml::Utils::abs(10.*d.getCar()->_trkPos.toRight);
     else if (d.getCar()->_trkPos.toLeft < 0.5)
         r -= sml::Utils::abs(10.*d.getCar()->_trkPos.toLeft) ;
- 
-    
-     if(r > 0 && !d.isStuck() && d.getCar()->_trkPos.toRight > 0.5 &&  d.getCar()->_trkPos.toLeft > 0.5) //not out or stuck
-       if((d.getAngle() < M_PI/8 && d.getAngle() >= 0) || (d.getAngle() > -M_PI/8 && d.getAngle() <= 0 ))
-	 r += 40;
+
+
+    if(r > 0 && !d.isStuck() && d.getCar()->_trkPos.toRight > 0.5 &&  d.getCar()->_trkPos.toLeft > 0.5) //not out or stuck
+        if((d.getAngle() < M_PI/8 && d.getAngle() >= 0) || (d.getAngle() > -M_PI/8 && d.getAngle() <= 0 ))
+            r += 40;
 
 //     LOG_DEBUG("recompense " << distanceMilieu << " "<< distParcourue << " " << r << " -- "  << d.getCar()->_distFromStartLine << " ");
 
     return r;
 }
 
-State* TWorld::observe(const Driver& d){
+State* TWorld::observe(const Driver& d) {
     const tCarElt* car = d.getCar();
     State* s = new State;
     s->stuck = d.isStuck();
@@ -56,33 +56,15 @@ State* TWorld::observe(const Driver& d){
     return s;
 }
 
-unsigned int TWorld::discretizeAngle(float angle, unsigned int cardinal){
-     unsigned int d = 0;
-     
-     for(unsigned int i=0; i<cardinal; i++)
-        if(angle < -M_PI +(M_PI/((double)cardinal/2.))*i ) {
-            d = i;
-            break;
-        }
-        
-     return d;
+unsigned int TWorld::discretizeAngle(float angle, unsigned int cardinal) {
+    return round(sml::Utils::transform(angle, -M_PI, M_PI, 0, (double)(cardinal - 1)));
 }
 
-unsigned int TWorld::discretizeDistance(float distance, unsigned int cardinal, double dismin, double dismax){
-    int d = -1;
-      
-    for(unsigned int i=0; i<cardinal; i++)
-        if(distance < dismin + ((dismax-dismin)/(double)cardinal)*(double)i) {
-            d = i;
-            break;
-        }
-    if(d == -1 )
-      return cardinal - 1;
-      
-    return (unsigned int)d;
+unsigned int TWorld::discretizeDistance(float distance, unsigned int cardinal, double dismin, double dismax) {
+    return round(sml::Utils::transform(distance, dismin, dismax, 0, (double)(cardinal - 1)));
 }
 
-float TWorld::computeSteering(unsigned int discetized, unsigned int cardinal, double smin, double smax){
+float TWorld::computeSteering(unsigned int discetized, unsigned int cardinal, double smin, double smax) {
     return smin+((float)discetized/(float)cardinal)*(smax-smin);
 }
 
