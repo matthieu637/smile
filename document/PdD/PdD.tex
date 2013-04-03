@@ -59,7 +59,7 @@
   \renewcommand{\labelitemiii}{$\diamond$}
   \renewcommand{\labelitemiv}{$\ast$}
   
-  \section{Apercu du TER} 
+  \section{Apercu du PIAD} 
 
   \subsection{Objectifs}
 	Nous devrons développer une bibliothèque indépendante du domaine dans lequel l'agent évolue. 
@@ -75,7 +75,7 @@
 	Parallèlement au développement de la bibliothèque, afin d'avoir une application pratique de la théorie,
 	on utilisera ces algorithmes dans le simulateur TORCS sur l'apprentissage automatique de la conduite de 
 	voiture sur circuit. Nous modifierons également l'interface TORCS pour intégrer les retours positifs ou 
-	négatif de l'expert, voire des retours plus complexes cité précédemment. \cite{CdC}
+	négatif de l'expert, voire des retours plus complexes cités précédemment \cite{CdC}.
 
   
   \nocite{TORCS}
@@ -99,7 +99,7 @@
     \item son freinage
     \item sa direction
     \end{itemize}
-    On s'attend donc à ce que l'agent dans cette environnement roule toujours avec la première vitesse.
+    On s'attend donc à ce que l'agent dans cet environnement roule toujours avec la première vitesse.
   
   \paragraph{Env. Complexe}Il s'agit toujours de l'environnement de TORCS mais agrémenté de nouvelles perceptions
     \begin{itemize}
@@ -126,7 +126,7 @@
     comprendre le plan sont les suivants : \cite{PDMIA} et \cite{ReinforceLearningIntro}.
   
   \newpage 
-  \section{Organisation du TER}
+  \section{Organisation du PIAD}
 
     \subsection{Participants}
 	Encadrants :
@@ -142,9 +142,6 @@
 		\item Matthieu \textsc{Zimmer} (\href{mailto:contact@matthieu-zimmer.net}{contact@matthieu-zimmer.net})
 	\end{itemize}
 
-	\bigskip
-	À l'heure actuelle, il n'y a pas de liens avec d'autres TER, enseignants, chercheurs,
-	laboratoires, entreprises.
     
     \subsection{Activités globales}
       \paragraph{Scripts} Maintenir et développer un ensemble de script permettant de compiler, installer, nettoyer, lancer
@@ -156,25 +153,25 @@
 
     \subsection{Tâches jalonnées}
     
-      \paragraph{Prise connaissances APR} Lire les 2 premiers chapitres de \cite{PDMIA} et se familiariser avec 
+      \paragraph{Prise de connaissances de l'APR} Lire les 2 premiers chapitres de \cite{PDMIA} et se familiariser avec 
       l'apprentissage par renforcement. Sans oublier le chapitre dédié de \cite{IntArt}.
       
-      \paragraph{Compréhension Robot TORCS} Comprendre la structure des les fichiers nécessaire pour concevoir un robot 
+      \paragraph{Compréhension du Robot TORCS} Comprendre la structure des les fichiers nécessaire pour concevoir un robot 
       dans TORCS. Déterminer les perceptions disponibles et les actions possibles pour le robot.
     
-      \paragraph{Etablissement CdC/PdD} Définir le cahier des charges avec les encadrants, découper le projet en plusieurs
+      \paragraph{Etablissement du CdC/PdD} Définir le cahier des charges avec les encadrants, découper le projet en plusieurs
       tâches, assigner les rôles de chacun.
     
       \paragraph{Analyse et Conception} Réfléchir aux différentes classes et méthodes nécessaire pour concevoir une
       bibliothèque réutilisable. Concevoir les diagrammes de classe.
       
-      \paragraph{Implémentation Q-learning} Implémenter l'algorithme Q-learning dans la bibliothèque de façon générique
+      \paragraph{Implémentation du Q-learning} Implémenter l'algorithme Q-learning dans la bibliothèque de façon générique
       et réutilisable.
       
-      \paragraph{Implémentation SARSA} Implémenter l'algorithme SARSA dans la bibliothèque de façon générique
+      \paragraph{Implémentation de SARSA} Implémenter l'algorithme SARSA dans la bibliothèque de façon générique
       et réutilisable.
       
-      \paragraph{Implémenter fonction de Récompenses} Coder des fonctions qui permettront de donner une valeur à un état,
+      \paragraph{Implémenter la fonction de Récompenses} Coder des fonctions qui permettront de donner une valeur à un état,
       pour ça il faut retrouver les informations données par TORCS et y appliquer quelques formules mathématiques.
       
       \paragraph{Interfacer Q-learning - Env. Réduit} Il s'agit de faire le lien entre la fonction générique Q-learning
@@ -183,8 +180,8 @@
       \paragraph{Interfacer SARSA - Env. Réduit} Il s'agit de faire le lien entre la fonction générique SARSA
       codée dans la bibliothèque et le robot dans l'environnement réduit de TORCS. 
       
-      \paragraph{Implémentation fonction d'approximation} Etant donné que dans les environnements complexes il y a une
-      explotion combinatoire, il nous faut developper des moyens pour réduire le nombre d'états de nos agent. C'est le
+      \paragraph{Implémentation des méthodes approchés de l'APR} Etant donné que dans les environnements complexes il y a une
+      explosion combinatoire, il nous faut developper des moyens pour réduire le nombre d'états de nos agent. C'est le
       rôle de cette tâche.
       
       \paragraph{Interfacer Q-learning - Env. Complexe} Il s'agit de faire le lien entre la fonction générique Q-learning
@@ -193,9 +190,9 @@
       \paragraph{Interfacer SARSA - Env. Complexe} Il s'agit de faire le lien entre la fonction générique SARSA
       codée dans la bibliothèque et le robot dans l'environnement réduit de TORCS. 
       
-      \paragraph{Implémenter mesure de Perf.} Pour permettre de comparer les différents algorithmes et les différents 
+      \paragraph{Implémenter les mesures de Perf.} Pour permettre de comparer les différents algorithmes et les différents 
       
-      \paragraph{Modifier interface TORCS} Intégrer les retours positifs/négatifs de l'expert.
+      \paragraph{Modifier l'interface de TORCS} Intégrer les retours positifs/négatifs de l'expert.
       
       \paragraph{Fonctionnalités additionnelles} Continuer le développement parmi les fonctions facultatives dont nous
       avons parlé dans \cite{CdC}.
