@@ -27,16 +27,17 @@
 #include <math.h>
 
 #include "QLearnDiscr.hpp"
-#include <QLearnDiscr2.hpp>
+#include "QLearnDiscr2.hpp"
+#include "QLearnGen.hpp"
 
-#define NBBOTS 2
+#define NBBOTS 3
 
 static const char* botname[NBBOTS] = {
-    "smile_0", "smile_1"
+    "smile_0", "smile_1", "smile_2"
 };
 
 static const char* botdesc[NBBOTS] = {
-    "Discretize Q learning", "Discretize Q learning without geering"
+    "Discretize Q learning", "Discretize Q learning (lamba)", "Q learning f. approximation"
 };
 
 static Driver *driver[NBBOTS];
@@ -54,7 +55,7 @@ static int InitFuncPt(int index, void *pt);
 extern "C" int smile(tModInfo *modInfo)
 {
     int i;
-
+    
     /* clear all structures */
 
     memset(modInfo, 0, 10*sizeof(tModInfo));
@@ -86,6 +87,8 @@ static int InitFuncPt(int index, void *pt)
     case 1:
         driver[index] = new QLearnDiscr2(index);
         break;
+    case 2:
+	driver[index] = new QLearnGen(index);
     }
     
     itf->rbNewTrack = initTrack;	/* Give the robot the track view called */

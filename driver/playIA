@@ -1,0 +1,20 @@
+#!/bin/bash
+
+
+launch(){
+
+index=$1
+cp ../torcs/xml/quickraceO.xml ~/.torcs/config/raceman/quickrace.xml
+sed -i "s/SEDME/$index/" ~/.torcs/config/raceman/quickrace.xml
+torcs
+cp ../torcs/xml/quickrace.xml ~/.torcs/config/raceman/
+}
+
+if [ $# -lt 1 ] ; then
+	echo "Usage : $0 <index>"
+else
+  launch $1
+fi
+
+
+

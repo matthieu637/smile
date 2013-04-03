@@ -26,17 +26,17 @@ private:
   void applyActionOn(const DAction& ac, tCarElt* car);
     
 private:
-    static const int DECISION_EACH = 2;
+    static const int DECISION_EACH = 5;
 
     static const int STATES_ALPHA = 16;
     static const int STATES_DISTANCE = 10;
     static const int ACTIONS_ACC = 7;
     static const int ACTIONS_DIRECTION = 10;
     
-    const double lamba = 0.2;
-    const double lrate = 0.4;
+    const double lamba = 0.9;
+    const double lrate = 0.01;
     const double discount = 0.35;
-    const double espilon = 0.1;
+    const double espilon = 0.01;
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
     static const sml::StateTemplate STATE_TEMPLATE;

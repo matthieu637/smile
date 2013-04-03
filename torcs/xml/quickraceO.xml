@@ -31,7 +31,7 @@
     <attstr name="type" val="race"/>
     <attstr name="starting order" val="drivers list"/>
     <attstr name="restart" val="no"/>
-    <attnum name="laps" val="3"/>
+    <attnum name="laps" val="0"/>
     <section name="Starting Grid">
       <attnum name="rows" val="2"/>
       <attnum name="distance to start" val="0"/>
@@ -46,19 +46,9 @@
   <section name="Drivers">
     <attnum name="maximum number" val="40"/>
     <attstr name="focused module" val="smile"/>
-    <attnum name="focused idx" val="2"/>
+    <attnum name="focused idx" val="1"/>
     <section name="1">
-      <attnum name="idx" val="2"/>
-      <attstr name="module" val="smile"/>
-    </section>
-
-    <section name="2">
-      <attnum name="idx" val="1"/>
-      <attstr name="module" val="smile"/>
-    </section>
-
-    <section name="3">
-      <attnum name="idx" val="0"/>
+      <attnum name="idx" val="SEDME"/>
       <attstr name="module" val="smile"/>
     </section>
 
@@ -84,6 +74,24 @@
 
       </section>
 
+    </section>
+
+  </section>
+
+  <section name="Drivers Start List">
+    <section name="1">
+      <attstr name="module" val="smile"/>
+      <attnum name="idx" val="2"/>
+    </section>
+
+    <section name="2">
+      <attstr name="module" val="smile"/>
+      <attnum name="idx" val="1"/>
+    </section>
+
+    <section name="3">
+      <attstr name="module" val="smile"/>
+      <attnum name="idx" val="0"/>
     </section>
 
   </section>

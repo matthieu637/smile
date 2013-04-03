@@ -1,6 +1,5 @@
 #include "QLearnDiscr2.hpp"
 #include <TWorld.hpp>
-#include <sml/SaveLoad.hpp>
 #include <sml/Utils.hpp>
 #include <iostream>
 #include <bib/Logger.hpp>
@@ -31,7 +30,6 @@ void QLearnDiscr2::decision()
 
     //Take action a, observe r, s'
     DAction a = *lastAction;
-    double r = TWorld::reward(*this);
     State st = *TWorld::observe(*this);
     DState* Psp = discretize(st);//TODO:memory leak
     DState sp = *Psp;
@@ -47,7 +45,7 @@ void QLearnDiscr2::decision()
 
 
     if(init) {
-        double delta = r + discount*Q(sp, as) - Q(s,a);
+        double delta = reward + discount*Q(sp, as) - Q(s,a);
         N(s,a) = N(s, a) + 1.;
 
         /*
@@ -81,7 +79,7 @@ void QLearnDiscr2::decision()
     lastState = Psp;
     init=true;
 
-    LOG_DEBUG("etat " << sp << " action " << ap << " recomp : " << r);
+    LOG_DEBUG("etat " << sp << " action " << ap << " recomp : " << reward);
 
     applyActionOn(ap, car);
 }
@@ -106,7 +104,7 @@ DState* QLearnDiscr2::discretize(const State& st) {
 }
 
 void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
-    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.5, 0.5);
+    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.4, 0.4);
 
     unsigned int accel = ac[ACC];
 

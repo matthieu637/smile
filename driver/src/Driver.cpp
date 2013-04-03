@@ -2,6 +2,7 @@
 #include <iostream>
 #include <bib/Logger.hpp>
 #include "Driver.hpp"
+#include <TWorld.hpp>
 
 const float Driver::MAX_UNSTUCK_ANGLE = 15.0/180.0*PI;		/* [radians] */
 
@@ -15,17 +16,19 @@ const float Driver::UNSTUCK_TIME_LIMIT = 2.0;				/* [s] */
 
 Driver::Driver(int index, int intervalAction)
 {
+    srand(time(NULL)); //need random in many algorithms
     INDEX = index;
     INTERVAL_ACTION = intervalAction;
 
 
     decision_each = 0;
     stuck = 0;
+    globalReward = 0.;
 }
 
 Driver::~Driver()
 {
-
+    LOG_DEBUG("REWARD :" << (long int)globalReward/1000);
 }
 
 /* Called for every track change or new race. */
@@ -60,10 +63,13 @@ void Driver::drive(tSituation *s)
 
     if(decision_each > INTERVAL_ACTION)
     {
-        if (car->_trkPos.toRight != car->_trkPos.toRight) { //fix bug during simulation ?
+        if (car->_trkPos.toRight != car->_trkPos.toRight || s->currentTime > 5*60) { //fix bug during simulation ?
+	    LOG_DEBUG("REWARD :" << (long int)globalReward/1000);
             endRace();
             exit(1);
         }
+        reward = TWorld::reward(*this);
+	globalReward += reward;
         decision();
         decision_each=0;
         lastDammage = car->_dammage;

@@ -18,6 +18,15 @@
 #define LOG_DEBUG(stream) \
   bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << "DEBUG :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
 
+#define LOG_DEBUGS(stream) \
+  bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << "DEBUG :" << __FILE__ << "."<< __LINE__ << " : " << stream
+  
+#define LOG_DEBUGC(stream) \
+  bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << stream 
+
+#define LOG_DEBUGE(stream) \
+  bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << std::endl
+  
 #define LOG_INFO(stream) \
   bib::Logger::getInstance()->isEnabled(bib::Logger::INFO) && std::cout << "INFO :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
 
@@ -43,6 +52,18 @@ public:
 
     void setLevel(LogLevel l) {
         level = l;
+    }
+    
+    template <class T>
+    static inline void PRINT_ELEMENTS (const T& coll, const char* optcstr="")
+    {
+        typename T::const_iterator pos;
+
+        LOG_DEBUGS(optcstr);
+        for (pos=coll.begin(); pos!=coll.end(); ++pos)
+            LOG_DEBUGC(*pos << ", ");
+        
+        LOG_DEBUGE();
     }
 
 protected:

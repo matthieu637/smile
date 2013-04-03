@@ -12,7 +12,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS} )
 file ( GLOB_RECURSE sources src/bib/*.cpp include/bib/*.hpp src/sml/*.cpp include/sml/*.hpp )
 file ( GLOB_RECURSE sources_test src/test/*.cpp include/test/*.hpp)
 
-set(CMAKE_CXX_FLAGS "-g -DDEBUG -Wall -Wextra -std=c++11 -fPIC")
+set(CMAKE_CXX_FLAGS "-g -O2 -DDEBUG -Wall -Wextra -std=c++11 -fPIC")
 set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/lib")
 
 set(TYPE_LIB STATIC CACHE STRING "(STATIC or SHARED)")

@@ -13,21 +13,21 @@ double TWorld::reward(const Driver& d) {
 
     double r = distParcourue;
 
-    if(d.isStuck() && distParcourue < 0.)
+    if(d.isStuck() && distParcourue < -0.01)
         r = 15;
     else {
-        if(distParcourue > 0 && !d.isStuck()) //increase reward if everything's ok r^3
+        if(distParcourue > 0.01 && !d.isStuck()) //increase reward if everything's ok r^3
         {
             r+=4; // 4² -> 16 > 15
-            r = r*r;
+            r = r*r*r;
         }
-        else if(distParcourue <= 0 && !d.isStuck()) { // don't move don't stuck
-            if(distParcourue > -0.01) 
+        else if(distParcourue < 0.01 && !d.isStuck()) { // don't move don't stuck
+            if(distParcourue > -0.01)
                 r = -500.;
-            else //rolls backwards
-	      r = -2000.*(1.+sml::Utils::abs(distParcourue));
+            else //drive backwards
+                r = -2000.*(1.+sml::Utils::abs(distParcourue));
         }
-        else if(distParcourue <= 0 && d.isStuck()) // don't move because stuck
+        else if(distParcourue < 0.01 && d.isStuck()) // don't move because stuck
             r = -1000.;
         else  // move and stuck -> forcing the wall -_-
             r = -2000.;
@@ -58,16 +58,23 @@ double TWorld::reward(const Driver& d) {
         }
 
         // stay in a good position
-        double aLimit = M_PI/6.;
-        double bonusMax = 50.;
-        if(r > 0 && !d.isStuck() && car->_trkPos.toRight > aLimit &&  car->_trkPos.toLeft > aLimit) { //not out or stuck
-            double aAgl = sml::Utils::abs(d.getAngle());
-            if(aAgl < aLimit) {
-                double bonus = bonusMax - sml::Utils::transform(aAgl, 0., aLimit, 0., bonusMax);
-                r+= bonus;
-            }
+//     double aLimit = M_PI/6.;
+        double aAgl = sml::Utils::abs(d.getAngle());
+        double bonusMax = 100.;
+        if(r > 0 && !d.isStuck() && car->_trkPos.toRight >= limit &&  car->_trkPos.toLeft >= limit) { //not out or stuck
+
+//         if(aAgl < aLimit) {
+            double bonus = bonusMax - sml::Utils::transform(aAgl, 0., M_PI, 0, bonusMax);
+            r+= bonus;
+//         }
+        } else {
+	  //TODO: come on the race
+//             double malus = sml::Utils::transform(aAgl, 0., M_PI, 0, bonusMax);
+//             r -= malus;
         }
+
     }
+
 
 
 

@@ -4,35 +4,34 @@
 launch(){
 
 index=$1
-nbCPU=$2
+#nbCPU=$2
 file="smile${index}.data"
-
-torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null
 
 for i in {1..900000}
 do 
+#  episod=`expr $i \* $nbCPU`
+  episod=$i
+#  pid=""
+#  for ((q=1; q <= $nbCPU ; q++))
+#  do
+  perf=`torcs -r ~/.torcs/config/dtmrace${index}.xml | grep REWARD | sed -e 's/^.*REWARD ://'`
   lsize=`cat /usr/local/share/games/torcs/$file | grep -ve '\([^0-9]\|^\)0\([.]\|<\)' | wc -l`
-  episod=`expr $i \* $nbCPU`
-  echo "iter : $i | state learned : $lsize | simulated races :  $episod"
-  pid=""
-  for ((q=1; q <= $nbCPU ; q++))
-  do
-    torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null &
-    pid="$pid $!"
-  done
-  for p in "$pid"
-  do
-	  wait $p
-  done
+  echo "iter : $i | state learned : $lsize | simulated races :  $episod | perf : $perf"
+#    pid="$pid $!"
+#  done
+#  for p in "$pid"
+#  do
+#	  wait $p
+#  done
 done
 
 }
 
-
-if [ ! $# -eq 2 ] ; then
-	echo "Usage : $0 <index> <cpu>"
+if [ $# -lt 1 ] ; then
+	echo "Usage : $0 <index>"
+	# <cpu>"
 else
-  launch $1 $2
+  launch $1 # $2
 fi
 
 

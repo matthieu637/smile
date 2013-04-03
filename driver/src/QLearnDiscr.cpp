@@ -1,6 +1,5 @@
 #include "QLearnDiscr.hpp"
 #include <TWorld.hpp>
-#include <sml/SaveLoad.hpp>
 #include <sml/Utils.hpp>
 #include <iostream>
 #include <bib/Logger.hpp>
@@ -39,7 +38,6 @@ void QLearnDiscr::decision()
 {
     DAction a = *lastAction;
     DState s = *lastState;
-    double r = TWorld::reward(*this);
 
     State st = *TWorld::observe(*this);
     DState* Psp = discretize(st);
@@ -50,7 +48,7 @@ void QLearnDiscr::decision()
     //update Q value with lastState
     if(init) {
 // 	LOG_DEBUG("Q(s,a) = " << Q(s,a) << " |  Q(sp, ap) = " << Q(sp, ap) << " | r = " << r);
-        Q(s,a) = Q(s,a) + lrate*(r+discount*Q(sp, ap) - Q(s, a) );
+        Q(s,a) = Q(s,a) + lrate*(reward+discount*Q(sp, ap) - Q(s, a) );
 // 	LOG_DEBUG("new Q(s,a) = " << Q(s,a));
 
         if(sml::Utils::rand01() < espilon ) {
@@ -88,7 +86,7 @@ DState* QLearnDiscr::discretize(const State& st) {
 }
 
 void QLearnDiscr::applyActionOn(const DAction& ac, tCarElt* car) {
-    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.8, 0.8);
+    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.4, 0.4);
 
     int accel = ac[ACC];
 

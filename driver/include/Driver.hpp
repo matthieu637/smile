@@ -38,7 +38,8 @@ public:
 protected:
     int getGear();
     float getDistToSegEnd();
-
+    double reward;
+    double globalReward;
     
 
     /* per robot global data */

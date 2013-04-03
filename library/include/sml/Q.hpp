@@ -21,9 +21,13 @@ public:
     
     const hashmap* operator[](const DState& name) const; 
     DAction* argmax(const DState& name) const;
+    DAction* argmax() const ;
     
     double operator()(const DState& s, const DAction& a) const;
     double& operator()(const DState& s, const DAction& a);
+    
+    double operator()(const DAction& a) const;
+    double& operator()(const DAction& a);
     
     double operator()(unsigned int s, unsigned int a) const;
     double& operator()(unsigned int s, unsigned int a);
