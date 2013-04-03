@@ -58,9 +58,9 @@
   \renewcommand{\labelitemiii}{$\diamond$}
   \renewcommand{\labelitemiv}{$\ast$}
   
-  \section{Objectif du TER IAD}
+  \section{Objectif du PIAD}
   \subsection{Présentation}
-    Ce document représente le cahier des charges du TER sur un apprentissage semi-supervisé d'agents intelligents 
+    Ce document représente le cahier des charges du PIAD portant sur un apprentissage semi-supervisé d'agents intelligents 
     en partant de l'\textbf{apprentissage par renforcement}.
 	  
     Il s'agit de concevoir et développer un système dans lequel un agent intelligent évoluera (surveillance automatique, ...).
@@ -84,7 +84,7 @@
 	Parallèlement au développement de la bibliothèque, afin d'avoir une application pratique de la théorie,
 	on utilisera ces algorithmes dans le \textbf{simulateur TORCS} sur l'apprentissage automatique de la conduite de 
 	voiture sur circuit. Nous modifierons également l'interface TORCS pour intégrer les retours positifs ou 
-	négatif de l'expert.
+	négatifs de l'expert.
 
   \subsection{État de l'art}
     \paragraph{Apprentissage non supervisé} 
@@ -93,24 +93,24 @@
       de façon à optimiser une récompense numérique au cours du temps.
 
       L'agent cherche, au travers d'expériences itérées, un comportement décisionnel optimal, en ce sens qu'il 
-      maximise la somme des récompenses au cours du temps.
-      \cite{Wiki_Reinforcement_learning} 
+      maximise la somme des récompenses au cours du temps
+      \cite{Wiki_Reinforcement_learning}.
       
-      Il existe déjà de nombreux algorithmes éprouvés qu'il conviendra simplement d'implémenter.
-      \cite{ReinforceLearningIntro}
+      Il existe déjà de nombreux algorithmes éprouvés qu'il conviendra simplement d'implémenter
+      \cite{ReinforceLearningIntro}.
   
     \vfill
     \paragraph{Apprentissage semi-supervisé} 
-      Le domaine est déjà assez développé avec plusieurs algorithmes existants.
-      \cite{Wiki_SemiSupervised}
+      Le domaine est déjà assez développé avec plusieurs algorithmes existants
+      \cite{Wiki_SemiSupervised}.
       
       Pour ce qui est de l'apprentissage semi-supervisé par renforcement, il existe déjà aussi quelques articles.
   
     \paragraph{TORCS : The Open Racing Car Simulator} C'est un simulateur de course de voiture multi plate-forme.
     Il peut être utilisé comme un jeu de voiture ordinaire, ou comme plateforme de recherche en intelligence artificielle 
     car il permet de définir facilement des robots qui conduiront les voitures. 
-    Son code source est sous licence GPL.
-    \cite{TORCS}
+    Son code source est sous licence GPL
+    \cite{TORCS}.
     
       \begin{center}
     \includegraphics[height=70mm]{../images/torcs.png} 
@@ -148,9 +148,9 @@
   \newpage 
   \section{Description de la solution demandée}
 	De nombreux termes et concepts utilisés dans cette section se réfèrent au document : \cite{PDMIA}. 
-	Il est necessaire d'être famillié avec les bases des MDP ( Markov Decision Process ) et de celles 
+	Il est necessaire d'être familier avec les bases du \textbf{processus de décision markovien} (MDP) et de celles 
 	de l'apprentissage par renforcement pour comprendre ce qui suit.
-	\subsection{Fonctionnalités bibliothèque}
+	\subsection{Fonctionnalités de la bibliothèque}
 		\paragraph{Algorithmes} La bibliothèque sera composée de 2 algorithmes génériques, basés sur le critère 
 		de performance $\gamma$-pondéré à horizon infini : 
 		  \begin{itemize}
@@ -162,45 +162,45 @@
 		\paragraph{Fonction de récompenses - semi supervisée} Il sera possible d'intégrer les retours d'un 
 			tuteur dans la fonction de récompense. En ajoutant/retirant une constante 
 			ou en multipliant la récompense par un facteur.
-		\paragraph{Approximation de foncion} Lorsqu'il y a une explosition combinatoire trop importante dans
+		\paragraph{Approximation de fonction} Lorsqu'il y a une explosition combinatoire trop importante dans
 		un domaine, la bibliothèque fournira des solutions par approximation de fonction.
 
-	\subsection{Fonctionnalités simulateur}
+	\subsection{Fonctionnalités du simulateur}
 		\paragraph{Robots} Les utilisateurs pourront visualiser les robots conduirent au terme ou durant leur
 		apprentissage. Il sera possible de visualiser différent algorithmes :
 		    \begin{itemize}
 		      \item Q-learning
 		      \item Sarsa
 		    \end{itemize}
-		\paragraph{Mesure de performance} Différentes mesure de performance pour les agents seront disponibles
-		tel que : le nombre de récompenses additionnées, la durée du temps de sortit de route, dommages perçu par  
+		\paragraph{Mesure de performance} Différentes mesures de performance pour les agents seront disponibles
+		tel que : le nombre de récompenses additionnées, la durée du temps de sortie de route, dommages perçus par  
                 le véhicule 
 		\paragraph{Fonction de récompenses} Il sera également possible de choisir la fonction de récompense 
 		tel que le fait de rester au milieu de la route, la distance parcouru
 		\paragraph{Réglage des paramètres} Les paramètres tel que le taux d'apprentissage, le réglage entre
 		exploitation et exploration, le taux de discrétisation des états/actions seront modifiables.
 		\paragraph{Interface retour expert} Dans le cadre de l'apprentissage semi-supervisé, l'interface de TORCS
-		sera modifiée pour permettre à un tuteur de donner des retours possitifs ou négatif durant l'apprentissage
+		sera modifiée pour permettre à un tuteur de donner des retours positifs ou négatifs durant l'apprentissage
 		de l'agent.
 	\subsection{Contraintes de réalisation}
 	  \begin{itemize}
 	   \item Il est primordial que les algorithmes soient \textbf{facilement interchangeables} et \textbf{réutilisables}
 	   en dehors de TORCS : il doit donc y avoir une nette distinction entre le code de la librairie et
 	   l'interfacement avec TORCS.
-	   \item Durant la phase de conception et de développement, les documents et le code devront être maintenu 
-	   en ligne (dans une forge type github) pour mettre aux endacrants de facilement suivre l'évolution du projet.
+	   \item Durant la phase de conception et de développement, les documents et le code devront être maintenus 
+	   en ligne (dans une forge type github) pour mettre aux encadrants de facilement suivre l'évolution du projet.
 	   \item Les fonctionnalités citées précédemment constituent le \textbf{noyau central} du projet et devront être à
 	   réaliser absolument. Les fonctionnalités à venir sont facultatives et leurs réalisations dépendront de 
 	   l'avancement du projet.
 	  \end{itemize}
 		
-	\subsection{Fonctionnalités additionnelles bibliothèque}
+	\subsection{Fonctionnalités additionnelles de la bibliothèque}
 	  \paragraph{Algorithmes} Un algorithme de \textbf{différence temporelle} pourra être ajouté.
 	  
 	  \paragraph{Fonction de récompenses - semi supervisée} L'expert pourra intégrer des feedbacks plus complexes
 	  tel que la prochaine action à choisir ou le renseigner sur sa stratégie exploration/exploitation.
 	  
-	\subsection{Fonctionnalités additionnelles simulateur}
+	\subsection{Fonctionnalités additionnelles du simulateur}
 	  \paragraph{Robots} L'algorithme de \textbf{différence temporelle} sera également disponible.
 	  \paragraph{Interface retour expert} L'interface de TORCS sera modifiée avec toute une partie indépendante
 	  pour permettre au tuteur de voir les détails de l'exécution de l'algorithme et intégrer des retours plus 
@@ -221,7 +221,7 @@
      \item Les robots implémentant les algorithmes d'apprentissage
      \item Les modifications de l'interface pour intégrer les retours de l'expert 
     \end{itemize}
-   \item Le code source entièrement commentés ( hormis celui de TORCS que nous n'aurons pas modifié )
+   \item Le code source entièrement commentés (hormis celui de TORCS que nous n'aurons pas modifié)
    \item Un ensemble de script facilitant la compilation et l'installation
    \item La documentation complète du projet à savoir :
     \begin{itemize}

@@ -20,6 +20,7 @@
 *~
 *.swp
 *.kate-swp
+*.kilepr
 
 # useless latex files
 *.toc
