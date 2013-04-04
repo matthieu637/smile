@@ -4,7 +4,7 @@
 #include <iostream>
 #include <bib/Logger.hpp>
 
-const sml::ActionTemplate QLearnDiscr2::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIRE}, {QLearnDiscr2::ACTIONS_ACC, QLearnDiscr2::ACTIONS_DIRECTION});
+const sml::ActionTemplate QLearnDiscr2::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIRE}, {TWorld::ACTIONS_ACC, QLearnDiscr2::ACTIONS_DIRECTION});
 
 // const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {STK, AGL, DST, SPD},
 // 							{2,QLearnDiscr2::STATES_ALPHA, QLearnDiscr2::STATES_DISTANCE, 6});
@@ -39,7 +39,7 @@ void QLearnDiscr2::decision()
     DAction ap = *PaP;
     DAction as = ap; //if a' ties for the max, then a* <- a'
     if(sml::Utils::rand01() < espilon ) {
-        PaP = new DAction(&ACTION_TEMPLATE, {rand() % ACTIONS_ACC, rand() % ACTIONS_DIRECTION});//TODO:memory
+        PaP = new DAction(&ACTION_TEMPLATE, {rand() % TWorld::ACTIONS_ACC, rand() % ACTIONS_DIRECTION});//TODO:memory
         ap = *PaP;
     }
 
@@ -105,35 +105,6 @@ DState* QLearnDiscr2::discretize(const State& st) {
 
 void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
     car->ctrl.steer = TWorld::computeSteering(ac[DIRE], ACTIONS_DIRECTION, -0.4, 0.4);
-
-    unsigned int accel = ac[ACC];
-
-    if(accel < 2) {
-        accel = 2 - accel;
-        car->ctrl.gear = -1;
-        car->ctrl.brakeCmd = 0;
-        car->ctrl.accelCmd = accel / 3.;
-    } else if(accel < 4) {
-        accel -= 2;
-        accel = 2 - accel;
-        //car->ctrl.gear = car->ctrl.gear;
-        car->ctrl.brakeCmd = accel / 3.;
-        car->ctrl.accelCmd = 0;
-    } else if(accel < 7)
-    {
-        accel -= 4;
-        accel = 3 - accel;
-        //car->ctrl.gear = getGear();
-        car->ctrl.gear = 1;
-        car->ctrl.brakeCmd = 0;
-        car->ctrl.accelCmd = accel / 4.;
-    } else
-    {
-        accel -= 7;
-        accel = 3 - accel;
-        car->ctrl.gear = 2;
-        car->ctrl.brakeCmd = 0;
-        car->ctrl.accelCmd = 1. - (accel / 4.);
-    }
+    TWorld::applyAcceleration(car, ac[ACC]);
 }
 

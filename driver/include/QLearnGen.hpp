@@ -29,7 +29,6 @@ private:
 private:
     static const int DECISION_EACH = 4;
 
-    static const int ACTIONS_ACC = 4;
     static const int ACTIONS_DIRECTION = 10;
     
     const double lamda = 0.95;

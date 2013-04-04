@@ -7,9 +7,7 @@
 
 double TWorld::reward(const Driver& d) {
     const tCarElt* car = d.getCar();
-//     double distanceMilieu = 10. - sml::Utils::abs( car->_trkPos.toMiddle );
     double distParcourue = d.getCoveredDistance();
-//     double dammageGet = d.getDamageGet();
 
     double r = distParcourue;
 
@@ -31,8 +29,6 @@ double TWorld::reward(const Driver& d) {
             r = -1000.;
         else  // move and stuck -> forcing the wall -_-
             r = -2000.;
-
-//     r-=dammageGet;
 
         // keep on the road
         // if near or out of the way
@@ -58,15 +54,11 @@ double TWorld::reward(const Driver& d) {
         }
 
         // stay in a good position
-//     double aLimit = M_PI/6.;
         double aAgl = sml::Utils::abs(d.getAngle());
         double bonusMax = 100.;
         if(r > 0 && !d.isStuck() && car->_trkPos.toRight >= limit &&  car->_trkPos.toLeft >= limit) { //not out or stuck
-
-//         if(aAgl < aLimit) {
             double bonus = bonusMax - sml::Utils::transform(aAgl, 0., M_PI, 0, bonusMax);
             r+= bonus;
-//         }
         } else {
             //TODO: come on the race
 //             double malus = sml::Utils::transform(aAgl, 0., M_PI, 0, bonusMax);
@@ -74,9 +66,6 @@ double TWorld::reward(const Driver& d) {
         }
 
     }
-
-
-
 
 //      LOG_DEBUG("recompense "<< r << "\t\t" <<  car->_trkPos.toRight <<"\t\t" <<  distParcourue << "\t" << d.getAngle()  );
 
@@ -106,6 +95,23 @@ State* TWorld::initialState() {
     return s;
 }
 
+DAction* TWorld::initialAction(const sml::ActionTemplate* atmp) {
+    int d = atmp->indexFor(DIRE);
+    int ac = atmp->indexFor(ACC);
+    list<int> args;
+    if(d < ac) { //dir before acc
+        args.push_back(atmp->sizesActions()->front()/2);
+        args.push_back(2);
+    }
+    else { //acc before dir
+        args.push_back(2);
+        args.push_back(atmp->sizesActions()->back()/2);
+    }
+
+    DAction* a = new DAction(atmp, args);
+    return a;
+}
+
 unsigned int TWorld::discretizeAngle(float angle, unsigned int cardinal) {
     return round(sml::Utils::transform(angle, -M_PI, M_PI, 0, (double)(cardinal - 1)));
 }
@@ -118,3 +124,27 @@ float TWorld::computeSteering(unsigned int discetized, unsigned int cardinal, do
     return smin+((float)discetized/(float)cardinal)*(smax-smin);
 }
 
+void TWorld::applyAcceleration(tCarElt* car, int accel) {
+
+    switch(accel)
+    {
+    case 0:
+        car->ctrl.gear = -1;
+        car->ctrl.brakeCmd = 0;
+        car->ctrl.accelCmd = 1;
+        break;
+    case 1:
+        car->ctrl.brakeCmd = 1;
+        car->ctrl.accelCmd = 0;
+        break;
+    case 2:
+        car->ctrl.brakeCmd = 0;
+        car->ctrl.accelCmd = 0;
+        break;
+    case 3:
+        car->ctrl.gear = 1;
+        car->ctrl.brakeCmd = 0;
+        car->ctrl.accelCmd = 1;
+        break;
+    }
+}

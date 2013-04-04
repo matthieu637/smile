@@ -30,7 +30,6 @@ private:
 
     static const int STATES_ALPHA = 16;
     static const int STATES_DISTANCE = 10;
-    static const int ACTIONS_ACC = 7;
     static const int ACTIONS_DIRECTION = 10;
     
     const double lamba = 0.9;

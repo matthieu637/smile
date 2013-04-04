@@ -26,6 +26,9 @@ public:
     double operator()(const DState& s, const DAction& a) const;
     double& operator()(const DState& s, const DAction& a);
     
+    double operator()(const DState* s, const DAction* a) const;
+    double& operator()(const DState* s, const DAction* a);
+    
     double operator()(const DAction& a) const;
     double& operator()(const DAction& a);
     

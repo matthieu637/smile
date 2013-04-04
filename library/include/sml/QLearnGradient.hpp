@@ -30,7 +30,7 @@ private:
     typedef typename sfeaturedList::iterator sfLiterator;
 
 public:
-    QLearnGradient(featuredList* features, unsigned int nbFeature, const ActionTemplate* atmp, const S& initial) :
+    QLearnGradient(featuredList* features, unsigned int nbFeature, const ActionTemplate* atmp, const DAction& initial) :
         nbFeature(nbFeature),
         nbFeatureActions(nbFeature*atmp->sizeNeeded()),
         teta(nbFeatureActions), e(zero_vector<double>(nbFeatureActions)),
@@ -43,17 +43,19 @@ public:
         for(unsigned int i=0; i < atmp->sizeNeeded() ; i++)
             actions[i] = DAction(atmpl, i);
 
+	LOG_DEBUG(initial);
+	lastAction = &initial;
     }
 
-    DAction* decision(const S& state, double r, float lrate, float epsilon, float lamda, float discout)
+    const DAction* decision(const S& state, double r, float lrate, float epsilon, float lamda, float discout)
     {
-        DAction* a;
+        const DAction* a;
         a = lastAction;
 
         float delta = r - Qa(*a);
 
         // For all a in A(s')
-
+	list<int> activeIndex = *computeQa(state);
 
 
         DAction ap = *Qa.argmax();
@@ -79,16 +81,16 @@ public:
         return a;
     }
 
-    void computeQa(const S& state) {
+    list<int>* computeQa(const S& state) {
         int featurePerLayer = nbFeature / features->size();
         int i = 0;
         int layer = 0;
-        list<int> activeIndex;
+        list<int>* activeIndex = new list<int>;
         for( fLiterator flist = features->begin(); flist != features->end(); ++flist) { // each feature
             for( sfLiterator f = (*flist).begin(); f != (*flist).end() ; ++f) {
                 double active = (*f).calc(state);
                 if(active==1.) { //save computations ie 1 feature only active per layer(tiling)
-                    activeIndex.push_back(i);
+                    activeIndex->push_back(i);
                     i = (layer+1)*featurePerLayer;//jump to the next layer
                     break;
                 }
@@ -102,12 +104,14 @@ public:
         for(vector<DAction>::iterator ai = actions.begin(); ai != actions.end() ; ++ai) { // each actions
             double _Qa = 0.;
 
-            for(list<int>::iterator it = activeIndex.begin(); it != activeIndex.end() ; ++it)
+            for(list<int>::iterator it = activeIndex->begin(); it != activeIndex->end() ; ++it)
                 _Qa += teta[(*it) + i * nbFeature ];
 
             Qa(*ai) = _Qa;
             i++;
         }
+        
+        return activeIndex;
     }
 
     void read(const string& chemin) {
@@ -139,7 +143,7 @@ private:
     list<int>* F;
     QTable Qa;
 
-    DAction* lastAction;
+    const DAction* lastAction;
 
     std::vector<DAction> actions;
 
@@ -150,3 +154,6 @@ private:
 }
 
 #endif // QLEARNGRADIENT_HPP
+
+
+

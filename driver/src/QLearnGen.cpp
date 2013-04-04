@@ -4,7 +4,7 @@
 #include <iostream>
 #include <bib/Logger.hpp>
 
-const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIRE, ACC}, {QLearnGen::ACTIONS_DIRECTION, QLearnGen::ACTIONS_ACC});
+const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIRE, ACC}, {QLearnGen::ACTIONS_DIRECTION, TWorld::ACTIONS_ACC});
 //const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIRE}, {QLearnGen::ACTIONS_DIRECTION});
 
 const double xmax = 12;
@@ -52,7 +52,7 @@ QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH)
                 sfeatures->push_back(Feature<State>(featuring, {(double)i, (double)x, (double)y/*, (double) z, (double) u*/}));
         features->push_back(*sfeatures);
     }
-    qlg = new QLearnGradient<State>(features, nbtiling * nbXinter * nbYinter, &ACTION_TEMPLATE, TWorld::initialState() );
+    qlg = new QLearnGradient<State>(features, nbtiling * nbXinter * nbYinter, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) );
     
 }
 
@@ -83,30 +83,8 @@ void QLearnGen::endRace() {
 
 
 void QLearnGen::applyActionOn(const DAction& ac, tCarElt* car) {
+
     car->ctrl.steer = TWorld::computeSteering(ac[DIRE], ACTIONS_DIRECTION, -0.3, 0.3);
-
-    unsigned int accel = ac[ACC];
-
-    switch(accel)
-    {
-    case 0:
-        car->ctrl.gear = -1;
-        car->ctrl.brakeCmd = 0;
-        car->ctrl.accelCmd = 1;
-        break;
-    case 1:
-        car->ctrl.brakeCmd = 1;
-        car->ctrl.accelCmd = 0;
-        break;
-    case 2:
-        car->ctrl.brakeCmd = 1;
-        car->ctrl.accelCmd = 0;
-        break;
-    case 3:
-        car->ctrl.gear = 1;
-        car->ctrl.brakeCmd = 0;
-        car->ctrl.accelCmd = 1;
-        break;
-    }
+    TWorld::applyAcceleration(car, ac[ACC]);
 }
 

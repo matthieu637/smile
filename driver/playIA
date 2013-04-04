@@ -6,7 +6,7 @@ launch(){
 index=$1
 cp ../torcs/xml/quickraceO.xml ~/.torcs/config/raceman/quickrace.xml
 sed -i "s/SEDME/$index/" ~/.torcs/config/raceman/quickrace.xml
-torcs
+torcs -d
 cp ../torcs/xml/quickrace.xml ~/.torcs/config/raceman/
 }
 
