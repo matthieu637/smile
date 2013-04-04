@@ -24,10 +24,10 @@ QTable::QTable(const StateTemplate* stmp, const ActionTemplate* atmp):stmpl(stmp
 }
 
 QTable::QTable(const ActionTemplate* atmp):atmpl(atmp) {
-    stmpl = new StateTemplate({""}, {1}); // for file saving
+    stmpl = new StateTemplate( {""}, {1}); // for file saving
     map = new hashmap(atmpl->sizeNeeded());
 
-    for(unsigned int j=0; j< atmpl->sizeNeeded(); j++) 
+    for(unsigned int j=0; j< atmpl->sizeNeeded(); j++)
         map->at(j) = 0.L;
 }
 
@@ -45,7 +45,7 @@ DAction* QTable::argmax(const DState& name) const {
 }
 
 DAction* QTable::argmax() const {
- 
+
     unsigned int imax = rand() % atmpl->sizeNeeded();
 //     LOG_DEBUG(imax << " " << hashState << " " << atmpl->sizeNeeded() << " " << name["angle"] << " " << name["distance"] );
     for(unsigned int j=0; j< atmpl->sizeNeeded(); j++)
@@ -63,6 +63,13 @@ double QTable::operator()(const DState& s, const DAction& a) const
 double& QTable::operator()(const DState& s, const DAction& a)
 {
     return this->operator()(s.hash(), a.hash());
+}
+
+double QTable::operator()(const DState* s, const DAction* a) const {
+    return this->operator()(*s, *a);
+}
+double& QTable::operator()(const DState* s, const DAction* a) {
+    return this->operator()(*s, *a);
 }
 
 double QTable::operator()(const DAction& a) const
@@ -100,7 +107,7 @@ void QTable::write(const string& chemin)
     named_mutex mutex( open_or_create, chemin.c_str());
 
     bib::XMLEngine::save< hashmap >(*map, "QTable", chemin);
-    
+
     mutex.unlock();
 }
 

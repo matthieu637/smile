@@ -5,10 +5,12 @@
 #include "Driver.hpp"
 #include <sml/Action.hpp>
 #include <sml/Q.hpp>
+#include <sml/QLearning.hpp>
 
 using sml::DAction;
 using sml::DState;
 using sml::QTable;
+using sml::QLearning;
 
 class State;
 
@@ -27,7 +29,7 @@ private:
   void applyActionOn(const DAction& ac, tCarElt* car);
     
 private:
-    static const int DECISION_EACH = 5;
+    static const int DECISION_EACH = 15;
 
     static const int STATES_ALPHA = 16;
     static const int STATES_DISTANCE = 10;
@@ -41,11 +43,7 @@ private:
     static const sml::ActionTemplate ACTION_TEMPLATE;
     static const sml::StateTemplate STATE_TEMPLATE;
 
-    QTable Q;
-    
-    bool init = false;
-    DState* lastState;
-    DAction* lastAction;
+    QLearning* q;
 };
 
 #endif // QLEARNDISCR_HPP

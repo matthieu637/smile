@@ -5,7 +5,7 @@
 #include <bib/Logger.hpp>
 
 // const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIR, ACC}, {QLearnGen::ACTIONS_DIRECTION, QLearnGen::ACTIONS_ACC});
-const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIR}, {QLearnGen::ACTIONS_DIRECTION});
+const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIRE}, {QLearnGen::ACTIONS_DIRECTION});
 
 const double xmax = 12;
 const double ymax = 2*M_PI;
@@ -94,7 +94,7 @@ void QLearnGen::endRace() {
 
 
 void QLearnGen::applyActionOn(const DAction& ac, tCarElt* car) {
-    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.4, 0.4);
+    car->ctrl.steer = TWorld::computeSteering(ac[DIRE], ACTIONS_DIRECTION, -0.4, 0.4);
     /*
         unsigned int accel = ac[ACC];
 
