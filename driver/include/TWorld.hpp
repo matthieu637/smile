@@ -9,7 +9,7 @@
 #define SPD "speed"
 
 #define ACC "acceleration"
-#define DIR "direction"
+#define DIRE "direction"
 
 class Driver;
 
@@ -27,6 +27,7 @@ class TWorld
 {
 
 public:
+    static State* initialState();
     static State* observe(const Driver& d);
     static double reward(const Driver& d);
     static unsigned int discretizeAngle(float angle, unsigned int cardinal);

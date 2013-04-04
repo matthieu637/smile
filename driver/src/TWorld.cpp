@@ -68,7 +68,7 @@ double TWorld::reward(const Driver& d) {
             r+= bonus;
 //         }
         } else {
-	  //TODO: come on the race
+            //TODO: come on the race
 //             double malus = sml::Utils::transform(aAgl, 0., M_PI, 0, bonusMax);
 //             r -= malus;
         }
@@ -92,6 +92,17 @@ State* TWorld::observe(const Driver& d) {
     s->distanceFromMiddle = car->_trkPos.toMiddle;
     s->leftDistance = car->_trkPos.toLeft;
     s->rightDistance = car->_trkPos.toRight;
+    return s;
+}
+
+State* TWorld::initialState() {
+    State* s = new State;
+    s->stuck = 0;
+    s->angle = 0;
+    s->speed = 0;
+    s->distanceFromMiddle = -1.8;
+    s->leftDistance = 7;
+    s->rightDistance = 3.6;
     return s;
 }
 
