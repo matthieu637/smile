@@ -29,17 +29,18 @@ private:
 private:
     static const int DECISION_EACH = 4;
 
-    static const int ACTIONS_ACC = 7;
+    static const int ACTIONS_ACC = 4;
     static const int ACTIONS_DIRECTION = 10;
     
-    const double lamda = 0.9;
-    const double lrate = 0.01;
+    const double lamda = 0.95;
+    const double lrate = 0.001;
     const double discount = 0.35;
-    const double epsilon = 0.1;
+    const double epsilon = 0.01;
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
-    
+     
     QLearnGradient<State>* qlg;
 };
 
 #endif // QLEARNDISCR_HPP
+

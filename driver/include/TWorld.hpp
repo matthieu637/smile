@@ -27,6 +27,7 @@ class TWorld
 {
 
 public:
+    //static DAction* initialAction(); 
     static State* initialState();
     static State* observe(const Driver& d);
     static double reward(const Driver& d);

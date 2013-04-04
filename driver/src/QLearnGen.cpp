@@ -4,51 +4,40 @@
 #include <iostream>
 #include <bib/Logger.hpp>
 
-// const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIR, ACC}, {QLearnGen::ACTIONS_DIRECTION, QLearnGen::ACTIONS_ACC});
-const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIR}, {QLearnGen::ACTIONS_DIRECTION});
+const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIRE, ACC}, {QLearnGen::ACTIONS_DIRECTION, QLearnGen::ACTIONS_ACC});
+//const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIRE}, {QLearnGen::ACTIONS_DIRECTION});
 
 const double xmax = 12;
 const double ymax = 2*M_PI;
-// const double zmax = 10;
-// const double umax = 7;
 
-const int nbtiling = 3;
+const int nbtiling = 4;
 
 const int nbXinter = 10;
 const int nbYinter = 16;
-// const int nbZinter = zmax;
-// const int nbUinter = umax;
 
 const double xwidth = xmax/(double)nbXinter;//increase by log
 const double yheight = ymax/(double)nbYinter;
-// const double zprof = zmax/(double)nbZinter;
-// const double uprof = umax/(double)nbUinter;
+
+//sort(rand(1,4-1)*(12/10))
+const double xtiling[nbtiling] = {0., 0.51708,   0.89841,   0.92744};
+//sort(rand(1,4-1)*(2*3.14/16))
+const double ytiling[nbtiling] = {0., 0.053834,   0.140523,   0.280546};
 
 using sml::Feature;
 
 double featuring (const State& st, std::vector<double> params) {
     double x = sml::Utils::transform(st.distanceFromMiddle, -xmax/2., xmax/2., 0., xmax);
     double y = sml::Utils::transform(st.angle, - ymax/2., ymax/2., 0., ymax);
-//     double z = ac[DIR];
-//     double u = ac[ACC];
 
-    double tiling = params[0];
+    int tiling = (int)params[0];
     double xtile = params[1];
     double ytile = params[2];
-//     double ztile = params[3];
-//     double utile = params[4];
 
-    x = x + tiling*xwidth/(double)nbtiling;
-    y = y + tiling*yheight/(double)nbtiling;
-//      z = z + tiling*zprof/(double)nbtiling;
-//     u = u + tiling*uprof/(double)nbtiling;
-// if(ztile == z && utile == u)
+    x = x + xtiling[tiling];
+    y = y + ytiling[tiling];
 
     if(xtile*xwidth <= x && x <= (xtile+1)*xwidth)
         if(ytile*yheight <=  y && y <= (ytile+1)*yheight)
-
-//             if(ztile*zprof <=  z && z <= (ztile+1)*zprof)
-// 	      if(utile*uprof <=  u && u <= (utile+1)*uprof)
             return 1;
     return 0;
 }
@@ -60,12 +49,11 @@ QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH)
         QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
         for(int x = 0; x < nbXinter; x++)
             for(int y = 0; y < nbYinter; y++)
-//                 for(int z = 0; z < nbZinter; z++)
-//                     for(int u = 0; u < nbUinter; u++)
                 sfeatures->push_back(Feature<State>(featuring, {(double)i, (double)x, (double)y/*, (double) z, (double) u*/}));
         features->push_back(*sfeatures);
     }
-    qlg = new QLearnGradient<State>(features, nbtiling* nbXinter * nbYinter /* * nbZinter  * nbUinter*/, &ACTION_TEMPLATE );
+    qlg = new QLearnGradient<State>(features, nbtiling * nbXinter * nbYinter, &ACTION_TEMPLATE, TWorld::initialState() );
+    
 }
 
 QLearnGen::~QLearnGen()
@@ -76,9 +64,10 @@ QLearnGen::~QLearnGen()
 void QLearnGen::decision()
 {
     State st = *TWorld::observe(*this);
+    LOG_DEBUG(st.rightDistance);
 
     DAction ac = *qlg->decision(st, reward, lrate,  epsilon, lamda, discount);
-    //LOG_DEBUG(" action " << ac << " recomp : " << reward);
+    LOG_DEBUG(" action " << ac << " recomp : " << reward);
     applyActionOn(ac, car);
 }
 
@@ -94,46 +83,30 @@ void QLearnGen::endRace() {
 
 
 void QLearnGen::applyActionOn(const DAction& ac, tCarElt* car) {
-    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.4, 0.4);
-    /*
-        unsigned int accel = ac[ACC];
+    car->ctrl.steer = TWorld::computeSteering(ac[DIRE], ACTIONS_DIRECTION, -0.3, 0.3);
 
-        if(accel < 2) {
-            accel = 2 - accel;
-            car->ctrl.gear = -1;
-            car->ctrl.brakeCmd = 0;
-            car->ctrl.accelCmd = accel / 3.;
-        } else if(accel < 4) {
-            accel -= 2;
-            accel = 2 - accel;
-            //car->ctrl.gear = car->ctrl.gear;
-            car->ctrl.brakeCmd = accel / 3.;
-            car->ctrl.accelCmd = 0;
-        } else if(accel < 7)
-        {
-            accel -= 4;
-            accel = 3 - accel;
-            //car->ctrl.gear = getGear();
-            car->ctrl.gear = 1;
-            car->ctrl.brakeCmd = 0;
-            car->ctrl.accelCmd = accel / 4.;
-        } else
-        {
-            accel -= 7;
-            accel = 3 - accel;
-            car->ctrl.gear = 2;
-            car->ctrl.brakeCmd = 0;
-            car->ctrl.accelCmd = 1. - (accel / 4.);
-        }*/
+    unsigned int accel = ac[ACC];
 
-
-    car->ctrl.gear = 1;
-    if( car->_speed_x > 10 ) {
+    switch(accel)
+    {
+    case 0:
+        car->ctrl.gear = -1;
         car->ctrl.brakeCmd = 0;
+        car->ctrl.accelCmd = 1;
+        break;
+    case 1:
+        car->ctrl.brakeCmd = 1;
         car->ctrl.accelCmd = 0;
-    } else {
+        break;
+    case 2:
+        car->ctrl.brakeCmd = 1;
+        car->ctrl.accelCmd = 0;
+        break;
+    case 3:
+        car->ctrl.gear = 1;
         car->ctrl.brakeCmd = 0;
-        car->ctrl.accelCmd = 0.7;
+        car->ctrl.accelCmd = 1;
+        break;
     }
 }
 

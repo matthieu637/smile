@@ -4,7 +4,7 @@
 #include <iostream>
 #include <bib/Logger.hpp>
 
-const sml::ActionTemplate QLearnDiscr::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIR}, {QLearnDiscr::ACTIONS_ACC, QLearnDiscr::ACTIONS_DIRECTION});
+const sml::ActionTemplate QLearnDiscr::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIRE}, {QLearnDiscr::ACTIONS_ACC, QLearnDiscr::ACTIONS_DIRECTION});
 const sml::StateTemplate QLearnDiscr::STATE_TEMPLATE = sml::StateTemplate( {AGL, DST}, {QLearnDiscr::STATES_ALPHA, QLearnDiscr::STATES_DISTANCE}); //, SPD});
 
 
@@ -86,7 +86,7 @@ DState* QLearnDiscr::discretize(const State& st) {
 }
 
 void QLearnDiscr::applyActionOn(const DAction& ac, tCarElt* car) {
-    car->ctrl.steer = TWorld::computeSteering(ac[DIR], ACTIONS_DIRECTION, -0.4, 0.4);
+    car->ctrl.steer = TWorld::computeSteering(ac[DIRE], ACTIONS_DIRECTION, -0.4, 0.4);
 
     int accel = ac[ACC];
 
