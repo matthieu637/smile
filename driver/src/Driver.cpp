@@ -95,7 +95,7 @@ float Driver::getDistToSegEnd()
 }
 
 /* Compute gear */
-int Driver::getGear()
+int Driver::getGear() const
 {
     if (car->_gear <= 0) return 1;
     float gr_up = car->_gearRatio[car->_gear + car->_gearOffset];
@@ -181,3 +181,4 @@ double Driver::getCoveredDistance() const {
 float Driver::getAngle() const {
     return angle;
 }
+

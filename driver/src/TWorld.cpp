@@ -34,7 +34,7 @@ double TWorld::reward(const Driver& d) {
         // if near or out of the way
         double limit = 1.5;
         double factor = 30;
-	double startMalus = 1000;
+	double startMalus = 2000;
         if(car->_trkPos.toRight < limit) {
             if(r>0)
                 r=0;
@@ -152,6 +152,31 @@ void TWorld::applyAcceleration(tCarElt* car, int accel) {
         break;
     case 3:
         car->ctrl.gear = 1;
+        car->ctrl.brakeCmd = 0;
+        car->ctrl.accelCmd = 1;
+        break;
+    }
+}
+
+void TWorld::applyAccelerationGear(const Driver& d, tCarElt* car, int accel) {
+
+    switch(accel)
+    {
+    case 0:
+        car->ctrl.gear = -1;
+        car->ctrl.brakeCmd = 0;
+        car->ctrl.accelCmd = 1;
+        break;
+    case 1:
+        car->ctrl.brakeCmd = 1;
+        car->ctrl.accelCmd = 0;
+        break;
+    case 2:
+        car->ctrl.brakeCmd = 0;
+        car->ctrl.accelCmd = 0;
+        break;
+    case 3:
+        car->ctrl.gear = d.getGear();
         car->ctrl.brakeCmd = 0;
         car->ctrl.accelCmd = 1;
         break;

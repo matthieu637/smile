@@ -9,6 +9,7 @@ sigusr1()
 
 launch(){
 
+sigusr1
 index=$1
 cp ../torcs/xml/quickraceO.xml ~/.torcs/config/raceman/quickrace.xml
 sed -i "s/SEDME/$index/" ~/.torcs/config/raceman/quickrace.xml
