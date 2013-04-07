@@ -4,31 +4,30 @@
 #include <iostream>
 #include <bib/Logger.hpp>
 
+using sml::Feature;
+
 const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIRE, ACC}, {QLearnGen::ACTIONS_DIRECTION, TWorld::ACTIONS_ACC});
 //const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIRE}, {QLearnGen::ACTIONS_DIRECTION});
 
-const double xmax = 12;
-const double ymax = 2*M_PI;
+const double QLearnGen::xmax = 12;
+const double QLearnGen::ymax = 2*M_PI;
 
 // const int nbtiling = 9;
 
-const int nbXinter = 14;
-const int nbYinter = 16;
+// const int QLearnGen::nbXinter = 14;
+// const int QLearnGen::nbYinter = 16;
 
-const double xwidth = xmax/(double)nbXinter;//increase by log
-const double yheight = ymax/(double)nbYinter;
+const double QLearnGen::xwidth = xmax/(double)nbXinter;//increase by log
+const double QLearnGen::yheight = ymax/(double)nbYinter;
 
 //sort(rand(1,4-1)*(12/14))
-const double xtiling[] = {0., 0.10817,   0.16954,   0.26241};
-const double xtiling2[] = {0., 0.11645,   0.22497,   0.55615};
+const double QLearnGen::xtiling[] = {0., 0.10817,   0.16954,   0.26241};
+const double QLearnGen::xtiling2[] = {0., 0.11645,   0.22497,   0.55615};
 //sort(rand(1,4-1)*(2*3.14/16))
-const double ytiling[] = {0., 0.048702,   0.178274,   0.185312};
-const double ytiling2[] = {0., 0.075859,   0.078161,   0.170480} ;
+const double QLearnGen::ytiling[] = {0., 0.048702,   0.178274,   0.185312};
+const double QLearnGen::ytiling2[] = {0., 0.075859,   0.078161,   0.170480} ;
 
-
-using sml::Feature;
-
-double featuring (const State& st, std::vector<double> params) {
+double QLearnGen::featuring (const State& st, std::vector<double> params) {
     double x = sml::Utils::transform(st.distanceFromMiddle, -xmax/2., xmax/2., 0., xmax);
     double y = sml::Utils::transform(st.angle, - ymax/2., ymax/2., 0., ymax);
 
@@ -45,7 +44,7 @@ double featuring (const State& st, std::vector<double> params) {
     return 0;
 }
 
-double featuring2 (const State& st, std::vector<double> params) {
+double QLearnGen::featuring2 (const State& st, std::vector<double> params) {
     double x = sml::Utils::transform(st.distanceFromMiddle, -xmax/2., xmax/2., 0., xmax);
 
     int tiling = (int)params[0];
@@ -58,7 +57,7 @@ double featuring2 (const State& st, std::vector<double> params) {
     return 0;
 }
 
-double featuring3 (const State& st, std::vector<double> params) {
+double QLearnGen::featuring3 (const State& st, std::vector<double> params) {
     double y = sml::Utils::transform(st.angle, - ymax/2., ymax/2., 0., ymax);
 
     int tiling = (int)params[0];
@@ -78,21 +77,21 @@ QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH, 2)
         QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
         for(int x = 0; x < nbXinter; x++)
             for(int y = 0; y < nbYinter; y++)
-                sfeatures->push_back(Feature<State>(featuring, {(double)i, (double)x, (double)y/*, (double) z, (double) u*/}));
+                sfeatures->push_back(Feature<State>(this->featuring, {(double)i, (double)x, (double)y/*, (double) z, (double) u*/}));
         features->push_back(*sfeatures);
     }
     for(int i = 0; i<1; i++) {
         QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
         for(int x = 0; x < nbXinter; x++)
             for(int y = 0; y < nbYinter; y++)
-                sfeatures->push_back(Feature<State>(featuring2, {(double)i, (double)x, (double)y}));
+                sfeatures->push_back(Feature<State>(this->featuring2, {(double)i, (double)x, (double)y}));
         features->push_back(*sfeatures);
     }
     for(int i = 0; i<1; i++) {
         QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
         for(int x = 0; x < nbXinter; x++)
             for(int y = 0; y < nbYinter; y++)
-                sfeatures->push_back(Feature<State>(featuring3, {(double)i, (double)x, (double)y}));
+                sfeatures->push_back(Feature<State>(this->featuring3, {(double)i, (double)x, (double)y}));
         features->push_back(*sfeatures);
     }
 
