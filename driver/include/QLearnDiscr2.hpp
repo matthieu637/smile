@@ -40,10 +40,10 @@ private:
     static const int DECISION_EACH = 5;
 
     static const int STATES_ALPHA = 16;
-    static const int STATES_DISTANCE = 7;
-    static const int ACTIONS_DIRECTION = 10;
+    static const int STATES_DISTANCE = 12;
+    static const int ACTIONS_DIRECTION = 8;
     
-    const double lamba = 0.95;
+    const double lamba = 0.99;
     const double lrate = 0.001;
     const double discount = 0.75;
     const double espilon = 0.01;
