@@ -29,15 +29,17 @@
 #include "QLearnDiscr.hpp"
 #include "QLearnDiscr2.hpp"
 #include "QLearnGen.hpp"
+#include "QLearnGenCmplx.hpp"
 
-#define NBBOTS 3
+#define NBBOTS 4
 
 static const char* botname[NBBOTS] = {
-    "smile_0", "smile_1", "smile_2"
+    "smile_0", "smile_1", "smile_2", "smile_3"
 };
 
 static const char* botdesc[NBBOTS] = {
-    "Discretize Q learning", "Discretize Q learning (lamba)", "Q learning f. approximation"
+    "Discretize Q learning", "Discretize Q learning (lamba)", "Q learning f. approximation",
+    "Q learning f. approximation Env Cmplx"
 };
 
 static Driver *driver[NBBOTS];
@@ -89,6 +91,10 @@ static int InitFuncPt(int index, void *pt)
         break;
     case 2:
 	driver[index] = new QLearnGen(index);
+	break;
+    case 3:
+	driver[index] = new QLearnGenCmplx(index);
+	break;
     }
     
     itf->rbNewTrack = initTrack;	/* Give the robot the track view called */

@@ -62,6 +62,11 @@
       <attstr name="module" val="smile"/>
     </section>
 
+    <section name="4">
+      <attnum name="idx" val="3"/>
+      <attstr name="module" val="smile"/>
+    </section>
+
   </section>
 
   <section name="Configuration">

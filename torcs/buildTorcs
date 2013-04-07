@@ -27,6 +27,5 @@ cd ..
 mkdir -p ~/.torcs/config/raceman/
 cp xml/*.xml ~/.torcs/config/
 mv ~/.torcs/config/quickrace.xml ~/.torcs/config/raceman/
-mv ~/.torcs/config/dtmrace.xml ~/.torcs/config/raceman/
 echo "config done"
 
