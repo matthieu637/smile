@@ -9,19 +9,20 @@ QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, cons
 
 }
 
-DAction* QLearning::decision(const DState& sp, double r, float lrate, float epsilon, float discount)
+DAction* QLearning::decision(const DState& s, double r, float lrate, float epsilon, float discount)
 {
-    DAction ap = *Q.argmax(sp);
-    Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(sp, ap) - Q(ds, da) );
+    DAction *ap = Q.argmax(s);
+    Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(s, *ap) - Q(ds, da) );
+    LOG_DEBUG("e"<<*ds << " a" << *da << " q" <<Q(ds,da));
 
     //exploitation
-    DAction* a = Q.argmax(*ds);
+    DAction* a = ap ; //Q.argmax(s); // Choose a from s
 
     //exploration
     if(sml::Utils::rand01() < epsilon )
         a = new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});//TODO:memory
-
-    ds=&sp;
+    
+    ds = &s;
     da = a;
 
     return a;

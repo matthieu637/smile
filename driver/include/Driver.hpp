@@ -17,7 +17,7 @@
 
 class Driver {
 public:
-    Driver(int index, int intervalAction);
+    Driver(int index, int intervalAction, float nbLaps);
     virtual ~Driver();
 
     /* callback functions called from TORCS */
@@ -54,6 +54,8 @@ private:
     void update(tSituation *s);
     void updateStuck();
   
+    float nbLaps;
+    
     /* data that should stay constant after first initialization */
     int MAX_UNSTUCK_COUNT;
     int INDEX;

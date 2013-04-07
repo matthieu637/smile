@@ -34,23 +34,24 @@ double TWorld::reward(const Driver& d) {
         // if near or out of the way
         double limit = 1.5;
         double factor = 30;
+	double startMalus = 1000;
         if(car->_trkPos.toRight < limit) {
             if(r>0)
                 r=0;
 
             if(car->_trkPos.toRight > 0)
-                r -= factor*car->_trkPos.toRight;
+                r -= startMalus + factor*car->_trkPos.toRight;
             else
-                r -= factor*(limit + sml::Utils::abs(car->_trkPos.toRight));
+                r -= startMalus + factor*(limit + sml::Utils::abs(car->_trkPos.toRight));
         }
         else if (car->_trkPos.toLeft < limit) {
             if(r>0)
                 r=0;
 
             if(car->_trkPos.toLeft > 0)
-                r -= factor*car->_trkPos.toLeft;
+                r -= startMalus + factor*car->_trkPos.toLeft;
             else
-                r -= factor*(limit + sml::Utils::abs(car->_trkPos.toLeft));
+                r -= startMalus + factor*(limit + sml::Utils::abs(car->_trkPos.toLeft));
         }
 
         // stay in a good position
@@ -97,15 +98,23 @@ State* TWorld::initialState() {
 
 DAction* TWorld::initialAction(const sml::ActionTemplate* atmp) {
     int d = atmp->indexFor(DIRE);
-    int ac = atmp->indexFor(ACC);
     list<int> args;
-    if(d < ac) { //dir before acc
+
+    if(atmp->sizesActions()->size() == 2) {
+        int ac = atmp->indexFor(ACC);
+
+        if(d < ac) { //dir before acc
+            args.push_back(atmp->sizesActions()->front()/2);
+            args.push_back(2);
+        }
+        else { //acc before dir
+            args.push_back(2);
+            args.push_back(atmp->sizesActions()->back()/2);
+        }
+    } // == 1 only DIRE
+    else
+    {
         args.push_back(atmp->sizesActions()->front()/2);
-        args.push_back(2);
-    }
-    else { //acc before dir
-        args.push_back(2);
-        args.push_back(atmp->sizesActions()->back()/2);
     }
 
     DAction* a = new DAction(atmp, args);

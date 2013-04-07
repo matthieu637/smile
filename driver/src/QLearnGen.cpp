@@ -71,7 +71,7 @@ double featuring3 (const State& st, std::vector<double> params) {
     return 0;
 }
 
-QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH)
+QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH, 2)
 {
     QLearnGradient<State>::featuredList *features = new QLearnGradient<State>::featuredList();
     for(int i = 0; i<3; i++) {

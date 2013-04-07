@@ -14,7 +14,7 @@ const float Driver::SHIFT_MARGIN = 4.0;						/* [m/s] */
 const float Driver::UNSTUCK_TIME_LIMIT = 2.0;				/* [s] */
 
 
-Driver::Driver(int index, int intervalAction)
+Driver::Driver(int index, int intervalAction, float nbLaps):nbLaps(nbLaps)
 {
     srand(time(NULL)); //need random in many algorithms
     INDEX = index;
@@ -63,7 +63,7 @@ void Driver::drive(tSituation *s)
 
     if(decision_each > INTERVAL_ACTION)
     {
-        if (car->_trkPos.toRight != car->_trkPos.toRight || s->currentTime > 5*60) { //fix bug during simulation ?
+        if (car->_trkPos.toRight != car->_trkPos.toRight || s->currentTime > nbLaps*5.*60.) { //fix bug during simulation ?
 	    LOG_DEBUG("REWARD :" << (long int)globalReward/1000);
             endRace();
             exit(1);

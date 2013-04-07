@@ -1,6 +1,14 @@
 #!/bin/bash
 
 
+trap sigusr1 SIGUSR1
+
+sigusr1()
+{
+        rm -rf /dev/shm/sem.*
+}
+
+
 launch(){
 
 index=$1

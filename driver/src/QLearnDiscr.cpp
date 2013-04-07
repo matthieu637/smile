@@ -4,11 +4,12 @@
 #include <iostream>
 #include <bib/Logger.hpp>
 
-const sml::ActionTemplate QLearnDiscr::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIRE}, {TWorld::ACTIONS_ACC, QLearnDiscr::ACTIONS_DIRECTION});
+// const sml::ActionTemplate QLearnDiscr::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIRE}, {TWorld::ACTIONS_ACC, QLearnDiscr::ACTIONS_DIRECTION});
+const sml::ActionTemplate QLearnDiscr::ACTION_TEMPLATE = sml::ActionTemplate( {DIRE}, {QLearnDiscr::ACTIONS_DIRECTION});
 const sml::StateTemplate QLearnDiscr::STATE_TEMPLATE = sml::StateTemplate( {AGL, DST}, {QLearnDiscr::STATES_ALPHA, QLearnDiscr::STATES_DISTANCE}); //, SPD});
 
 
-QLearnDiscr::QLearnDiscr(int index):Driver(index, DECISION_EACH)
+QLearnDiscr::QLearnDiscr(int index):Driver(index, DECISION_EACH, 1)
 {
     State st = *TWorld::initialState();
     DState* dst = discretize(st);
@@ -26,11 +27,19 @@ void QLearnDiscr::endRace() {
 
 void QLearnDiscr::decision()
 {
-    State st = *TWorld::observe(*this);
-    DState* dst = discretize(st);
-    DAction a = *q->decision(*dst,reward,lrate,espilon,discount);
-    LOG_DEBUG("etat " << *dst << " action " << a << " recomp : " << reward);
-    applyActionOn(a, car);
+    DAction* a;
+
+    if(car->_speed_x < 9 && car->_distRaced < 10) {
+        a = TWorld::initialAction(&ACTION_TEMPLATE);
+    }
+    else {
+        State st = *TWorld::observe(*this);
+        DState* dst = discretize(st);
+        a = q->decision(*dst,reward,lrate,espilon,discount);
+        LOG_DEBUG("etat " << *dst << " action " << *a << " recomp : " << reward);
+    }
+    
+    applyActionOn(*a, car);
 }
 
 void QLearnDiscr::newRace(tCarElt* car, tSituation *s) {
@@ -48,6 +57,12 @@ DState* QLearnDiscr::discretize(const State& st) {
 
 void QLearnDiscr::applyActionOn(const DAction& ac, tCarElt* car) {
     car->ctrl.steer = TWorld::computeSteering(ac[DIRE], ACTIONS_DIRECTION, -0.4, 0.4);
-    LOG_DEBUG(car->ctrl.steer);
-    TWorld::applyAcceleration(car, ac[ACC]);
+
+    car->ctrl.gear = 1;
+    car->ctrl.brakeCmd = 0;
+
+    if(car->_speed_x  > 10)
+        car->ctrl.accelCmd = 0;
+    else
+        car->ctrl.accelCmd = 0.3;
 }
