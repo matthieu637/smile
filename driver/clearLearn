@@ -1,5 +1,9 @@
 #!/bin/bash
 
-rm -i /usr/local/share/games/torcs/smile*
-rm /dev/shm/sem.smile*
-
+if [ $# -eq 1 ]; then
+	rm /usr/local/share/games/torcs/smile${1}*
+	rm /dev/shm/sem.smile*
+else
+	rm -i /usr/local/share/games/torcs/smile*
+	rm /dev/shm/sem.smile*
+fi

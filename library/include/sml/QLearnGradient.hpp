@@ -35,7 +35,7 @@ public:
         nbFeatureActions(nbFeature*atmp->sizeNeeded()),
         teta(nbFeatureActions), e(zero_vector<double>(nbFeatureActions)),
         Qa(atmp), actions(atmp->sizeNeeded()),
-        features(features), atmpl(atmp)
+        features(features), atmpl(atmp), history()
     {
         for(unsigned int i=0; i<nbFeatureActions; i++)
             teta[i]=-1./5.+ 2.*sml::Utils::rand01()/5.;//TODO:kinda important
@@ -43,7 +43,6 @@ public:
         for(unsigned int i=0; i < atmp->sizeNeeded() ; i++)
             actions[i] = DAction(atmpl, i);
 
-	LOG_DEBUG(initial);
 	lastAction = &initial;
     }
 
@@ -60,20 +59,27 @@ public:
 
         DAction ap = *Qa.argmax();
         delta = delta + discout * Qa(ap);
-        teta = teta + lrate * delta * e;
+// 	teta = teta + lrate * delta * e;
+	for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
+	  teta(*it) = teta(*it) + lrate * delta * e(*it);
 
 
         //begin
         if( sml::Utils::rand01() < epsilon) {
             a = new DAction(atmpl, rand() % atmpl->sizeNeeded());
-            e *= 0;
+	    for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
+	      e(*it) = 0L;
+	    history.clear();
         } else {
             a = Qa.argmax();
-            e = lamda * discout * e;
+	    for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
+	      e(*it) = lamda * discout * e(*it);
         }
 
-        for(list<int>::iterator it = activeIndex.begin(); it != activeIndex.end() ; ++it)
+        for(list<int>::iterator it = activeIndex.begin(); it != activeIndex.end() ; ++it){
             e[(*it) + a->hash() * nbFeature] += 1.;
+	    history.insert((*it) + a->hash() * nbFeature);
+	}
 
         //take action a, observe reward, and next state
 
@@ -149,6 +155,7 @@ private:
 
     featuredList* features;
     const ActionTemplate* atmpl;
+    std::set<unsigned int> history; //set : no duplicates
 };
 
 }

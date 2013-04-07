@@ -27,15 +27,15 @@ DAction* QLearning::decision(const DState& sp, double r, float lrate, float epsi
     return a;
 }
 
-  void QLearning::write(const string& arg1)
-  {
+void QLearning::write(const string& arg1)
+{
     Q.write(arg1);
-  }
+}
 
-  void QLearning::read(const string& arg1)
-  {
+void QLearning::read(const string& arg1)
+{
     Q.read(arg1);
-  }
+}
 }
 
 

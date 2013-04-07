@@ -11,6 +11,17 @@ using sml::DAction;
 using sml::DState;
 using sml::QTable;
 
+class HistoryComparator
+{
+public:
+    bool operator()(const std::pair<DState*, DAction*>& p1, const std::pair<DState*, DAction*>& p2) const
+    {
+	if(*p1.first == *p2.first)
+	  return *p1.second < *p2.second;
+        return *p1.first < *p2.first;
+    }
+};
+
 class QLearnDiscr2 : public Driver
 {
 
@@ -29,12 +40,12 @@ private:
     static const int DECISION_EACH = 5;
 
     static const int STATES_ALPHA = 16;
-    static const int STATES_DISTANCE = 10;
+    static const int STATES_DISTANCE = 7;
     static const int ACTIONS_DIRECTION = 10;
     
-    const double lamba = 0.9;
-    const double lrate = 0.01;
-    const double discount = 0.35;
+    const double lamba = 0.95;
+    const double lrate = 0.001;
+    const double discount = 0.75;
     const double espilon = 0.01;
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
@@ -42,7 +53,7 @@ private:
     
     
     QTable Q, N;
-    std::list< std::pair<DState*, DAction*> > history;
+    std::set< std::pair<DState*, DAction*>, HistoryComparator > history;
 
     bool init = false;
     DState* lastState;

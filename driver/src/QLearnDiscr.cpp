@@ -12,8 +12,7 @@ QLearnDiscr::QLearnDiscr(int index):Driver(index, DECISION_EACH)
 {
     State st = *TWorld::initialState();
     DState* dst = discretize(st);
-    DAction* a = new DAction(&ACTION_TEMPLATE, {3,4});
-    q = new sml::QLearning(&STATE_TEMPLATE, &ACTION_TEMPLATE, *dst, *a);
+    q = new sml::QLearning(&STATE_TEMPLATE, &ACTION_TEMPLATE, *dst, *TWorld::initialAction(&ACTION_TEMPLATE));
 }
 
 QLearnDiscr::~QLearnDiscr()
@@ -30,6 +29,7 @@ void QLearnDiscr::decision()
     State st = *TWorld::observe(*this);
     DState* dst = discretize(st);
     DAction a = *q->decision(*dst,reward,lrate,espilon,discount);
+    LOG_DEBUG("etat " << *dst << " action " << a << " recomp : " << reward);
     applyActionOn(a, car);
 }
 
@@ -48,5 +48,6 @@ DState* QLearnDiscr::discretize(const State& st) {
 
 void QLearnDiscr::applyActionOn(const DAction& ac, tCarElt* car) {
     car->ctrl.steer = TWorld::computeSteering(ac[DIRE], ACTIONS_DIRECTION, -0.4, 0.4);
+    LOG_DEBUG(car->ctrl.steer);
     TWorld::applyAcceleration(car, ac[ACC]);
 }

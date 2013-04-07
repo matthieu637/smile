@@ -27,14 +27,14 @@ private:
   void applyActionOn(const DAction& ac, tCarElt* car);
     
 private:
-    static const int DECISION_EACH = 4;
+    static const int DECISION_EACH = 5;
 
     static const int ACTIONS_DIRECTION = 10;
     
     const double lamda = 0.95;
     const double lrate = 0.001;
-    const double discount = 0.35;
-    const double epsilon = 0.01;
+    const double discount = 0.75;
+    const double epsilon = 0.001;
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
      

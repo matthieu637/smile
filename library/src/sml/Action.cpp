@@ -95,14 +95,9 @@ void DAction::computehash()
 }
 
 bool DAction::operator==(const DAction& ac) const {
-    if(*(ac.templ) == *(templ)) {
-
-        for(int i=0; i<templ->actionNumber(); i++)
-            if(values[i] != ac.values[i])
-                return false;
-
-        return true;
-    }
+    if(*(ac.templ) == *(templ)) 
+        return hash() == ac.hash();
+    
     return false;
 }
 
