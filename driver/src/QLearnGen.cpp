@@ -20,12 +20,10 @@ const double QLearnGen::ymax = 2*M_PI;
 const double QLearnGen::xwidth = xmax/(double)nbXinter;//increase by log
 const double QLearnGen::yheight = ymax/(double)nbYinter;
 
-//sort(rand(1,4-1)*(12/14))
-const double QLearnGen::xtiling[] = {0., 0.10817,   0.16954,   0.26241};
-const double QLearnGen::xtiling2[] = {0., 0.11645,   0.22497,   0.55615};
-//sort(rand(1,4-1)*(2*3.14/16))
-const double QLearnGen::ytiling[] = {0., 0.048702,   0.178274,   0.185312};
-const double QLearnGen::ytiling2[] = {0., 0.075859,   0.078161,   0.170480} ;
+//sort(rand(1,7-1)*(12/14))
+const double QLearnGen::xtiling[] = {0., 0.092406,   0.161428,   0.253100,   0.301486,   0.493252,   0.758365};
+//sort(rand(1,7-1)*(2*3.14/16))
+const double QLearnGen::ytiling[] = {0.,  0.085714,   0.094104,   0.189928,   0.224569,   0.231825,   0.332045};
 
 double QLearnGen::featuring (const State& st, std::vector<double> params) {
     double x = sml::Utils::transform(st.distanceFromMiddle, -xmax/2., xmax/2., 0., xmax);
@@ -67,7 +65,7 @@ double QLearnGen::featuring3 (const State& st, std::vector<double> params) {
 QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH, 2)
 {
     QLearnGradient<State>::featuredList *features = new QLearnGradient<State>::featuredList();
-    for(int i = 0; i<3; i++) {
+    for(int i = 0; i<7; i++) {
         QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
         for(int x = 0; x < nbXinter; x++)
             for(int y = 0; y < nbYinter; y++)
@@ -87,7 +85,7 @@ QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH, 2)
     features->push_back(*sfeatures);
 
 
-    qlg = new QLearnGradient<State>(features, nbXinter + nbYinter + 3 * nbXinter * nbYinter, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) );
+    qlg = new QLearnGradient<State>(features, nbXinter + nbYinter + 7 * nbXinter * nbYinter, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) );
 
 }
 
