@@ -83,37 +83,37 @@ double QLearnGenCmplx::featuring4 (const State& st, std::vector<double> params) 
 
 QLearnGenCmplx::QLearnGenCmplx(int index):Driver(index, DECISION_EACH, 2)
 {
-//     list<int> sizes;
-    QLearnGradient<State>::featuredList *features = new QLearnGradient<State>::featuredList();
-    for(int i = 0; i<3; i++) {
-        QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
-        for(int x = 0; x < nbXinter; x++)
-            for(int y = 0; y < nbYinter; y++)
-                for(int z = 0; z < nbZinter; z++)
-                    sfeatures->push_back(Feature<State>(this->featuring, {(double)i, (double)x, (double)y, (double) z}));
-        features->push_back(*sfeatures);
-// 	sizes.push_back(nbXinter * nbYinter * nbZinter);
-    }
-
-    QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
-    for(int x = 0; x < nbXinter; x++)
-        sfeatures->push_back(Feature<State>(this->featuring2, {(double)x}));
-    features->push_back(*sfeatures);
-//     sizes.push_back(nbXinter);
-
-    sfeatures = new QLearnGradient<State>::sfeaturedList();
-    for(int y = 0; y < nbYinter; y++)
-        sfeatures->push_back(Feature<State>(this->featuring3, {(double)y}));
-    features->push_back(*sfeatures);
-//     sizes.push_back(nbYinter);
-
-    sfeatures = new QLearnGradient<State>::sfeaturedList();
-    for(int z = 0; z < nbZinter; z++)
-        sfeatures->push_back(Feature<State>(this->featuring4, {(double)z}));
-    features->push_back(*sfeatures);
-
-
-    qlg = new QLearnGradient<State>(features, nbXinter + nbYinter + nbZinter + 3 * nbXinter * nbYinter * nbZinter, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) );
+// //     list<int> sizes;
+//     QLearnGradient<State>::featuredList *features = new QLearnGradient<State>::featuredList();
+//     for(int i = 0; i<3; i++) {
+//         QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
+//         for(int x = 0; x < nbXinter; x++)
+//             for(int y = 0; y < nbYinter; y++)
+//                 for(int z = 0; z < nbZinter; z++)
+//                     sfeatures->push_back(Feature<State>(this->featuring, {(double)i, (double)x, (double)y, (double) z}));
+//         features->push_back(*sfeatures);
+// // 	sizes.push_back(nbXinter * nbYinter * nbZinter);
+//     }
+// 
+//     QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
+//     for(int x = 0; x < nbXinter; x++)
+//         sfeatures->push_back(Feature<State>(this->featuring2, {(double)x}));
+//     features->push_back(*sfeatures);
+// //     sizes.push_back(nbXinter);
+// 
+//     sfeatures = new QLearnGradient<State>::sfeaturedList();
+//     for(int y = 0; y < nbYinter; y++)
+//         sfeatures->push_back(Feature<State>(this->featuring3, {(double)y}));
+//     features->push_back(*sfeatures);
+// //     sizes.push_back(nbYinter);
+// 
+//     sfeatures = new QLearnGradient<State>::sfeaturedList();
+//     for(int z = 0; z < nbZinter; z++)
+//         sfeatures->push_back(Feature<State>(this->featuring4, {(double)z}));
+//     features->push_back(*sfeatures);
+// 
+// 
+//     qlg = new QLearnGradient<State>(features, nbXinter + nbYinter + nbZinter + 3 * nbXinter * nbYinter * nbZinter, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) );
 }
 
 QLearnGenCmplx::~QLearnGenCmplx()

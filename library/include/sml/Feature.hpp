@@ -10,12 +10,12 @@ template<typename S>
 class Feature
 {
 public:
-    typedef double (*featuring) (const S&, std::vector<double> params);
+    typedef double (*featuring) (const S&, const DAction&, std::vector<double> params);
 
     Feature(featuring f, const std::vector<double> &params):f(f), params(params) {}
 
-    double calc(const S& st) {
-        return f(st, params);
+    double calc(const S& st, const DAction& ac) {
+        return f(st, ac, params);
     }
 
 private:

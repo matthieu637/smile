@@ -10,6 +10,9 @@ double TWorld::reward(const Driver& d) {
     double distParcourue = d.getCoveredDistance();
 
     double r = distParcourue;
+    
+    const double startMalus = 1000;
+    const double malus = startMalus + 500;
 
     if(d.isStuck() && distParcourue < -0.01)
         r = 15;
@@ -21,20 +24,19 @@ double TWorld::reward(const Driver& d) {
         }
         else if(distParcourue < 0.01 && !d.isStuck()) { // don't move don't stuck
             if(distParcourue > -0.01)
-                r = -500.;
+                r = - malus;
             else //drive backwards
-                r = -2000.*(1.+sml::Utils::abs(distParcourue));
+                r = - malus*2.*(1.+sml::Utils::abs(distParcourue));
         }
         else if(distParcourue < 0.01 && d.isStuck()) // don't move because stuck
-            r = -1000.;
+            r = -malus*2.;
         else  // move and stuck -> forcing the wall -_-
-            r = -2000.;
+            r = -malus*3.;
 
         // keep on the road
         // if near or out of the way
         double limit = 1.5;
-        double factor = 30;
-	double startMalus = 2000;
+        double factor = 5;
         if(car->_trkPos.toRight < limit) {
             if(r>0)
                 r=0;

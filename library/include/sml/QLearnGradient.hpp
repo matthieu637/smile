@@ -32,18 +32,18 @@ private:
 public:
     QLearnGradient(featuredList* features, unsigned int nbFeature, const ActionTemplate* atmp, const DAction& initial) :
         nbFeature(nbFeature),
-        nbFeatureActions(nbFeature*atmp->sizeNeeded()),
-        teta(nbFeatureActions), e(zero_vector<double>(nbFeatureActions)),
+        teta(nbFeature + 1), e(zero_vector<double>(nbFeature + 1)),
         Qa(atmp), actions(atmp->sizeNeeded()),
         features(features), atmpl(atmp), history()
     {
-        for(unsigned int i=0; i<nbFeatureActions; i++)
+        for(unsigned int i=0; i<nbFeature + 1; i++)
             teta[i]=-1./5.+ 2.*sml::Utils::rand01()/5.;//TODO:kinda important
 
         for(unsigned int i=0; i < atmp->sizeNeeded() ; i++)
             actions[i] = DAction(atmpl, i);
 
-	lastAction = &initial;
+	teta[nbFeature] = 1;
+        lastAction = &initial;
     }
 
     const DAction* decision(const S& state, double r, float lrate, float epsilon, float lamda, float discout)
@@ -54,32 +54,32 @@ public:
         float delta = r - Qa(*a);
 
         // For all a in A(s')
-	list<int> activeIndex = *computeQa(state);
+        computeQa(state);
 
 
         DAction ap = *Qa.argmax();
         delta = delta + discout * Qa(ap);
 // 	teta = teta + lrate * delta * e;
-	for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
-	  teta(*it) = teta(*it) + lrate * delta * e(*it);
-
+        for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
+            teta(*it) = teta(*it) + lrate * delta * e(*it);
 
         //begin
         if( sml::Utils::rand01() < epsilon) {
             a = new DAction(atmpl, rand() % atmpl->sizeNeeded());
-	    for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
-	      e(*it) = 0L;
-	    history.clear();
+            for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
+                e(*it) = 0L;
+            history.clear();
         } else {
             a = Qa.argmax();
-	    for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
-	      e(*it) = lamda * discout * e(*it);
+            for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
+                e(*it) = lamda * discout * e(*it);
         }
 
-        for(list<int>::iterator it = activeIndex.begin(); it != activeIndex.end() ; ++it){
-            e[(*it) + a->hash() * nbFeature] += 1.;
-	    history.insert((*it) + a->hash() * nbFeature);
-	}
+        list<int> activeIndex = *extractFeatures(state, *a);
+        for(list<int>::iterator it = activeIndex.begin(); it != activeIndex.end() ; ++it) {
+            e[*it] += 1.;
+            history.insert(*it);
+        }
 
         //take action a, observe reward, and next state
 
@@ -87,40 +87,44 @@ public:
         return a;
     }
 
-    list<int>* computeQa(const S& state) {
-//         int featurePerLayer = nbFeature / features->size();
+    void computeQa(const S& state) {
+
+        for(vector<DAction>::iterator ai = actions.begin(); ai != actions.end() ; ++ai) { // each actions
+            double _Qa = 0.;
+
+            list<int>* actived = extractFeatures(state, *ai);
+            
+            for(list<int>::iterator it=actived->begin(); it != actived->end(); ++it)
+                _Qa += teta[*it];
+            
+// 	    bib::Logger::PRINT_ELEMENTS<list<int>>(*actived);
+	    
+            Qa(*ai) = _Qa;
+// 	    LOG_DEBUG(_Qa);
+        }
+    }
+
+    list<int>* extractFeatures(const S& state, const DAction& ac) {
+        list<int>* actived = new list<int>;
+
         int i = 0;
         int layer = 0;
-        list<int>* activeIndex = new list<int>;
-	
         for(fLiterator flist = features->begin() ; flist != features->end(); ++flist) { // each feature
             for( sfLiterator f = (*flist).begin(); f != (*flist).end() ; ++f) {
-                double active = (*f).calc(state);
+                double active = (*f).calc(state, ac);
                 if(active==1.) { //save computations ie 1 feature only active per layer(tiling)
-                    activeIndex->push_back(i);
+		    actived->push_back(i);
                     i = layer+(*flist).size();//jump to the next layer
                     break;
                 }
                 i++;
             }
             layer+= (*flist).size();
-	    LOG_DEBUG(i << " " << layer);
         }
-        // bib::Logger::PRINT_ELEMENTS<list<int>>(activeIndex);
 
-        i = 0;
-	layer = 0;
-        for(vector<DAction>::iterator ai = actions.begin(); ai != actions.end() ; ++ai) { // each actions
-            double _Qa = 0.;
-
-            for(list<int>::iterator it = activeIndex->begin(); it != activeIndex->end() ; ++it)
-                _Qa += teta[(*it) + i * nbFeature ];
-
-            Qa(*ai) = _Qa;
-            i++;
-        }
+        actived->push_back(nbFeature);//bias always active
         
-        return activeIndex;
+        return actived;
     }
 
     void read(const string& chemin) {
@@ -137,7 +141,6 @@ public:
 
     void write(const string& chemin) {
         bib::XMLEngine::save< dbvector >(teta, "teta", chemin);
-// 	bib::Logger::PRINT_ELEMENTS<dbvector>(teta);
         named_mutex mutex( open_or_create, chemin.c_str());
         mutex.unlock();
     }
@@ -145,7 +148,6 @@ public:
 
 private:
     int nbFeature;
-    int nbFeatureActions;
 
     dbvector teta;
     dbvector e;
