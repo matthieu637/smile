@@ -2,7 +2,7 @@
 \usepackage[utf8x]{inputenc} %fac
 %\usepackage[utf8]{inputenc} %fac
 
-\usepackage[square,sort,comma]{natbib}
+%\usepackage[square,sort,comma]{natbib}
 %\usepackage{chapterbib}
 
 \usepackage[francais]{babel} %FR
@@ -13,8 +13,8 @@
 %\usepackage{wrapfig} %fac
 \usepackage{float}
 
-\usepackage{algpseudocode} %fac
-\usepackage[hidelinks=true]{hyperref} %fac
+%\usepackage{algpseudocode} %fac
+\usepackage[hidelinks]{hyperref} %fac
 
 \usepackage[top=3.5cm, bottom=3.5cm, left=3cm, right=3cm]{geometry} %Réduire les marges
 
@@ -81,10 +81,12 @@
 	sur le choix de l'action à entreprendre lors de l'exploration de l'agent, ou encore dire à l'agent s'il 
 	est temps d'exploiter ou d'explorer.
 	
-	Parallèlement au développement de la bibliothèque, afin d'avoir une application pratique de la théorie,
-	on utilisera ces algorithmes dans le \textbf{simulateur TORCS} sur l'apprentissage automatique de la conduite de 
-	voiture sur circuit. Nous modifierons également l'interface TORCS pour intégrer les retours positifs ou 
-	négatifs de l'expert.
+	Parallèlement au développement de la bibliothèque, afin d'avoir une application pratique 
+	de la théorie,
+	on utilisera \textbf{TORCS} qui simule des courses de voiture en 3D dans lequelles on 
+	intégrera nos propres conducteurs.
+	Nous modifierons 
+	également l'interface TORCS pour intégrer les retours positifs ou négatifs de l'expert.
 
   \subsection{État de l'art}
     \paragraph{Apprentissage non supervisé} 
@@ -101,10 +103,14 @@
   
     \vfill
     \paragraph{Apprentissage semi-supervisé} 
+      est une classe de techniques d'apprentissage automatique qui utilise
+      un ensemble de données étiquetées et non-étiquetés.
       Le domaine est déjà assez développé avec plusieurs algorithmes existants
       \cite{Wiki_SemiSupervised}.
       
-      Pour ce qui est de l'apprentissage semi-supervisé par renforcement, il existe déjà aussi quelques articles.
+      Pour ce qui est de l'apprentissage semi-supervisé par renforcement, 
+      il existe déjà aussi quelques recherches dont celles de
+      \cite{semi1},\cite{semi2} ou \cite{semi3}.
   
     \paragraph{TORCS : The Open Racing Car Simulator} C'est un simulateur de course de voiture multi plate-forme.
     Il peut être utilisé comme un jeu de voiture ordinaire, ou comme plateforme de recherche en intelligence artificielle 
@@ -144,44 +150,66 @@
   \end{itemize}
   
   \vfill
-
   \newpage 
   \section{Description de la solution demandée}
 	De nombreux termes et concepts utilisés dans cette section se réfèrent au document : \cite{PDMIA}. 
 	Il est necessaire d'être familier avec les bases du \textbf{processus de décision markovien} (MDP) et de celles 
 	de l'apprentissage par renforcement pour comprendre ce qui suit.
+	
+	Nous allons maintenant détailler les differentes fonctionnalités de notre solution :
 	\subsection{Fonctionnalités de la bibliothèque}
+		\paragraph{Structures} Nous proposerons des structures de données permettant 
+		de gérer des actions/états génériques, qu'ils soient continues ou discrétisés.
+		
 		\paragraph{Algorithmes} La bibliothèque sera composée de 2 algorithmes génériques, basés sur le critère 
 		de performance $\gamma$-pondéré à horizon infini : 
 		  \begin{itemize}
 			  \item Q-learning
 			  \item Sarsa
 		  \end{itemize}
-		 Ils pourront être utilisés dans n'importe quel domaine d'application.
+		  déclinés sous 3 versions chaque fois :
+		  \begin{itemize}
+			  \item tabulaire, sans historique (version la plus simple)
+			  \item tabulaire, avec prise en compte de l'historique
+			  \item par fonction d'approximation, avec prise en compte de l'historique
+		  \end{itemize}
+		 Ils devront pouvoir être utilisés dans n'importe quel domaine d'application.
 		  
 		\paragraph{Fonction de récompenses - semi supervisée} Il sera possible d'intégrer les retours d'un 
 			tuteur dans la fonction de récompense. En ajoutant/retirant une constante 
 			ou en multipliant la récompense par un facteur.
-		\paragraph{Approximation de fonction} Lorsqu'il y a une explosition combinatoire trop importante dans
-		un domaine, la bibliothèque fournira des solutions par approximation de fonction.
+		\paragraph{Fonction d'approximation} Lorsqu'il y a une explosition combinatoire trop 
+		importante d'états/actions dans
+		un domaine, la bibliothèque fournira des solutions pour approximer les $Q(s,a)$ en
+		sommant des features (pouvant être binaire) :
+		\begin{center}
+		 $Q(s,a) = \theta_{0} + \sum\limits_{i=1}^n \theta_{i} \times f_{i}(s,a)$
+		\end{center}
+		Permettant à la fois de réduire l'espace nécessaire et de généraliser l'apprentissage
+		sans passer par tous les couples d'états/actions.
+		
+		\paragraph{Sauvegarder/Restaurer l'apprentissage} Étant donné la nature des algorithmes
+		et la nécessité d'apprendre sur plusieurs épisodes, nous permettrons de sauvegarder
+		et restaurer les paramètres requis permettant le bon déroulement de l'apprentissage.
+		
 
 	\subsection{Fonctionnalités du simulateur}
 		\paragraph{Robots} Les utilisateurs pourront visualiser les robots conduirent au terme ou durant leur
-		apprentissage. Il sera possible de visualiser différent algorithmes :
-		    \begin{itemize}
-		      \item Q-learning
-		      \item Sarsa
-		    \end{itemize}
+		apprentissage. Il sera possible de visualiser les 6 différents algorithmes de la bibliothèque.
 		\paragraph{Mesure de performance} Différentes mesures de performance pour les agents seront disponibles
-		tel que : le nombre de récompenses additionnées, la durée du temps de sortie de route, dommages perçus par  
-                le véhicule 
+		tel que : la somme de récompenses additionnées, la durée du temps de sortie de route, dommages perçus par  
+                le véhicule, le temps pour effectuer un tour.
 		\paragraph{Fonction de récompenses} Il sera également possible de choisir la fonction de récompense 
-		tel que le fait de rester au milieu de la route, la distance parcouru
+		tel que le fait de rester au centre de la route, la distance parcourue, ne pas sortir de la route.
 		\paragraph{Réglage des paramètres} Les paramètres tel que le taux d'apprentissage, le réglage entre
-		exploitation et exploration, le taux de discrétisation des états/actions seront modifiables.
+		exploitation et exploration, le taux de discrétisation des états/actions, le taux d'influence
+		de l'historique seront modifiables.
 		\paragraph{Interface retour expert} Dans le cadre de l'apprentissage semi-supervisé, l'interface de TORCS
 		sera modifiée pour permettre à un tuteur de donner des retours positifs ou négatifs durant l'apprentissage
-		de l'agent.
+		de l'agent. Il pourra presser sur une touche pour dire que l'agent se comporte bien,
+		et une seconde touche pour dire que l'agent n'a pas fait le bon choix.
+		Un retour sera affiché sur la console pour permettre à l'expert de savoir que son
+		action a bien été prise en compte.
 	\subsection{Contraintes de réalisation}
 	  \begin{itemize}
 	   \item Il est primordial que les algorithmes soient \textbf{facilement interchangeables} et \textbf{réutilisables}
@@ -205,6 +233,8 @@
 	  \paragraph{Interface retour expert} L'interface de TORCS sera modifiée avec toute une partie indépendante
 	  pour permettre au tuteur de voir les détails de l'exécution de l'algorithme et intégrer des retours plus 
 	  complexes (choix d'action, stratégie exploitation/exploration).
+	  \paragraph{Fichier configuration} Le robot et l'ensemble de ses paramètres pourront être
+	  définis dans un fichier permettant alors de le simuler sans avoir à re-compiler des sources.
 	  \paragraph{Course multijoueur} Il sera également possible d'aborder les courses à plusieurs conducteurs. En 
 	  ce sens, on pourra alors fournir de nouvelles fonctions de récompense et mesures de performance
 	  tel que la position dans la course.
