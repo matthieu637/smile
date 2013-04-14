@@ -41,6 +41,7 @@ public:
 
     static float computeSteering(unsigned int discetized, unsigned int cardinal, double smin, double smax);
     static void applyAcceleration(tCarElt* car, int acc);
+    static void applyAccelerationGear(const Driver& d, tCarElt* car, int acc);
     
     static const int ACTIONS_ACC = 4;
 };

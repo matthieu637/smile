@@ -35,8 +35,8 @@ public:
 
     /* utility functions */
     bool isStuck() const;
+    int getGear() const;
 protected:
-    int getGear();
     float getDistToSegEnd();
     double reward;
     double globalReward;

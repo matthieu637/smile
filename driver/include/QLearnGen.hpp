@@ -52,10 +52,8 @@ private:
     static const double yheight;
 
     static const double xtiling[];
-    static const double xtiling2[];
 
     static const double ytiling[];
-    static const double ytiling2[];
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
 

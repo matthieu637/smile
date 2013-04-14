@@ -88,25 +88,28 @@ public:
     }
 
     list<int>* computeQa(const S& state) {
-        int featurePerLayer = nbFeature / features->size();
+//         int featurePerLayer = nbFeature / features->size();
         int i = 0;
         int layer = 0;
         list<int>* activeIndex = new list<int>;
-        for( fLiterator flist = features->begin(); flist != features->end(); ++flist) { // each feature
+	
+        for(fLiterator flist = features->begin() ; flist != features->end(); ++flist) { // each feature
             for( sfLiterator f = (*flist).begin(); f != (*flist).end() ; ++f) {
                 double active = (*f).calc(state);
                 if(active==1.) { //save computations ie 1 feature only active per layer(tiling)
                     activeIndex->push_back(i);
-                    i = (layer+1)*featurePerLayer;//jump to the next layer
+                    i = layer+(*flist).size();//jump to the next layer
                     break;
                 }
                 i++;
             }
-            layer++;
+            layer+= (*flist).size();
+	    LOG_DEBUG(i << " " << layer);
         }
         // bib::Logger::PRINT_ELEMENTS<list<int>>(activeIndex);
 
         i = 0;
+	layer = 0;
         for(vector<DAction>::iterator ai = actions.begin(); ai != actions.end() ; ++ai) { // each actions
             double _Qa = 0.;
 
