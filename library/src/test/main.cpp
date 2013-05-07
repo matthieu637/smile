@@ -53,8 +53,8 @@ int main() {
     LOG_DEBUG(Q(a, DAction(&ACTION_TEMPLATE, {0,1})));
     LOG_DEBUG("argmax " << Q.argmax(a)->get(0) << " " << Q.argmax(a)->get(1));
 
-    Q.write("test.xml");
-    Q.read("test.xml");
+//     Q.write("test.xml");
+//     Q.read("test.xml");
     
     LOG_DEBUG(Q(a, b));
     LOG_DEBUG(Q(a, a));

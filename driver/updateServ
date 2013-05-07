@@ -1,0 +1,1 @@
+scp build/libdriver.so matthieu@paris.matthieu-zimmer.net:/usr/local/lib/torcs/drivers/smile/smile.so

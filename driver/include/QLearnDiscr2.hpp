@@ -4,23 +4,12 @@
 
 #include "Driver.hpp"
 #include <sml/Action.hpp>
-#include <sml/Q.hpp>
+#include <sml/QLearningLamb.hpp>
 #include "TWorld.hpp"
 
 using sml::DAction;
 using sml::DState;
-using sml::QTable;
-
-class HistoryComparator
-{
-public:
-    bool operator()(const std::pair<DState*, DAction*>& p1, const std::pair<DState*, DAction*>& p2) const
-    {
-	if(*p1.first == *p2.first)
-	  return *p1.second < *p2.second;
-        return *p1.first < *p2.first;
-    }
-};
+using sml::QLearningLamb;
 
 class QLearnDiscr2 : public Driver
 {
@@ -40,24 +29,18 @@ private:
     static const int DECISION_EACH = 5;
 
     static const int STATES_ALPHA = 16;
-    static const int STATES_DISTANCE = 12;
-    static const int ACTIONS_DIRECTION = 8;
+    static const int STATES_DISTANCE = 14;
+    static const int ACTIONS_DIRECTION = 10;
     
-    const double lamba = 0.99;
+    const double lambda = 0.95;
     const double lrate = 0.001;
     const double discount = 0.75;
-    const double espilon = 0.01;
+    const double espilon = 0.05;
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
     static const sml::StateTemplate STATE_TEMPLATE;
     
-    
-    QTable Q, N;
-    std::set< std::pair<DState*, DAction*>, HistoryComparator > history;
-
-    bool init = false;
-    DState* lastState;
-    DAction* lastAction;
+    QLearningLamb* q;
 };
 
 #endif // QLEARNDISCR_HPP

@@ -1,24 +1,25 @@
 
-#ifndef QLEARNGEN_HPP
-#define QLEARNGEN_HPP
+#ifndef QLEARNGENFDB_HPP
+#define QLEARNGENFDB_HPP
 
-#include "Driver.hpp"
 #include <sml/Action.hpp>
 #include <sml/QLearnGradient.hpp>
 #include <sml/Q.hpp>
 #include "TWorld.hpp"
+#include "DriverFeedback.hpp"
 
 using sml::DAction;
 using sml::DState;
+using sml::QTable;
 using sml::QLearnGradient;
 
-class QLearnGen : public Driver
+class QLearnGenFdb : public DriverFeedback
 {
 
 public:
-    QLearnGen(int index);
+    QLearnGenFdb(int index);
     void decision();
-    ~QLearnGen();
+    ~QLearnGenFdb();
     void newRace(tCarElt* car, tSituation *s);
     void endRace();
 
@@ -28,7 +29,7 @@ private:
 private:
     static const int DECISION_EACH = 3;
 
-    static const int ACTIONS_DIRECTION = 8;
+    static const int ACTIONS_DIRECTION = 12;
 
     const double lamda = 0.95;
     const double lrate = 0.0001;
@@ -38,13 +39,13 @@ private:
     static const double road_width;
     static const double total_angle;
 
-    static const int nbXinter = 14;
-    static const int nbYinter = 16;
+    static const int nbXinter = 22;
+    static const int nbYinter = 24;
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
 
     QLearnGradient<State>* qlg;
 };
 
-#endif // QLEARNDISCR_HPP
+#endif 
 

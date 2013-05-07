@@ -3,117 +3,174 @@
 #include <sml/Utils.hpp>
 #include <iostream>
 #include <bib/Logger.hpp>
+#include <TFeatures.hpp>
 
 using sml::Feature;
 
 const sml::ActionTemplate QLearnGenCmplx::ACTION_TEMPLATE = sml::ActionTemplate( {DIRE, ACC}, {QLearnGenCmplx::ACTIONS_DIRECTION, TWorld::ACTIONS_ACC});
 
-const double QLearnGenCmplx::xmax = 12;
-const double QLearnGenCmplx::ymax = 2*M_PI;
-const double QLearnGenCmplx::zmax = 80;
-
-// const int nbtiling = 9;
-
-// const int QLearnGenCmplx::nbXinter = 14;
-// const int QLearnGenCmplx::nbYinter = 16;
-
-const double QLearnGenCmplx::xwidth = xmax/(double)nbXinter;//increase by log
-const double QLearnGenCmplx::yheight = ymax/(double)nbYinter;
-const double QLearnGenCmplx::zheight = zmax/(double)nbZinter;
-
-//sort(rand(1,3-1)*(12/14))
-const double QLearnGenCmplx::xtiling[] = {0., 0.13181,   0.52260};
-//sort(rand(1,3-1)*(2*3.14/32))
-const double QLearnGenCmplx::ytiling[] = {0., 0.073144,   0.147884};
-//sort(rand(1,3-1)*(80/10))
-const double QLearnGenCmplx::ztiling[] = {0., 3.9516,   7.6738};
-
-double QLearnGenCmplx::featuring (const State& st, std::vector<double> params) {
-    double x = sml::Utils::transform(st.distanceFromMiddle, -xmax/2., xmax/2., 0., xmax);
-    double y = sml::Utils::transform(st.angle, - ymax/2., ymax/2., 0., ymax);
-    double z = sml::Utils::transform(st.speed,  -10, zmax - 10., 0., zmax);
-
-    int tiling = (int)params[0];
-    double xtile = params[1];
-    double ytile = params[2];
-    double ztile = params[3];
-
-    x = x + xtiling[tiling];
-    y = y + ytiling[tiling];
-    z = z + ztiling[tiling];
-
-    if(xtile*xwidth <= x && x <= (xtile+1)*xwidth)
-        if(ytile*yheight <=  y && y <= (ytile+1)*yheight)
-            if(ytile*yheight <=  y && y <= (ytile+1)*yheight)
-                if(ztile*zheight <=  z && z <= (ztile+1)*zheight)
-                    return 1;
-    return 0;
-}
-
-double QLearnGenCmplx::featuring2 (const State& st, std::vector<double> params) {
-    double x = sml::Utils::transform(st.distanceFromMiddle, -xmax/2., xmax/2., 0., xmax);
-
-    double xtile = params[0];
-
-    if(xtile*xwidth <= x && x <= (xtile+1)*xwidth)
-        return 1;
-    return 0;
-}
-
-double QLearnGenCmplx::featuring3 (const State& st, std::vector<double> params) {
-    double y = sml::Utils::transform(st.angle, - ymax/2., ymax/2., 0., ymax);
-
-    double ytile = params[0];
-
-    if(ytile*yheight <=  y && y <= (ytile+1)*yheight)
-        return 1;
-    return 0;
-}
-
-double QLearnGenCmplx::featuring4 (const State& st, std::vector<double> params) {
-    double z = sml::Utils::transform(st.speed,  -10, zmax - 10., 0., zmax);
-
-    double ztile = params[0];
-
-    if(ztile*zheight <=  z && z <= (ztile+1)*zheight)
-        return 1;
-    return 0;
-}
+const double QLearnGenCmplx::road_width = 12;
+const double QLearnGenCmplx::total_angle = 2*M_PI;
+const double QLearnGenCmplx::total_speed = 60;
 
 
 QLearnGenCmplx::QLearnGenCmplx(int index):Driver(index, DECISION_EACH, 2)
 {
-// //     list<int> sizes;
-//     QLearnGradient<State>::featuredList *features = new QLearnGradient<State>::featuredList();
-//     for(int i = 0; i<3; i++) {
-//         QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
-//         for(int x = 0; x < nbXinter; x++)
-//             for(int y = 0; y < nbYinter; y++)
-//                 for(int z = 0; z < nbZinter; z++)
-//                     sfeatures->push_back(Feature<State>(this->featuring, {(double)i, (double)x, (double)y, (double) z}));
-//         features->push_back(*sfeatures);
-// // 	sizes.push_back(nbXinter * nbYinter * nbZinter);
-//     }
-// 
-//     QLearnGradient<State>::sfeaturedList *sfeatures = new QLearnGradient<State>::sfeaturedList();
-//     for(int x = 0; x < nbXinter; x++)
-//         sfeatures->push_back(Feature<State>(this->featuring2, {(double)x}));
-//     features->push_back(*sfeatures);
-// //     sizes.push_back(nbXinter);
-// 
-//     sfeatures = new QLearnGradient<State>::sfeaturedList();
-//     for(int y = 0; y < nbYinter; y++)
-//         sfeatures->push_back(Feature<State>(this->featuring3, {(double)y}));
-//     features->push_back(*sfeatures);
-// //     sizes.push_back(nbYinter);
-// 
-//     sfeatures = new QLearnGradient<State>::sfeaturedList();
-//     for(int z = 0; z < nbZinter; z++)
-//         sfeatures->push_back(Feature<State>(this->featuring4, {(double)z}));
-//     features->push_back(*sfeatures);
-// 
-// 
-//     qlg = new QLearnGradient<State>(features, nbXinter + nbYinter + nbZinter + 3 * nbXinter * nbYinter * nbZinter, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) );
+    QLearnGradient<State>::featuredList *features = new QLearnGradient<State>::featuredList();
+
+    //     STATE 1D
+// ...
+
+    //     STATE 2D
+// ...
+
+    //     STATE 3D == bias
+
+    {
+        Feature<State> f(TFeatures::_1DMiddle(road_width),
+                         TFeatures::_1DAngle(total_angle),
+                         TFeatures::_1DSpeed(total_speed),
+        {nbXinter, road_width, nbYinter, total_angle, nbZinter, total_speed});
+        QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbYinter * nbZinter );
+        features->push_back(p);
+    }
+
+    // 	MIX STATE/ACTION 2D
+// ...
+// 	MIX STATE/ACTION 3D
+    {   //abd
+        Feature<State> f(TFeatures::_1DMiddle(road_width),
+                         TFeatures::_1DAngle(total_angle),
+                         TFeatures::_1DAction(ACC),
+        {nbXinter, road_width, nbYinter, total_angle, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC});
+        QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbYinter * TWorld::ACTIONS_ACC );
+        features->push_back(p);
+    }
+    {   //abe
+        Feature<State> f(TFeatures::_1DMiddle(road_width),
+                         TFeatures::_1DAngle(total_angle),
+                         TFeatures::_1DAction(DIRE),
+        {nbXinter, road_width, nbYinter, total_angle, QLearnGenCmplx::ACTIONS_DIRECTION, QLearnGenCmplx::ACTIONS_DIRECTION});
+        QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbYinter * QLearnGenCmplx::ACTIONS_DIRECTION );
+        features->push_back(p);
+    }
+    {   //acd
+        Feature<State> f(TFeatures::_1DMiddle(road_width),
+                         TFeatures::_1DSpeed(total_speed),
+                         TFeatures::_1DAction(ACC),
+        {nbXinter, road_width, nbZinter, total_speed, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC});
+        QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbZinter * TWorld::ACTIONS_ACC );
+        features->push_back(p);
+    }
+    {   //ace
+        Feature<State> f(TFeatures::_1DMiddle(road_width),
+                         TFeatures::_1DSpeed(total_speed),
+                         TFeatures::_1DAction(DIRE),
+        {nbXinter, road_width, nbZinter, total_speed, QLearnGenCmplx::ACTIONS_DIRECTION, QLearnGenCmplx::ACTIONS_DIRECTION});
+        QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbZinter * QLearnGenCmplx::ACTIONS_DIRECTION );
+        features->push_back(p);
+    }
+    {   //bcd
+        Feature<State> f(TFeatures::_1DAngle(total_angle),
+                         TFeatures::_1DSpeed(total_speed),
+                         TFeatures::_1DAction(ACC),
+        {nbYinter, total_angle, nbZinter, total_speed, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC});
+        QLearnGradient<State>::sfeaturedList p(f, nbYinter * nbZinter * TWorld::ACTIONS_ACC );
+        features->push_back(p);
+    }
+    {   //bce
+        Feature<State> f(TFeatures::_1DAngle(total_angle),
+                         TFeatures::_1DSpeed(total_speed),
+                         TFeatures::_1DAction(DIRE),
+        {nbYinter, total_angle, nbZinter, total_speed, QLearnGenCmplx::ACTIONS_DIRECTION, QLearnGenCmplx::ACTIONS_DIRECTION});
+        QLearnGradient<State>::sfeaturedList p(f, nbYinter * nbZinter * QLearnGenCmplx::ACTIONS_DIRECTION );
+        features->push_back(p);
+    }
+    {   //ade
+        Feature<State> f(TFeatures::_1DAction(ACC),
+                         TFeatures::_1DAction(DIRE),
+                         TFeatures::_1DMiddle(road_width),
+        {TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC, QLearnGenCmplx::ACTIONS_DIRECTION, QLearnGenCmplx::ACTIONS_DIRECTION, nbXinter, road_width});
+        QLearnGradient<State>::sfeaturedList p(f, TWorld::ACTIONS_ACC *  QLearnGenCmplx::ACTIONS_DIRECTION * nbXinter );
+        features->push_back(p);
+    }
+    {   //bde
+        Feature<State> f(TFeatures::_1DAction(ACC),
+                         TFeatures::_1DAction(DIRE),
+                         TFeatures::_1DAngle(total_angle),
+        {TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC, QLearnGenCmplx::ACTIONS_DIRECTION, QLearnGenCmplx::ACTIONS_DIRECTION, nbYinter, total_angle});
+        QLearnGradient<State>::sfeaturedList p(f, TWorld::ACTIONS_ACC *  QLearnGenCmplx::ACTIONS_DIRECTION * nbYinter );
+        features->push_back(p);
+    }
+
+    {   //cde
+        Feature<State> f(TFeatures::_1DAction(ACC),
+                         TFeatures::_1DAction(DIRE),
+                         TFeatures::_1DSpeed(total_speed),
+        {TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC, QLearnGenCmplx::ACTIONS_DIRECTION, QLearnGenCmplx::ACTIONS_DIRECTION, nbZinter, total_speed});
+        QLearnGradient<State>::sfeaturedList p(f, TWorld::ACTIONS_ACC *  QLearnGenCmplx::ACTIONS_DIRECTION * nbZinter );
+        features->push_back(p);
+    }
+// 	MIX STATE/ACTION 4D
+
+    {
+        Feature<State> f(TFeatures::_1DMiddle(road_width),
+                         TFeatures::_1DAngle(total_angle),
+                         TFeatures::_1DSpeed(total_speed),
+                         TFeatures::_1DAction(ACC),
+        {nbXinter, road_width, nbYinter, total_angle, nbZinter, total_speed, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC});
+        QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbYinter * nbZinter * TWorld::ACTIONS_ACC );
+        features->push_back(p);
+    }
+
+    {
+        Feature<State> f(TFeatures::_1DMiddle(road_width),
+                         TFeatures::_1DAngle(total_angle),
+                         TFeatures::_1DSpeed(total_speed),
+                         TFeatures::_1DAction(DIRE),
+        {nbXinter, road_width, nbYinter, total_angle, nbZinter, total_speed, QLearnGenCmplx::ACTIONS_DIRECTION, QLearnGenCmplx::ACTIONS_DIRECTION});
+        QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbYinter * nbZinter * QLearnGenCmplx::ACTIONS_DIRECTION );
+        features->push_back(p);
+    }
+
+    {
+        Feature<State> f(TFeatures::_1DMiddle(road_width),
+                         TFeatures::_1DAngle(total_angle),
+                         TFeatures::_1DAction(ACC),
+                         TFeatures::_1DAction(DIRE),
+        {nbXinter, road_width, nbYinter, total_angle, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC, QLearnGenCmplx::ACTIONS_DIRECTION, QLearnGenCmplx::ACTIONS_DIRECTION});
+        QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbYinter * TWorld::ACTIONS_ACC * QLearnGenCmplx::ACTIONS_DIRECTION );
+        features->push_back(p);
+    }
+
+    {
+        Feature<State> f(TFeatures::_1DMiddle(road_width),
+                         TFeatures::_1DSpeed(total_speed),
+                         TFeatures::_1DAction(ACC),
+                         TFeatures::_1DAction(DIRE),
+        {nbXinter, road_width, nbZinter, total_speed, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC, QLearnGenCmplx::ACTIONS_DIRECTION, QLearnGenCmplx::ACTIONS_DIRECTION});
+        QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbZinter * TWorld::ACTIONS_ACC * QLearnGenCmplx::ACTIONS_DIRECTION );
+        features->push_back(p);
+    }
+
+    {
+        Feature<State> f(TFeatures::_1DAngle(total_angle),
+                         TFeatures::_1DSpeed(total_speed),
+                         TFeatures::_1DAction(ACC),
+                         TFeatures::_1DAction(DIRE),
+        {nbYinter, total_angle, nbZinter, total_speed, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC, QLearnGenCmplx::ACTIONS_DIRECTION, QLearnGenCmplx::ACTIONS_DIRECTION});
+        QLearnGradient<State>::sfeaturedList p(f, nbYinter * nbZinter * TWorld::ACTIONS_ACC * QLearnGenCmplx::ACTIONS_DIRECTION );
+        features->push_back(p);
+    }
+
+
+    unsigned int nbFeature = 0;
+    for(QLearnGradient<State>::fLiterator flist = features->begin() ; flist != features->end(); ++flist) {
+        QLearnGradient<State>::sfeaturedList sl = *flist;
+        nbFeature += sl.second;
+    }
+
+    qlg = new QLearnGradient<State>(features, nbFeature, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) );
 }
 
 QLearnGenCmplx::~QLearnGenCmplx()
@@ -124,9 +181,7 @@ QLearnGenCmplx::~QLearnGenCmplx()
 void QLearnGenCmplx::decision()
 {
     State st = *TWorld::observe(*this);
-    LOG_DEBUG(st.rightDistance);
-
-    DAction ac = *qlg->decision(st, reward, lrate,  epsilon, lamda, discount);
+    DAction ac = *qlg->learn(st, reward, lrate,  epsilon, lamda, discount, false);
     LOG_DEBUG(" action " << ac << " recomp : " << reward << " " << car->_speed_x);
     applyActionOn(ac, car);
 }

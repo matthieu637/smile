@@ -12,25 +12,14 @@ sigusr1()
 launch(){
 
 index=$1
-#nbCPU=$2
 file="smile${index}.data"
 
 for i in {1..900000}
 do 
-#  episod=`expr $i \* $nbCPU`
   episod=$i
-#  pid=""
-#  for ((q=1; q <= $nbCPU ; q++))
-#  do
   perf=`torcs -r ~/.torcs/config/dtmrace${index}.xml | grep REWARD | sed -e 's/^.*REWARD ://'`
   lsize=`cat /usr/local/share/games/torcs/$file | grep -ve '\([^0-9]\|^\)0\([.]\|<\)' | wc -l`
   echo "iter : $i | state learned : $lsize | simulated races :  $episod | perf : $perf"
-#    pid="$pid $!"
-#  done
-#  for p in "$pid"
-#  do
-#	  wait $p
-#  done
 done
 
 }

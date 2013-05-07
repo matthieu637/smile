@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <bib/XMLEngine.hpp>
 #include "sml/Action.hpp"
 
 using std::string;
@@ -35,8 +36,8 @@ public:
     double operator()(unsigned int s, unsigned int a) const;
     double& operator()(unsigned int s, unsigned int a);
 
-    void write(const string& chemin);
-    void read(const string& chemin);
+    void save(boost::archive::xml_oarchive* xml);
+    void load(boost::archive::xml_iarchive* xml);
     
     hashmap* getWholeCouple();
 

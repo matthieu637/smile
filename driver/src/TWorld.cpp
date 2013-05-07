@@ -9,7 +9,8 @@ double TWorld::reward(const Driver& d) {
     const tCarElt* car = d.getCar();
     double distParcourue = d.getCoveredDistance();
 
-    double r = distParcourue;
+//     double r = distParcourue;
+    double r = car->_speed_x;
     
     const double startMalus = 1000;
     const double malus = startMalus + 500;
@@ -20,7 +21,8 @@ double TWorld::reward(const Driver& d) {
         if(distParcourue > 0.01 && !d.isStuck()) //increase reward if everything's ok r^3
         {
             r+=4; // 4² -> 16 > 15
-            r = r*r*r;
+//             r = r*r*r;//dist
+	    r=r*r;
         }
         else if(distParcourue < 0.01 && !d.isStuck()) { // don't move don't stuck
             if(distParcourue > -0.01)

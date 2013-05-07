@@ -2,14 +2,11 @@
 #include "sml/Q.hpp"
 
 #include <bib/XMLEngine.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/interprocess/sync/named_mutex.hpp>
 #include <boost/serialization/vector.hpp>
-#include <boost/filesystem.hpp>
 #include <fstream>
 #include "bib/Logger.hpp"
 
-using namespace boost::interprocess;
+
 
 namespace sml {
 
@@ -102,26 +99,14 @@ hashmap* QTable::getWholeCouple() {
     return map;
 }
 
-void QTable::write(const string& chemin)
+void QTable::save(boost::archive::xml_oarchive* xml)
 {
-    named_mutex mutex( open_or_create, chemin.c_str());
-
-    bib::XMLEngine::save< hashmap >(*map, "QTable", chemin);
-
-    mutex.unlock();
+    *xml << make_nvp("QTable", map);
 }
 
-void QTable::read(const string& chemin)
+void QTable::load(boost::archive::xml_iarchive* xml)
 {
-    if(  !boost::filesystem::exists( chemin ) ) {
-        LOG_DEBUG(chemin << " n'existe pas.");
-    }
-    else {
-        named_mutex mutex( open_or_create, chemin.c_str());
-        mutex.lock();
-
-        map = bib::XMLEngine::load< hashmap >("QTable", chemin);
-    }
+    *xml >> make_nvp("QTable", map);
 }
 
 }

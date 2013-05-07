@@ -16,7 +16,13 @@ file ( GLOB_RECURSE HEADER include/*.hpp)
 file ( GLOB_RECURSE SOURCE src/*.cpp)
 
 add_library(driver SHARED ${HEADER} ${SOURCE})
-target_link_libraries(driver ${SMILE_LIBRARY} ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} "${CMAKE_SOURCE_DIR}/../torcs/torcs-1.3.4/export/lib/librobottools.so")
+target_link_libraries(driver 	
+		${SMILE_LIBRARY} 
+		${Boost_LIBRARIES} 
+		${CMAKE_THREAD_LIBS_INIT} 
+		"${CMAKE_SOURCE_DIR}/../torcs/torcs-1.3.4/export/lib/librobottools.so"
+		"${CMAKE_SOURCE_DIR}/../torcs/torcs-1.3.4/export/lib/libtgfclient.so"
+		)
 
 #install 
 install(FILES build/libdriver.so DESTINATION /usr/local/lib/torcs/drivers/smile/ RENAME smile.so)

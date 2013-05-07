@@ -38,6 +38,7 @@ public:
     int getGear() const;
 protected:
     float getDistToSegEnd();
+    virtual void update(tSituation *s);
     double reward;
     double globalReward;
     
@@ -51,7 +52,7 @@ protected:
     float lastDammage = 0;
 
 private:
-    void update(tSituation *s);
+    
     void updateStuck();
   
     float nbLaps;

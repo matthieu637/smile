@@ -65,6 +65,16 @@ public:
         
         LOG_DEBUGE();
     }
+    
+    template <class T>
+    static inline void PRINT_ELEMENTS (const T& coll, int length, const char* optcstr="")
+    {
+        LOG_DEBUGS(optcstr);
+        for (int i=0;i<length;i++)
+            LOG_DEBUGC(coll[i] << ", ");
+        
+        LOG_DEBUGE();
+    }
 
 protected:
     Logger():level(DEBUGGING) {}
