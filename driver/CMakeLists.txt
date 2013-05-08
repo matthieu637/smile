@@ -10,7 +10,7 @@ find_package(Smile REQUIRED)
 find_package(Boost COMPONENTS system serialization filesystem REQUIRED)
 find_package (Threads)
 
-include_directories(include ../torcs/torcs-1.3.4/export/include ${SMILE_INCLUDE_DIRS} )
+include_directories(include ../torcs/torcs-1.3.4/export/include ${SMILE_INCLUDE_DIRS} ../torcs/torcs-1.3.4/export/include )
 
 file ( GLOB_RECURSE HEADER include/*.hpp)
 file ( GLOB_RECURSE SOURCE src/*.cpp)
