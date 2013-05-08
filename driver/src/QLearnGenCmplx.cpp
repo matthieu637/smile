@@ -14,7 +14,7 @@ const double QLearnGenCmplx::total_angle = 2*M_PI;
 const double QLearnGenCmplx::total_speed = 60;
 
 
-QLearnGenCmplx::QLearnGenCmplx(int index):Driver(index, DECISION_EACH, 2)
+QLearnGenCmplx::QLearnGenCmplx(int index):Driver(index, DECISION_EACH, simu_time)
 {
     QLearnGradient<State>::featuredList *features = new QLearnGradient<State>::featuredList();
 
@@ -170,7 +170,7 @@ QLearnGenCmplx::QLearnGenCmplx(int index):Driver(index, DECISION_EACH, 2)
         nbFeature += sl.second;
     }
 
-    qlg = new QLearnGradient<State>(features, nbFeature, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) );
+    qlg = new QLearnGradient<State>(features, nbFeature, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) , conf);
 }
 
 QLearnGenCmplx::~QLearnGenCmplx()
@@ -182,7 +182,7 @@ void QLearnGenCmplx::decision()
 {
     State st = *TWorld::observe(*this);
     DAction ac = *qlg->learn(st, reward, lrate,  epsilon, lamda, discount, false);
-    LOG_DEBUG(" action " << ac << " recomp : " << reward << " " << car->_speed_x);
+    LOG_DEBUG(" action " << ac << " recomp : " << reward << " " << st.angle << " " << car->_trkPos.seg->angle[TR_XS] << " " << st.distanceToSegEnd);
     applyActionOn(ac, car);
 }
 
@@ -193,9 +193,13 @@ void QLearnGenCmplx::newRace(tCarElt* car, tSituation *s) {
 }
 
 void QLearnGenCmplx::endRace() {
+    Driver::endRace();
     qlg->write("smile3.data");
 }
 
+sml::LearnStat* QLearnGenCmplx::getAlgo() {
+    return qlg;
+}
 
 void QLearnGenCmplx::applyActionOn(const DAction& ac, tCarElt* car) {
 

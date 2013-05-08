@@ -13,60 +13,60 @@ const sml::ActionTemplate QLearnGen::ACTION_TEMPLATE = sml::ActionTemplate( {DIR
 const double QLearnGen::road_width = 12;
 const double QLearnGen::total_angle = 2*M_PI;
 
-QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH, 2)
+QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH, simu_time)
 {
     QLearnGradient<State>::featuredList *features = new QLearnGradient<State>::featuredList();
-/*
-//     STATE 1D
-    {
-        Feature<State> f(TFeatures::_1DMiddle(road_width), {nbXinter, road_width});
-        QLearnGradient<State>::sfeaturedList p(f, nbXinter );
-        features->push_back(p);
-    }
-    {
-        Feature<State> f(TFeatures::_1DAngle(total_angle), {nbYinter, total_angle});
-        QLearnGradient<State>::sfeaturedList p(f, nbYinter );
-        features->push_back(p);
-    }
-//     STATE 2D
-    {
-        Feature<State> f(TFeatures::_1DMiddle(road_width),
-                         TFeatures::_1DAngle(total_angle),
-        {nbXinter, road_width, nbYinter, total_angle});
-        QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbYinter );
-        features->push_back(p);
-    }
-// 	MIX STATE/ACTION 2D
-    {
-        Feature<State> f(TFeatures::_1DMiddle(road_width),
-                         TFeatures::_1DAction(ACC),
-        {nbXinter, road_width, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC});
-        QLearnGradient<State>::sfeaturedList p(f, nbXinter * TWorld::ACTIONS_ACC );
-        features->push_back(p);
-    }
+    /*
+    //     STATE 1D
+        {
+            Feature<State> f(TFeatures::_1DMiddle(road_width), {nbXinter, road_width});
+            QLearnGradient<State>::sfeaturedList p(f, nbXinter );
+            features->push_back(p);
+        }
+        {
+            Feature<State> f(TFeatures::_1DAngle(total_angle), {nbYinter, total_angle});
+            QLearnGradient<State>::sfeaturedList p(f, nbYinter );
+            features->push_back(p);
+        }
+    //     STATE 2D
+        {
+            Feature<State> f(TFeatures::_1DMiddle(road_width),
+                             TFeatures::_1DAngle(total_angle),
+            {nbXinter, road_width, nbYinter, total_angle});
+            QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbYinter );
+            features->push_back(p);
+        }
+    // 	MIX STATE/ACTION 2D
+        {
+            Feature<State> f(TFeatures::_1DMiddle(road_width),
+                             TFeatures::_1DAction(ACC),
+            {nbXinter, road_width, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC});
+            QLearnGradient<State>::sfeaturedList p(f, nbXinter * TWorld::ACTIONS_ACC );
+            features->push_back(p);
+        }
 
-    {
-        Feature<State> f(TFeatures::_1DAngle(total_angle),
-                         TFeatures::_1DAction(ACC),
-        {nbYinter, total_angle, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC});
-        QLearnGradient<State>::sfeaturedList p(f, nbYinter * TWorld::ACTIONS_ACC );
-        features->push_back(p);
-    }
-    {
-        Feature<State> f(TFeatures::_1DMiddle(road_width),
-                         TFeatures::_1DAction(DIRE),
-        {nbXinter, road_width, QLearnGen::ACTIONS_DIRECTION, QLearnGen::ACTIONS_DIRECTION});
-        QLearnGradient<State>::sfeaturedList p(f, nbXinter * QLearnGen::ACTIONS_DIRECTION );
-        features->push_back(p);
-    }
+        {
+            Feature<State> f(TFeatures::_1DAngle(total_angle),
+                             TFeatures::_1DAction(ACC),
+            {nbYinter, total_angle, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC});
+            QLearnGradient<State>::sfeaturedList p(f, nbYinter * TWorld::ACTIONS_ACC );
+            features->push_back(p);
+        }
+        {
+            Feature<State> f(TFeatures::_1DMiddle(road_width),
+                             TFeatures::_1DAction(DIRE),
+            {nbXinter, road_width, QLearnGen::ACTIONS_DIRECTION, QLearnGen::ACTIONS_DIRECTION});
+            QLearnGradient<State>::sfeaturedList p(f, nbXinter * QLearnGen::ACTIONS_DIRECTION );
+            features->push_back(p);
+        }
 
-    {
-        Feature<State> f(TFeatures::_1DAngle(total_angle),
-                         TFeatures::_1DAction(DIRE),
-        {nbYinter, total_angle, QLearnGen::ACTIONS_DIRECTION, QLearnGen::ACTIONS_DIRECTION});
-        QLearnGradient<State>::sfeaturedList p(f, nbYinter * QLearnGen::ACTIONS_DIRECTION );
-        features->push_back(p);
-    }*/
+        {
+            Feature<State> f(TFeatures::_1DAngle(total_angle),
+                             TFeatures::_1DAction(DIRE),
+            {nbYinter, total_angle, QLearnGen::ACTIONS_DIRECTION, QLearnGen::ACTIONS_DIRECTION});
+            QLearnGradient<State>::sfeaturedList p(f, nbYinter * QLearnGen::ACTIONS_DIRECTION );
+            features->push_back(p);
+        }*/
 // 	MIX STATE/ACTION 3D
     {
         Feature<State> f(TFeatures::_1DMiddle(road_width),
@@ -108,7 +108,7 @@ QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH, 2)
         nbFeature += sl.second;
     }
 
-    qlg = new QLearnGradient<State>(features, nbFeature, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) );
+    qlg = new QLearnGradient<State>(features, nbFeature, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) , conf);
 }
 
 QLearnGen::~QLearnGen()
@@ -127,8 +127,12 @@ void QLearnGen::decision()
     else {
         const DAction* ac;
         State st = *TWorld::observe(*this);
-        ac = qlg->learn(st, reward, lrate,  epsilon, lamda, discount, false);
-        LOG_DEBUG(" action " << *ac << " recomp : " << reward);
+        if(learn) {
+            ac = qlg->learn(st, reward, lrate,  epsilon, lamda, discount, false);
+            LOG_DEBUG(" action " << *ac << " recomp : " << reward);
+        }
+        else ac = qlg->decision(st);
+
         applyActionOn(*ac, car);
     }
 }
@@ -140,9 +144,13 @@ void QLearnGen::newRace(tCarElt* car, tSituation *s) {
 }
 
 void QLearnGen::endRace() {
+    Driver::endRace();
     qlg->write("smile2.data");
 }
 
+sml::LearnStat* QLearnGen::getAlgo() {
+    return qlg;
+}
 
 void QLearnGen::applyActionOn(const DAction& ac, tCarElt* car) {
     car->ctrl.steer = TWorld::computeSteering(ac[DIRE], ACTIONS_DIRECTION, -0.4, 0.4);

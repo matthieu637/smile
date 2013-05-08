@@ -3,14 +3,15 @@
 #include "Q.hpp"
 #include "LearnStat.hpp"
 
-namespace sml{
+namespace sml {
 
 class QLearning : public LearnStat
 {
 
 public:
-    QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a);
-    DAction* decision(const DState& s, double r, float lrate, float epsilon, float discount);
+    QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf);
+    DAction* learn(const DState& s, double r, float lrate, float epsilon, float discount);
+    DAction* decision(const DState& s);
 protected:
     void save(boost::archive::xml_oarchive* xml);
     void load(boost::archive::xml_iarchive* xml);
@@ -19,7 +20,7 @@ private:
     const ActionTemplate* atmp;
     const DState* ds;
     const DAction* da;
-    
+
 };
 
 }

@@ -14,17 +14,18 @@
 #include <car.h>
 #include <robottools.h>
 #include <robot.h>
+#include <sml/LearnStat.hpp>
 
 class Driver {
 public:
-    Driver(int index, int intervalAction, float nbLaps);
+    Driver(int index, int intervalAction, float simu_time);
     virtual ~Driver();
 
     /* callback functions called from TORCS */
     void initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituation *s);
     virtual void newRace(tCarElt* car, tSituation *s);
     virtual void drive(tSituation *s);
-    virtual void endRace() = 0;
+    virtual void endRace();
 
     virtual void decision() = 0;
     
@@ -36,13 +37,12 @@ public:
     /* utility functions */
     bool isStuck() const;
     int getGear() const;
+    float getDistToSegEnd() const;
 protected:
-    float getDistToSegEnd();
     virtual void update(tSituation *s);
+    virtual sml::LearnStat* getAlgo() = 0;
     double reward;
     double globalReward;
-    
-
     /* per robot global data */
     int stuck;
     int decision_each;
@@ -55,7 +55,7 @@ private:
     
     void updateStuck();
   
-    float nbLaps;
+    float simu_time;
     
     /* data that should stay constant after first initialization */
     int MAX_UNSTUCK_COUNT;

@@ -14,7 +14,7 @@ const float Driver::SHIFT_MARGIN = 4.0;						/* [m/s] */
 const float Driver::UNSTUCK_TIME_LIMIT = 2.0;				/* [s] */
 
 
-Driver::Driver(int index, int intervalAction, float nbLaps):nbLaps(nbLaps)
+Driver::Driver(int index, int intervalAction, float simu_time):simu_time(simu_time)
 {
     srand(time(NULL)); //need random in many algorithms
     INDEX = index;
@@ -28,7 +28,7 @@ Driver::Driver(int index, int intervalAction, float nbLaps):nbLaps(nbLaps)
 
 Driver::~Driver()
 {
-    LOG_DEBUG("REWARD :" << (long int)globalReward/1000);
+  
 }
 
 /* Called for every track change or new race. */
@@ -63,11 +63,12 @@ void Driver::drive(tSituation *s)
 
     if(decision_each > INTERVAL_ACTION)
     {
-        if (car->_trkPos.toRight != car->_trkPos.toRight || s->currentTime > nbLaps*5.*60.) { //fix bug during simulation ?
-	    LOG_DEBUG("REWARD :" << (long int)globalReward/1000);
+        if (car->_trkPos.toRight != car->_trkPos.toRight || s->currentTime > simu_time*60. /*|| //fix bug during simulation ?
+	  (s->currentTime > (nbLaps/4)*5.*60. && !getAlgo()->keepLearning(globalReward/1000))*/) { //break simu with too bad perf
             endRace();
             exit(1);
         }
+        
         reward = TWorld::reward(*this);
 	globalReward += reward;
         decision();
@@ -77,6 +78,12 @@ void Driver::drive(tSituation *s)
     }
 }
 
+void Driver::endRace()
+{
+    LOG_DEBUG("Global Perf : " << globalReward/1000);
+    getAlgo()->setPerf(globalReward/1000);
+    getAlgo()->increaseEpisode();
+}
 
 /***************************************************************************
  *
@@ -85,10 +92,11 @@ void Driver::drive(tSituation *s)
 ***************************************************************************/
 
 /* Compute the length to the end of the segment */
-float Driver::getDistToSegEnd()
+float Driver::getDistToSegEnd() const
 {
-    if (car->_trkPos.seg->type == TR_STR) {
-        return car->_trkPos.seg->length - car->_trkPos.toStart;
+    int type = car->_trkPos.seg->type;
+    if (type == TR_STR) {
+        return car->pub.trkPos.seg->length - car->_trkPos.toStart;
     } else {
         return (car->_trkPos.seg->arc - car->_trkPos.toStart)*car->_trkPos.seg->radius;
     }

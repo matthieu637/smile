@@ -14,7 +14,7 @@ const double QLearnGenFdb::road_width = 14;
 const double QLearnGenFdb::total_angle = 2*M_PI;
 
 QLearnGenFdb::QLearnGenFdb(int index):
-    DriverFeedback(index, DECISION_EACH, 2,
+    DriverFeedback(index, DECISION_EACH, simu_time,
 {{GFCTRL_TYPE_KEYBOARD, 's'}, {GFCTRL_TYPE_KEYBOARD, 'd'}, {GFCTRL_TYPE_KEYBOARD, 'f'}, {GFCTRL_TYPE_KEYBOARD, 'g'}})
 {
     QLearnGradient<State>::featuredList *features = new QLearnGradient<State>::featuredList();
@@ -110,7 +110,7 @@ QLearnGenFdb::QLearnGenFdb(int index):
         nbFeature += sl.second;
     }
 
-    qlg = new QLearnGradient<State>(features, nbFeature, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE) );
+    qlg = new QLearnGradient<State>(features, nbFeature, &ACTION_TEMPLATE, *TWorld::initialAction(&ACTION_TEMPLATE), conf );
 }
 
 QLearnGenFdb::~QLearnGenFdb()
@@ -140,8 +140,12 @@ void QLearnGenFdb::decision()
 
         const DAction* ac;
         State st = *TWorld::observe(*this);
-        ac = qlg->learn(st, reward + expertReward, lrate,  epsilon, lamda, discount, false);
-        LOG_DEBUG(" action " << *ac << " recomp : " << reward << " expert : " << expertReward );
+        if(learn) {
+            ac = qlg->learn(st, reward + expertReward, lrate,  epsilon, lamda, discount, false);
+            LOG_DEBUG(" action " << *ac << " recomp : " << reward << " expert : " << expertReward );
+        }
+        else
+            ac = qlg->decision(st);
         applyActionOn(*ac, car);
     }
 }
@@ -153,9 +157,13 @@ void QLearnGenFdb::newRace(tCarElt* car, tSituation *s) {
 }
 
 void QLearnGenFdb::endRace() {
+    Driver::endRace();
     qlg->write("smile4.data");
 }
 
+sml::LearnStat* QLearnGenFdb::getAlgo() {
+    return qlg;
+}
 
 void QLearnGenFdb::applyActionOn(const DAction& ac, tCarElt* car) {
     car->ctrl.steer = TWorld::computeSteering(ac[DIRE], ACTIONS_DIRECTION, -0.4, 0.4);

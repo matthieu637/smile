@@ -11,15 +11,34 @@ sigusr1()
 
 launch(){
 
+lperf=0
 index=$1
 file="smile${index}.data"
 
 for i in {1..900000}
 do 
-  episod=$i
-  perf=`torcs -r ~/.torcs/config/dtmrace${index}.xml | grep REWARD | sed -e 's/^.*REWARD ://'`
+  torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null &
+  pid1=$!
+#  torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null &
+#  pid2=$!
+#  torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null &
+#  pid3=$!
+#  torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null &
+#  pid4=$!
+
+  wait $pid1 #$pid2 $pid3 $pid4
+
+  episod=`cat /usr/local/share/games/torcs/$file  | grep episode | sed 's/[^0-9]*//g'`
+  perf=`cat /usr/local/share/games/torcs/$file  | grep perf | sed 's/[^-0-9]*//g'`
   lsize=`cat /usr/local/share/games/torcs/$file | grep -ve '\([^0-9]\|^\)0\([.]\|<\)' | wc -l`
-  echo "iter : $i | state learned : $lsize | simulated races :  $episod | perf : $perf"
+  if [ $perf -ne $lperf  ] ; then
+  	echo "episod : $episod | state learned : $lsize | perf : $perf"
+  fi
+  lperf=$perf
+  if [ $perf -lt -8000 ] && [ $episod -gt 70 ] ; then
+	echo "cannot converge, retry from scratch"
+	rm /usr/local/share/games/torcs/$file
+  fi
 done
 
 }

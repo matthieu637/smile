@@ -23,6 +23,7 @@ public:
     ~QLearnDiscr();
     void newRace(tCarElt* car, tSituation *s);
     void endRace();
+    sml::LearnStat* getAlgo();
     
 private:  
   DState* discretize(const State& st);
@@ -38,6 +39,10 @@ private:
     const float lrate = 0.001;
     const float discount = 0.95;
     const float espilon = 0.01;
+    
+    static const bool learn = false;
+    sml::LearnConfig conf = {true, 0.1, 2000};
+    static const unsigned int simu_time = 10; //in minutes
     
     static const sml::ActionTemplate ACTION_TEMPLATE;
     static const sml::StateTemplate STATE_TEMPLATE;

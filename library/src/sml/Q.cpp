@@ -106,7 +106,9 @@ void QTable::save(boost::archive::xml_oarchive* xml)
 
 void QTable::load(boost::archive::xml_iarchive* xml)
 {
-    *xml >> make_nvp("QTable", map);
+    hashmap* obj = new hashmap;
+    *xml >> make_nvp("QTable", *obj);
+    map = obj;
 }
 
 }

@@ -20,7 +20,8 @@ public:
     ~QLearnDiscr2();
     void newRace(tCarElt* car, tSituation *s);
     void endRace();
-
+    sml::LearnStat* getAlgo();
+    
 private:
   DState* discretize(const State& st);
   void applyActionOn(const DAction& ac, tCarElt* car);
@@ -36,6 +37,10 @@ private:
     const double lrate = 0.001;
     const double discount = 0.75;
     const double espilon = 0.05;
+    
+    static const bool learn = false;
+    sml::LearnConfig conf = {true, 0.1, 2000};
+    static const unsigned int simu_time = 10; //in minutes
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
     static const sml::StateTemplate STATE_TEMPLATE;

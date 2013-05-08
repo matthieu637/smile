@@ -1,6 +1,7 @@
 #ifndef QLEARNINGLAMB_HPP
 #define QLEARNINGLAMB_HPP
 #include "Q.hpp"
+#include "LearnStat.hpp"
 
 namespace sml {
 
@@ -15,12 +16,13 @@ public:
     }
 };
 
-class QLearningLamb
+class QLearningLamb : public sml::LearnStat
 {
 
 public:
-    QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, DState& s, DAction& a);
-    DAction* decision(DState& s, double r, float lrate, float epsilon, float discount, float lambda, bool accumulative);
+    QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, DState& s, DAction& a, const LearnConfig& conf);
+    DAction* learn(DState& s, double r, float lrate, float epsilon, float discount, float lambda, bool accumulative);
+    DAction* decision(DState& s);
 protected:
     void save(boost::archive::xml_oarchive* xml);
     void load(boost::archive::xml_iarchive* xml);

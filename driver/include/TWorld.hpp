@@ -25,6 +25,7 @@ struct State {
     float leftDistance;
     float rightDistance;
     float speed; //-40 / 40 ?
+    float distanceToSegEnd;
 };
 
 

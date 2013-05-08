@@ -3,13 +3,14 @@
 
 namespace sml {
 
-QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a) : Q(stmp, atmp), atmp(atmp),ds(&s),da(&a)
+QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf) :
+    LearnStat(conf), Q(stmp, atmp), atmp(atmp),ds(&s),da(&a)
 {
 
 
 }
 
-DAction* QLearning::decision(const DState& s, double r, float lrate, float epsilon, float discount)
+DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon, float discount)
 {
     DAction *ap = Q.argmax(s);
     Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(s, *ap) - Q(ds, da) );
@@ -25,6 +26,10 @@ DAction* QLearning::decision(const DState& s, double r, float lrate, float epsil
     da = a;
 
     return a;
+}
+
+DAction* QLearning::decision(const DState& s) {
+    return Q.argmax(s);
 }
 
 void QLearning::save(boost::archive::xml_oarchive* xml)

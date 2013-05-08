@@ -2,15 +2,11 @@
 #define QLEARNGRADIENT_HPP
 
 #include <boost/numeric/ublas/vector.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/interprocess/sync/named_mutex.hpp>
 #include <bib/XMLEngine.hpp>
 #include "sml/Q.hpp"
 #include "sml/Feature.hpp"
 #include "sml/Utils.hpp"
-
-using namespace boost::interprocess;
+#include "LearnStat.hpp"
 
 namespace sml {
 
@@ -20,7 +16,7 @@ typedef boost::numeric::ublas::vector<bool> bbvector;
 using boost::numeric::ublas::zero_vector;
 
 template <class S>
-class QLearnGradient
+class QLearnGradient : public LearnStat
 {
 public:
     typedef std::pair< Feature<S>, unsigned int > sfeaturedList;
@@ -28,7 +24,8 @@ public:
     typedef typename featuredList::iterator fLiterator;
 
 public:
-    QLearnGradient(featuredList* features, unsigned int nbFeature, const ActionTemplate* atmp, const DAction& initial) :
+    QLearnGradient(featuredList* features, unsigned int nbFeature, const ActionTemplate* atmp, const DAction& initial, const LearnConfig& conf) :
+	LearnStat(conf),
         nbFeature(nbFeature),
         teta(nbFeature), e(zero_vector<double>(nbFeature)),
         Qa(atmp), actions(atmp->sizeNeeded()),
@@ -36,11 +33,16 @@ public:
     {
         for(unsigned int i=0; i<nbFeature; i++)
             teta[i]=-1./5.+ 2.*sml::Utils::rand01()/5.;//TODO:kinda important
-	  
+
         for(unsigned int i=0; i < atmp->sizeNeeded() ; i++)
             actions[i] = DAction(atmpl, i);
 
         lastAction = &initial;
+    }
+
+    const DAction* decision(const S& state) {
+        computeQa(state);
+        return Qa.argmax();
     }
 
     const DAction* learn(const S& state, double r, float lrate, float epsilon, float lamda, float discout, bool accumulative)
@@ -55,14 +57,14 @@ public:
 
 
         const DAction* ap = Qa.argmax();
-	delta = delta + discout * Qa(*ap);
-	
+        delta = delta + discout * Qa(*ap);
+
 // 	LOG_DEBUG("history size:" << history.size());
 // 	teta = teta + lrate * delta * e;
-        for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it){
-	    int index = *it;
+        for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
+            int index = *it;
             teta[index] = teta[index] + lrate * delta * e[index];
-	}
+        }
 
         //begin
         if( sml::Utils::rand01() < epsilon) {
@@ -72,17 +74,17 @@ public:
             history.clear();
         } else {
 //             a = Qa.argmax();
-	    a = ap;
-            for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it){
-		unsigned int index = *it;
+            a = ap;
+            for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
+                unsigned int index = *it;
                 e[index] = lamda * discout * e[index];
 // 		LOG_DEBUG(e(*it));
-	    }
+            }
         }
 
         list<int> activeIndex = *extractFeatures(state, *a);
         for(list<int>::iterator it = activeIndex.begin(); it != activeIndex.end() ; ++it) {
-	    int index = *it;
+            int index = *it;
             if(accumulative)
                 e[index] += 1.;
             else
@@ -101,12 +103,12 @@ public:
             double _Qa = 0.;
 
             list<int>* actived = extractFeatures(state, *ai);
-	    
+
 //   	    bib::Logger::PRINT_ELEMENTS<list<int>>(*actived);
 
             for(list<int>::iterator it=actived->begin(); it != actived->end(); ++it)
                 _Qa += teta[*it];
-	    
+
 // 	    LOG_DEBUG("old :" << Qa(*ai) << " new :" << _Qa);
             Qa(*ai) = _Qa;
         }
@@ -154,24 +156,14 @@ public:
         return actived;
     }
 
-    void read(const string& chemin) {
-        named_mutex mutex( open_or_create, chemin.c_str());
-        mutex.lock();
-
-        if(  !boost::filesystem::exists( chemin ) ) {
-            LOG_DEBUG(chemin << " n'existe pas.");
-        }
-        else {
-            teta = *bib::XMLEngine::load< dbvector >("teta", chemin);
-        }
+    void save(boost::archive::xml_oarchive* xml)
+    {
+        *xml << make_nvp("teta", teta);
     }
 
-    void write(const string& chemin) {
-        bib::XMLEngine::save< dbvector >(teta, "teta", chemin);
-        named_mutex mutex( open_or_create, chemin.c_str());
-        mutex.unlock();
+    void load(boost::archive::xml_iarchive* xml) {
+        *xml >> make_nvp("teta", teta);
     }
-
 
 private:
     int nbFeature;

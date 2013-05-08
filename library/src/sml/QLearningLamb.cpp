@@ -3,20 +3,19 @@
 
 namespace sml {
 
-QLearningLamb::QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, DState& s, DAction& a) : Q(stmp, atmp), N(stmp, atmp), atmp(atmp),s(&s),a(&a)
+QLearningLamb::QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, DState& s, DAction& a, const LearnConfig& conf) :
+    LearnStat(conf), Q(stmp, atmp), N(stmp, atmp), atmp(atmp),s(&s),a(&a)
 {
-
 
 }
 
-DAction* QLearningLamb::decision(DState& sp, double r, float lrate, float epsilon, float discount, float lambda, bool accumulative)
+DAction* QLearningLamb::learn(DState& sp, double r, float lrate, float epsilon, float discount, float lambda, bool accumulative)
 {
-
     //Take action a, observe r, s'
 
     //Choose a' from s' using policy derived from Q
     DAction* as = Q.argmax(sp); //TODO:memory leak
-     //if a' ties for the max, then a* <- a'
+    //if a' ties for the max, then a* <- a'
     DAction* ap = as;
     if(sml::Utils::rand01() < epsilon ) {
         ap = new DAction(atmp, rand() % (int)atmp->sizeNeeded());//TODO:memory
@@ -47,6 +46,10 @@ DAction* QLearningLamb::decision(DState& sp, double r, float lrate, float epsilo
     s = &sp;
 
     return ap;
+}
+
+DAction* QLearningLamb::decision(DState& s) {
+    return Q.argmax(s);
 }
 
 void QLearningLamb::save(boost::archive::xml_oarchive* xml)

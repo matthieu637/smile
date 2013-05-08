@@ -86,6 +86,7 @@ State* TWorld::observe(const Driver& d) {
     s->distanceFromMiddle = car->_trkPos.toMiddle;
     s->leftDistance = car->_trkPos.toLeft;
     s->rightDistance = car->_trkPos.toRight;
+    s->distanceToSegEnd = d.getDistToSegEnd();
     return s;
 }
 

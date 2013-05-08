@@ -10,11 +10,11 @@ const sml::ActionTemplate QLearnDiscr2::ACTION_TEMPLATE = sml::ActionTemplate( {
 const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {AGL, DST}, {QLearnDiscr2::STATES_ALPHA, QLearnDiscr2::STATES_DISTANCE});
 // const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {AGL, DST, SPD}, {QLearnDiscr2::STATES_ALPHA, QLearnDiscr2::STATES_DISTANCE*2, 3});
 
-QLearnDiscr2::QLearnDiscr2(int index):Driver(index, DECISION_EACH, 2.)
+QLearnDiscr2::QLearnDiscr2(int index):Driver(index, DECISION_EACH, simu_time)
 {
     State st = *TWorld::initialState();
     DState* dst = discretize(st);
-    q = new sml::QLearningLamb(&STATE_TEMPLATE, &ACTION_TEMPLATE, *dst, *TWorld::initialAction(&ACTION_TEMPLATE));
+    q = new sml::QLearningLamb(&STATE_TEMPLATE, &ACTION_TEMPLATE, *dst, *TWorld::initialAction(&ACTION_TEMPLATE), conf);
 }
 
 QLearnDiscr2::~QLearnDiscr2()
@@ -22,23 +22,32 @@ QLearnDiscr2::~QLearnDiscr2()
 
 }
 
+sml::LearnStat* QLearnDiscr2::getAlgo() {
+    return q;
+}
+
 void QLearnDiscr2::endRace() {
+    Driver::endRace();
     q->write("smile1.data");
 }
 
 void QLearnDiscr2::decision()
 {
     DAction* a;
-  
+
     if(car->_speed_x < 9 && car->_distRaced < 10) {
         a = TWorld::initialAction(&ACTION_TEMPLATE);
-	a->set(ACC, 3);
+        a->set(ACC, 3);
     }
     else {
         State st = *TWorld::observe(*this);
         DState* dst = discretize(st);
-        a = q->decision(*dst,reward,lrate,espilon,discount, lambda, false);
-        LOG_DEBUG("etat " << *dst << " action " << *a << " recomp : " << reward);
+        if(learn) {
+            a = q->learn(*dst,reward,lrate,espilon,discount, lambda, false);
+            LOG_DEBUG("etat " << *dst << " action " << *a << " recomp : " << reward);
+        }
+        else
+            a = q->decision(*dst);
     }
 
     applyActionOn(*a, car);

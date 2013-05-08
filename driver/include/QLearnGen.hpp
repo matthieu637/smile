@@ -21,6 +21,7 @@ public:
     ~QLearnGen();
     void newRace(tCarElt* car, tSituation *s);
     void endRace();
+    sml::LearnStat* getAlgo();
 
 private:
     void applyActionOn(const DAction& ac, tCarElt* car);
@@ -40,6 +41,10 @@ private:
 
     static const int nbXinter = 14;
     static const int nbYinter = 16;
+    
+    static const bool learn = false;
+    sml::LearnConfig conf = {true, 0.1, 2000};
+    static const unsigned int simu_time = 10; //in minutes
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
 
