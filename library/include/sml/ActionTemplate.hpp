@@ -24,7 +24,7 @@ public:
     ActionTemplate();//empty constructor for serialization
     
 ///
-///\brief Construction
+///\brief Constructeur
 ///\param names : la liste des noms pour chaque action 
 /// 	  sizes : le nombre des valeurs possibles pour chaque action   
     ActionTemplate(const std::list<string>& names, const std::list<int>& sizes);

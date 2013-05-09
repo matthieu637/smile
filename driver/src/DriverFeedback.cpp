@@ -8,7 +8,7 @@ DriverFeedback::tKeyInfo DriverFeedback::keyInfo[256];
 DriverFeedback::tKeyInfo DriverFeedback::skeyInfo[256];
 tdble DriverFeedback::lastKeyUpdate = -10.0;
 
-DriverFeedback::DriverFeedback(int index, int intervalAction, float nbLaps, const vector<tControlCmd>& listenKeys) : Driver(index, intervalAction, nbLaps), listenKeys(listenKeys)
+DriverFeedback::DriverFeedback(int index, int intervalAction, float simu_time, const vector<tControlCmd>& listenKeys) : Driver(index, intervalAction, simu_time), listenKeys(listenKeys)
 {
     memset(keyInfo, 0, sizeof(keyInfo));
     memset(skeyInfo, 0, sizeof(skeyInfo));

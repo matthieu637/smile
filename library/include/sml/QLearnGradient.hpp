@@ -31,7 +31,7 @@ public:
 public:
 
 ///
-///\brief Construction
+///\brief Constructeur
 ///\param features : les quadrillages
 ///       nbFeature : le nombre total de rectagle de tous les quadrillages
 /// 	  atmp : le modèle d'action
@@ -245,6 +245,8 @@ private:
     
 ///
 ///\brief Retourner les indices des rectangles activés par cet état et action
+///\param st : l'état présent
+///	  ac : l'action 
     list<int>* extractFeatures(const S& state, const DAction& ac) {
         list<int>* actived = new list<int>;
 

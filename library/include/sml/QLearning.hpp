@@ -17,7 +17,7 @@ class QLearning : public LearnStat
 public:
   
 ///
-///\brief Construction
+///\brief Constructeur
 ///\param stmp : le modèle d'état
 /// 	  atmp : le modèle d'action
 ///       s : l'état
