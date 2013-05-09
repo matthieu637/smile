@@ -9,6 +9,7 @@ set(SMILE_PATH "${CMAKE_SOURCE_DIR}/../library/" CACHE PATH "Chemin vers la libr
 find_package(Smile REQUIRED)
 find_package(Boost COMPONENTS system serialization filesystem REQUIRED)
 find_package (Threads)
+find_package( TorcsLibs )
 
 include_directories(include ../torcs/torcs-1.3.4/export/include ${SMILE_INCLUDE_DIRS} ../torcs/torcs-1.3.4/export/include )
 
@@ -20,8 +21,8 @@ target_link_libraries(driver
 		${SMILE_LIBRARY} 
 		${Boost_LIBRARIES} 
 		${CMAKE_THREAD_LIBS_INIT} 
-		"${CMAKE_SOURCE_DIR}/../torcs/torcs-1.3.4/export/lib/librobottools.so"
-		"${CMAKE_SOURCE_DIR}/../torcs/torcs-1.3.4/export/lib/libtgfclient.so"
+		${TORCS_LIBS_ROBOTTOOLS}
+		${TORCS_LIBS_TGFCLIENT}
 		)
 
 #install 

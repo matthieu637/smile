@@ -8,6 +8,7 @@
 \usepackage[francais]{babel} %FR
 \usepackage[T1]{fontenc}
 \usepackage{fancyhdr}
+\usepackage{multicol}
 
 \usepackage[pdftex]{graphicx} % img
 %\usepackage{wrapfig} %fac
@@ -22,6 +23,9 @@
 % \usepackage{showlabels}
 \usepackage{nameref}
 
+\usepackage{color}
+\usepackage{listings}
+
 % Style Page
 \pagestyle{fancy} % entêtes
 
@@ -33,6 +37,41 @@
 \sloppy % ne pas faire déborder les lignes dans la marge
 
 %\setcounter{tocdepth}{1} %hideallsubsections
+
+
+ 
+% Definition de couleur supplementaire
+\definecolor{colString}{rgb}{0.6,0.1,0.1}
+ 
+% Definition du langage
+\lstdefinelanguage{LangageConsole}{%
+    morekeywords={%
+        ligne% mot-clé ``ligne''
+    }
+}
+ 
+% Definition du style
+\lstdefinestyle{styleLangage}{%
+    language        = LangageConsole,%
+    basicstyle      = \footnotesize\ttfamily\color{white},% ecriture standard
+    identifierstyle = \color{white},%
+    commentstyle    = \color{green},%
+    keywordstyle    = \color{blue},%
+    stringstyle     = \color{colString},%
+    extendedchars   = true,% permet d'avoir des accents dans le code
+    tabsize         = 2,%
+    showspaces      = false,%
+    showstringspaces = false,%
+%     numbers=left,%
+    numberstyle=\tiny\ttfamily\color{black},%
+    breaklines=true,%
+    breakautoindent=true,%
+        backgroundcolor=\color{black},%
+}
+ 
+\lstset{%
+    style = styleLangage%
+}
 
 \begin{document}
   \begin{titlepage}
@@ -58,27 +97,120 @@
   \renewcommand{\labelitemiii}{$\diamond$}
   \renewcommand{\labelitemiv}{$\ast$}
   
+  
+  De part la nature du projet : bibliothèque + interfacement avec le simulateur, l'installation est un peu technique.
+  De plus, le fonctionnement sans modification de code est assez limité, il faudra mieux se référer au 
+  Manuel du Programmeur pour tirer parti de la bibliothèque.
+  
   \section{Procédure d’installation}
 
   \subsection{Configuration Requise}
   La procédure d'installation doit se dérouler sur un environnement GNU/Linux.
   Le projet est pleinement fonctionnel sur les distributions Archlinux et Ubuntu.
  
-  Il vous faudra disposer des drivers graphiques hardware de votre carte et répondre aux spécifications
+  Il vous faudra disposer des drivers graphiques ``hardware'' de votre carte et répondre aux spécifications
   matérielles suivantes :
    \begin{itemize}
     \item 1GHz CPU
     \item 512MB RAM
     \item OpenGL 1.3 compatible graphics card with 64 MB RAM
+    \item 2 Go d'espace libre
    \end{itemize}
  
-  \subsection{Récupérer le simulateur}
-  Au vu de la taille du simulateur (\verb+~+800Mo), il n'a été fourni en même temps que le reste du projet.
+ Au vu de la taille du simulateur TORCS \cite{TORCS} présenté
+  dans le cahier des charges \cite{CdC}, il n'a été fourni en même temps que le reste du projet.
+ Vous avez donc 2 méthodes pour le récupérer : 
+  \subsection{Installer le simulateur : Via la distribution}
   
-  La première étape de l'installation consiste à récupérer le simulateur TORCS \cite{TORCS} présenté
-  dans le cahier des charges \cite{CdC}.
+  Si vous êtes sous Ubuntu, vous pouvez installer directement le simulateur via la commande :
+  
+    \begin{lstlisting}
+sudo apt-get install torcs
+    \end{lstlisting}
+    
+    Vous pouvez alors passer à l'étape 1.3.2 directement, puis 1.4 sans passer par la 1.3.3.
+    Le projet a besoin du code de TORCS pour être compilé même si TORCS est déjà installé.
+  
+  \subsection{Installer le simulateur : Via compilation}
  
+  \subsubsection{Liste des paquets pré-requis}
+  Voici la liste des paquets que vous aurez besoin afin de compiler le simulateur :
+  \begin{multicols}{2}
+    \begin{itemize}
+    \item bash
+    \item gcc (avec g++)
+    \item mesa
+    \item freeglut
+    \item openAL (avec alut)
+    \item vorbis
+    \item libxi
+    \item Xmu
+    \item Xrender
+    \item Xrandr
+    \item libz
+    \item libpng
+    \end{itemize}
+  \end{multicols}
+  
+  Sur un live CD Ubuntu, la commande suivante est suffisante (en activant tout les dépôts) :
+  \begin{lstlisting}
+sudo apt-get install g++ mesa-common-dev freeglut3-dev libplib-dev libopenal-dev libalut-dev libvorbis-dev libxi-dev libxmu-dev libxrender-dev libxrandr-dev zlib1g-dev libpng12-dev 
+    \end{lstlisting}
+
+  
+  L'utilisation de sudo facilite l'installation et ne modifira que les chemins (local est optionnel en fonction de la
+  distribution) : 
+  \begin{itemize}
+    \item /usr/local/share/games/torcs/
+    \item /usr/local/lib/torcs/
+    \item /usr/local/bin/torcs
+  \end{itemize}
+
+  Si vous n'en avez pas l'envie, vous pouvez utiliser un live CD.
+  
+  \subsubsection{Récupérer le code du simulateur}
+  
+  
+  Il faut maintenant récupérer le code du simulateur 
+  
+  Pour celà, ouvrez une console et placez vous dans le répertoire Sources/torcs/ et lancer le script 
+    \begin{lstlisting}
+./getTorcs
+    \end{lstlisting}
+  Vous devriez alors avoir un dossier /Sources/torcs/torcs-1.3.4/ avec tout les fichiers nécessaires à la compilation.
  
+   \subsubsection{Compiler le simulateur}
+  
+  Toujours dans Sources/torcs/, lancer :
+  
+  \begin{lstlisting}
+./buildTorcs
+    \end{lstlisting}
+  
+  Si vous avez des problèmes lors de cette phase, vous pouvez vous reportez sur l'aide en ligne de TORCS :
+  \href{http://torcs.sourceforge.net/index.php?name=Sections&op=viewarticle&artid=30}{FAQ}
+  
+  \subsection{Compilation du projet}
+  
+  Voici la liste des paquets que vous aurez besoin afin de compiler le projet :
+    
+  \begin{itemize}
+    \item make
+    \item g++
+    \item cmake
+    \item sudo
+    \item boost (system, serialization, filesystem)
+  \end{itemize}
+
+  Sur ubuntu : 
+    \begin{lstlisting}
+sudo apt-get install g++ cmake libboost-dev libboost-system-dev libboost-serialization-dev libboost-filesystem-dev
+    \end{lstlisting}
+    
+    Vous êtes alors prêt à lancer la dernière compilation.
+    
+  \section{Désinstallation}
+  
  
   \section{Paramètres de fonctionnement}
 

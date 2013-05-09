@@ -37,6 +37,7 @@
 torcs.base/
 torcs-1.3.4/
 torcs-1.3.4.tar.bz2
+torcs.base.tar.bz2
 
 #kdevelop
 *.kdev4
