@@ -28,45 +28,40 @@ QLearnGen::QLearnGen(int index):Driver(index, DECISION_EACH, simu_time)
             QLearnGradient<State>::sfeaturedList p(f, nbYinter );
             features->push_back(f);
         }
-    //     STATE 2D
+  */  //     STATE 2D
         {
             Feature<State> f({TFeatures::_1DMiddle(road_width),
-                             TFeatures::_1DAngle(total_angle),
+                             TFeatures::_1DAngle(total_angle)},
             {nbXinter, road_width, nbYinter, total_angle});
-            QLearnGradient<State>::sfeaturedList p(f, nbXinter * nbYinter );
             features->push_back(f);
         }
     // 	MIX STATE/ACTION 2D
         {
             Feature<State> f({TFeatures::_1DMiddle(road_width),
-                             TFeatures::_1DAction(ACC),
+                             TFeatures::_1DAction(ACC)},
             {nbXinter, road_width, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC});
-            QLearnGradient<State>::sfeaturedList p(f, nbXinter * TWorld::ACTIONS_ACC );
             features->push_back(f);
         }
 
         {
             Feature<State> f({TFeatures::_1DAngle(total_angle),
-                             TFeatures::_1DAction(ACC),
+                             TFeatures::_1DAction(ACC)},
             {nbYinter, total_angle, TWorld::ACTIONS_ACC, TWorld::ACTIONS_ACC});
-            QLearnGradient<State>::sfeaturedList p(f, nbYinter * TWorld::ACTIONS_ACC );
             features->push_back(f);
         }
         {
             Feature<State> f({TFeatures::_1DMiddle(road_width),
-                             TFeatures::_1DAction(DIRE),
+                             TFeatures::_1DAction(DIRE)},
             {nbXinter, road_width, QLearnGen::ACTIONS_DIRECTION, QLearnGen::ACTIONS_DIRECTION});
-            QLearnGradient<State>::sfeaturedList p(f, nbXinter * QLearnGen::ACTIONS_DIRECTION );
             features->push_back(f);
         }
 
         {
             Feature<State> f({TFeatures::_1DAngle(total_angle),
-                             TFeatures::_1DAction(DIRE),
+                             TFeatures::_1DAction(DIRE)},
             {nbYinter, total_angle, QLearnGen::ACTIONS_DIRECTION, QLearnGen::ACTIONS_DIRECTION});
-            QLearnGradient<State>::sfeaturedList p(f, nbYinter * QLearnGen::ACTIONS_DIRECTION );
             features->push_back(f);
-        }*/
+        }
 // 	MIX STATE/ACTION 3D
     {
         Feature<State> f( {TFeatures::_1DMiddle(road_width),
