@@ -7,7 +7,7 @@ core=`grep -c ^processor /proc/cpuinfo`
 jobs=`expr $core + 1`
 
 if [ ! -e ./library ]; then
-	echo "Placez vous dans risk/"
+	echo "Placez vous dans library/"
 	exit 1
 fi
 
@@ -39,4 +39,7 @@ mkdir -p ~/.torcs/config/raceman/
 cp torcs/xml/*.xml ~/.torcs/config/
 mv ~/.torcs/config/quickrace.xml ~/.torcs/config/raceman/
 echo "config done"
+
+. driver/path
+cp -r driver/workingState/* $path/
 

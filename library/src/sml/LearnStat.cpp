@@ -10,7 +10,7 @@ using namespace boost::interprocess;
 
 namespace sml {
 
-LearnStat::LearnStat(const LearnConfig& conf):conf(conf),performance(0), last_performance(0), episode(0), performance_set(false), read_before(false) {}
+LearnStat::LearnStat(const LearnConfig& conf):performance(0), last_performance(0), episode(0), performance_set(false), read_before(false), conf(conf) {}
 
 void LearnStat::write(const string& chemin) {
 

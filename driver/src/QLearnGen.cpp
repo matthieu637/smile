@@ -120,11 +120,11 @@ void QLearnGen::decision()
     State st = *TWorld::observe(*this);
     
     if(car->_speed_x < 15 && car->_distRaced < 15) {
-        DAction ac;
-        ac = *TWorld::initialAction(&ACTION_TEMPLATE);
-        ac.set(ACC, 3);
-        applyActionOn(ac, car);
-        qlg->update(ac);
+        DAction* ac;
+        ac = TWorld::initialAction(&ACTION_TEMPLATE);
+        ac->set(ACC, 3);
+        applyActionOn(*ac, car);
+        qlg->update(*ac);
     }
     else {
         const DAction* ac;

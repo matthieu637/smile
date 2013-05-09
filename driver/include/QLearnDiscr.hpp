@@ -42,7 +42,7 @@ private:
     const float discount = 0.95;
     const float espilon = 0.01;
     
-    static const bool learn = true;
+    static const bool learn = false;
     sml::LearnConfig conf = {true, 0.1, 2000};
     static const unsigned int simu_time = 10; //in minutes
     

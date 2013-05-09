@@ -114,7 +114,8 @@
     \item 1GHz CPU
     \item 512MB RAM
     \item OpenGL 1.3 compatible graphics card with 64 MB RAM
-    \item 2 Go d'espace libre
+    \item 2 Go d'espace libre (si compilation)
+    \item 1 Go d'espace libre (si installation)
    \end{itemize}
  
  Au vu de la taille du simulateur TORCS \cite{TORCS} présenté
@@ -292,21 +293,45 @@ sudo apt-get install g++ cmake libboost-dev libboost-system-dev libboost-seriali
 	  & par descente de gradient & tangente à la route & 4 actions vitesse & & \\  \hline
       
       	5 & Sarsa($\lambda$)  & distance au centre, &
-	  direction, & Contr& vitesse < 70km/h \\ 
-	  & & tangente à la route & 4 actions vitesse & & \\  \hline
+	  direction, & Contrôle & Sans \\ 
+	  & & tangente à la route, & 4 actions vitesse & & \\  
+	  & & vitesse & & & \\  \hline
 
     \end{tabular}
    \end{scriptsize}
    \end{center}
 
+  La pluspart des algorithmes sont tirés du livre \cite{ReinforceLearningIntro}.
   Notons les 2 types de feedback, dont nous allons détailler un peu plus l'utilisation :
   
   \paragraph{Superviseur} Le tuteur peut avec ce robot, lui envoyer un feedback sur ces récompenses
   à l'aide des touches S, D, F, G.
-  
-  La définition de nouveaux robots se voit dans le Manuel du Programmeur.
-  
 
+  F et G pour des récompenses possitives.
+  
+  S et D pour des récompenses négatives.
+  
+  L'ordre étant le suivante S < D < F < G.  
+  
+  L'utilisateur peut vérifier que ces feedbacks sont bien intégrés en regardant la console après
+  avoir lancé un playIA par exemple.
+  \\[1cm]
+  
+  
+  \paragraph{Contrôle} Nous avons intégré un second type de feedback, plus intéressant, 
+  permettant à l'agent de voir quels actions le tuteur ferait à sa place et d'apprendre
+  directement des actions du tuteur.
+  Pour prendre le contrôle du véhicule, le tuteur doit presser la touche contrôle gauche durant
+  un petit laps de temps jusqu'à qu'il voit le signal dans la console.
+  
+  Il sera alors en mesure de diriger l'appareil à l'aide des flêches directionnelles du clavier.
+  
+  Pour redonner la main à l'agent, il faut à nouveau exercer une pression sur la touche contrôle gauche.
+  \\[1cm]
+  
+  La définition de nouveaux robots se voit dans le Manuel du Programmeur \cite{MdP}.
+  
+\clearpage
 \addcontentsline{toc}{section}{Références}
 \bibliographystyle{../dependance/apalike}
 \bibliography{../dependance/biblio}

@@ -38,7 +38,7 @@ private:
     const double discount = 0.75;
     const double espilon = 0.05;
     
-    static const bool learn = true;
+    static const bool learn = false;
     sml::LearnConfig conf = {true, 0.1, 2000};
     static const unsigned int simu_time = 10; //in minutes
 
