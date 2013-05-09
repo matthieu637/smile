@@ -120,18 +120,21 @@
  Au vu de la taille du simulateur TORCS \cite{TORCS} présenté
   dans le cahier des charges \cite{CdC}, il n'a été fourni en même temps que le reste du projet.
  Vous avez donc 2 méthodes pour le récupérer : 
-  \subsection{Installer le simulateur : Via la distribution}
+  \subsection{Installer le simulateur : Via la distribution (recommandé sur Ubuntu) }
   
-  Si vous êtes sous Ubuntu, vous pouvez installer directement le simulateur via la commande :
+  Si vous êtes sous Ubuntu, TORCS semble avoir quelques problèmes à se lancer après une compilation à la main,
+  nous recommandons donc de l'installer directement :
   
     \begin{lstlisting}
 sudo apt-get install torcs
     \end{lstlisting}
     
-    Vous pouvez alors passer à l'étape 1.3.2 directement, puis 1.4 sans passer par la 1.3.3.
-    Le projet a besoin du code de TORCS pour être compilé même si TORCS est déjà installé.
-  
+    Vous pouvez alors passer à l'étape 1.4 directement.
+   
   \subsection{Installer le simulateur : Via compilation}
+  
+  Si toutefois, vous souhaitez vous lancer dans la compilation de torcs, voici la marche à suivre : (fonctionne sur 
+  Archlinux )
  
   \subsubsection{Liste des paquets pré-requis}
   Voici la liste des paquets que vous aurez besoin afin de compiler le simulateur :

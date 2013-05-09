@@ -9,7 +9,7 @@ set(SMILE_PATH "${CMAKE_SOURCE_DIR}/../library/" CACHE PATH "Chemin vers la libr
 find_package(Smile REQUIRED)
 find_package(Boost COMPONENTS system serialization filesystem REQUIRED)
 find_package (Threads)
-find_package( TorcsLibs )
+find_package( TorcsLibs REQUIRED )
 
 include_directories(include ${TORCS_INCLUDE} ${SMILE_INCLUDE_DIRS})
 
