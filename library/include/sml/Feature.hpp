@@ -1,6 +1,11 @@
 #ifndef FEATURE_HPP
 #define FEATURE_HPP
 
+///
+///\file feature.hpp
+///\brief Représente une couche pour les fonctions d'approximations (par exemple un tiling)
+//
+
 #include <boost/function.hpp>
 #include "sml/Action.hpp"
 #include "bib/Logger.hpp"
@@ -19,9 +24,17 @@ public:
     typedef int (*featuring) (const S&, const DAction&, std::vector<double> params);
     typedef boost::function<double (const S&, const DAction&)> featuring1D;
 
+///
+///\brief Constructeur pour créer une couche complexe (RBF, log, ...)
+///\param f : une fonction 
+/// 	  params : paramètre pour la fonction 
     Feature(featuring f, const std::vector<double> &params, type t=custom):
         f(f), params(params), t(t) {}
 
+///
+///\brief Constructeur pour créer une couche regulière : un tiling en dimension quelconque
+///\param featuresl : liste des fonctions pour chaque dimension 
+/// 	  params : paramètre pour la fonction         
     Feature(const vector<featuring1D>& featuresl, const std::vector<double> &params):
         featuresl(featuresl), params(params), t(_ND), var(featuresl.size()), max(featuresl.size()), total(featuresl.size()), width(featuresl.size()), size(1)
     {
@@ -37,10 +50,16 @@ public:
         }
     }
 
+///
+///\brief Retourner le taille total de dimensions  
     int getSize() {
         return size;
     }
 
+///
+///\brief Déterminer l'indice activé pour l'état et l'action pour un tiling
+///\param st : l'état donné
+/// 	  at : l'action donnée
     int calc(const S& st, const DAction& ac) {
         switch(t)
         {
@@ -52,6 +71,10 @@ public:
         return -1;
     }
 
+///
+///\brief Déterminer l'indice activé pour l'état et l'action
+///\param st : l'état donné
+/// 	  at : l'action donnée    
     int caseND(const S& st, const DAction& ac) {
 
         for(int index=0; index < featuresl.size(); index++) {

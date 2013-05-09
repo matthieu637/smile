@@ -23,18 +23,22 @@ namespace sml {
 class DAction {
 
 public:
-//     friend class boost::serialization::access;
-    DAction();//empty constructor for serialization
+  
+//friend class boost::serialization::access;
+  
+///
+///\brief Constructeur vide 
+    DAction();
     
 ///
-///\brief Construction
+///\brief Constructeur
 ///\param temp : le modèle de la nouvelle action
 /// 	  vals : les valeurs des actions  
 ///
     DAction(const ActionTemplate* temp, const std::list<int>& vals);
 
 ///
-///\brief Construction
+///\brief Constructeur
 ///\param temp : le modèle de la nouvelle action
 /// 	  value : le hash des actions  
 ///
@@ -109,6 +113,9 @@ private:
     int hashmem;
 };
 
+
+///
+///\brief Pour afficher l'action dans un flux
 std::ostream& operator<< (std::ostream& stream, const sml::DAction& ac);
 
 typedef DAction DState;

@@ -20,7 +20,7 @@ class SarsaLamb : public sml::LearnStat
 public:
   
 ///
-///\brief Construction
+///\brief Constructeur
 ///\param stmp : le modèle d'état
 /// 	  atmp : le modèle d'action
 ///       s : l'état
@@ -62,6 +62,7 @@ protected:
 ///\brief Charger ce que l'algorithme a appris
 ///\param xml : le fichier XML
     void load(boost::archive::xml_iarchive* xml);
+    
 private:
     QTable Q, N;
     const ActionTemplate* atmp;

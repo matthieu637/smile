@@ -135,8 +135,8 @@ unsigned int TWorld::discretizeDistance(float distance, unsigned int cardinal, d
     return round(sml::Utils::transform(distance, dismin, dismax, 0, (double)(cardinal - 1)));
 }
 
-float TWorld::computeSteering(unsigned int discetized, unsigned int cardinal, double smin, double smax) {
-    return smin+((float)discetized/(float)cardinal)*(smax-smin);
+float TWorld::computeSteering(unsigned int discretized, unsigned int cardinal, double smin, double smax) {
+    return smin+((float)discretized/(float)cardinal)*(smax-smin);
 }
 
 void TWorld::applyAcceleration(tCarElt* car, int accel) {
