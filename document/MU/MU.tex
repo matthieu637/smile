@@ -197,20 +197,28 @@ sudo apt-get install g++ mesa-common-dev freeglut3-dev libplib-dev libopenal-dev
   
   Voici la liste des paquets que vous aurez besoin afin de compiler le projet :
     
+   \begin{multicols}{2}
   \begin{itemize}
     \item make
     \item g++
     \item cmake
     \item sudo
     \item boost (system, serialization, filesystem)
+    \item libplib
   \end{itemize}
+    \end{multicols}
 
   Sur ubuntu : 
     \begin{lstlisting}
-sudo apt-get install g++ cmake libboost-dev libboost-system-dev libboost-serialization-dev libboost-filesystem-dev
+sudo apt-get install g++ cmake libboost-dev libboost-system-dev libboost-serialization-dev libboost-filesystem-dev libplib-dev
     \end{lstlisting}
     
     Vous êtes alors prêt à lancer la dernière compilation.
+    
+    Pour celà, il faut se rendre dans le dossier Sources/ et lancer
+    \begin{lstlisting}
+./makeDriver
+    \end{lstlisting}
     
   \section{Désinstallation}
   

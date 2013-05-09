@@ -33,3 +33,10 @@ if [ $? -ne 0 ]; then exit 1 ; fi
 
 sudo make install
 
+cd ../../
+
+mkdir -p ~/.torcs/config/raceman/
+cp torcs/xml/*.xml ~/.torcs/config/
+mv ~/.torcs/config/quickrace.xml ~/.torcs/config/raceman/
+echo "config done"
+

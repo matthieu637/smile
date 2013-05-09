@@ -44,3 +44,6 @@ torcs.base.tar.bz2
 
 build/
 
+#doc
+
+doc/

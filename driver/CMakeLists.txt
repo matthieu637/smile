@@ -27,9 +27,18 @@ target_link_libraries(driver
 		${TORCS_LIBS_TGFCLIENT}
 		)
 
-#install 
-install(FILES build/libdriver.so DESTINATION /usr/local/lib/torcs/drivers/smile/ RENAME smile.so)
+if(EXISTS /usr/local/bin/torcs)		
+  #install 
+  install(FILES build/libdriver.so DESTINATION /usr/local/lib/torcs/drivers/smile/ RENAME smile.so)
 
-#install data
-file(GLOB_RECURSE files "${CMAKE_SOURCE_DIR}/data/*.xml" "${CMAKE_SOURCE_DIR}/data/*.rgb")
-install(FILES ${files} DESTINATION /usr/local/share/games/torcs/drivers/smile/)
+  #install data
+  file(GLOB_RECURSE files "${CMAKE_SOURCE_DIR}/data/*.xml" "${CMAKE_SOURCE_DIR}/data/*.rgb")
+  install(FILES ${files} DESTINATION /usr/local/share/games/torcs/drivers/smile/)
+else()
+  #install 
+  install(FILES build/libdriver.so DESTINATION /usr/lib/torcs/drivers/smile/ RENAME smile.so)
+
+  #install data
+  file(GLOB_RECURSE files "${CMAKE_SOURCE_DIR}/data/*.xml" "${CMAKE_SOURCE_DIR}/data/*.rgb")
+  install(FILES ${files} DESTINATION /usr/share/games/torcs/drivers/smile/)
+endif()
