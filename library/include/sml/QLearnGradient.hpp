@@ -19,13 +19,12 @@ template <class S>
 class QLearnGradient : public LearnStat
 {
 public:
-    typedef std::pair< Feature<S>, unsigned int > sfeaturedList;
-    typedef std::list< sfeaturedList > featuredList;
+    typedef std::list< Feature<S> > featuredList;
     typedef typename featuredList::iterator fLiterator;
 
 public:
     QLearnGradient(featuredList* features, unsigned int nbFeature, const ActionTemplate* atmp, const DAction& initial, const LearnConfig& conf) :
-	LearnStat(conf),
+        LearnStat(conf),
         nbFeature(nbFeature),
         teta(nbFeature), e(zero_vector<double>(nbFeature)),
         Qa(atmp), actions(atmp->sizeNeeded()),
@@ -97,6 +96,43 @@ public:
         return a;
     }
 
+    void observeTutor(const S& st, const DAction& ac, double r, double lrate, double lambda, double discount, bool accumulative) {
+        float delta = r - Qa(*lastAction);
+
+        // For all a in A(s')
+        computeQa(st);
+
+        const DAction* ap = Qa.argmax();
+        delta = delta + discount * Qa(*ap);
+
+// 	LOG_DEBUG("history size:" << history.size());
+// 	teta = teta + lrate * delta * e;
+        for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
+            int index = *it;
+            teta[index] = teta[index] + lrate * delta * e[index];
+        }
+
+        //begin
+        for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
+            unsigned int index = *it;
+            e[index] = lambda * discount * e[index];
+        }
+
+
+        list<int> activeIndex = *extractFeatures(st, ac);
+        for(list<int>::iterator it = activeIndex.begin(); it != activeIndex.end() ; ++it) {
+            int index = *it;
+            if(accumulative)
+                e[index] += 1.;
+            else
+                e[index] = 1.;
+            history.insert(index);
+        }
+
+        //take action a, observe reward, and next state
+        lastAction = &ac;
+    }
+
     void computeQa(const S& state) {
 
         for(vector<DAction>::iterator ai = actions.begin(); ai != actions.end() ; ++ai) { // each actions
@@ -143,9 +179,8 @@ public:
 
         int layer = 0;
         for(fLiterator flist = features->begin() ; flist != features->end(); ++flist) { // each tiling
-            sfeaturedList sl = *flist;
-            Feature<S> f = sl.first;
-            int size = sl.second;
+            Feature<S> f = *flist;
+            int size = f.getSize();
             int active = f.calc(state, ac);
 // 	    LOG_DEBUG(active);
             if(active != -1)
@@ -154,6 +189,10 @@ public:
         }
 
         return actived;
+    }
+
+    void update(const DAction& ac) {
+        lastAction = &ac;
     }
 
     void save(boost::archive::xml_oarchive* xml)

@@ -19,13 +19,13 @@ using sml::DAction;
 using sml::ActionTemplate;
 
 struct State {
-    bool stuck;  // 0 1
+//     bool stuck;  // 0 1
     float angle; // -pi / pi
     float distanceFromMiddle; // -20 / 20
-    float leftDistance;
+    float leftDistance; // -4 / 9
     float rightDistance;
     float speed; //-40 / 40 ?
-    float distanceToSegEnd;
+    float straightLength; // -3 / 300
 };
 
 

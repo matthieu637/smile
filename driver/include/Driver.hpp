@@ -14,7 +14,6 @@
 #include <car.h>
 #include <robottools.h>
 #include <robot.h>
-#include "linalg.h"
 #include <sml/LearnStat.hpp>
 
 class Driver {
@@ -39,7 +38,7 @@ public:
     bool isStuck() const;
     int getGear() const;
     float getDistToSegEnd() const;
-    v2d getTargetPoint() const;
+    float straightLength() const;
 protected:
     virtual void update(tSituation *s);
     virtual sml::LearnStat* getAlgo() = 0;
@@ -72,9 +71,6 @@ private:
 
     static const float SHIFT;
     static const float SHIFT_MARGIN;
-    
-    static const float LOOKAHEAD_CONST;
-    static const float LOOKAHEAD_FACTOR; 
 
     /* track variables */
     tTrack* track;

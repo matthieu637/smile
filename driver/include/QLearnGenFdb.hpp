@@ -44,7 +44,7 @@ private:
     static const int nbYinter = 24;
 
     static const bool learn = false;
-    sml::LearnConfig conf = {true, 0.1, 2000};
+    sml::LearnConfig conf = {true, 0.1, 3000};
     static const unsigned int simu_time = 10; //in minutes
 
     static const sml::ActionTemplate ACTION_TEMPLATE;

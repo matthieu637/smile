@@ -20,10 +20,15 @@ DriverFeedback::DriverFeedback(int index, int intervalAction, float nbLaps, cons
 void DriverFeedback::update(tSituation *s) {
 
     Driver::update(s);
-
-    if(first_time) {
-        GfuiKeyEventRegisterCurrent(onKeyAction);
-        GfuiSKeyEventRegisterCurrent(onSKeyAction);
+    
+    if(first_time ) {
+	int scrw, scrh, dummy;
+	GfScrGetSize(&scrw, &scrh, &dummy, &dummy);
+	
+	if(scrw != 0 && scrh != 0){//if actived screen
+            GfuiKeyEventRegisterCurrent(onKeyAction);
+            GfuiSKeyEventRegisterCurrent(onSKeyAction);
+	}
 
         first_time = false;
     }

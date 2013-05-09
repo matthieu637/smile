@@ -11,7 +11,7 @@ double TWorld::reward(const Driver& d) {
 
 //     double r = distParcourue;
     double r = car->_speed_x;
-    
+
     const double startMalus = 1000;
     const double malus = startMalus + 500;
 
@@ -22,7 +22,7 @@ double TWorld::reward(const Driver& d) {
         {
             r+=4; // 4² -> 16 > 15
 //             r = r*r*r;//dist
-	    r=r*r;
+            r=r*r;
         }
         else if(distParcourue < 0.01 && !d.isStuck()) { // don't move don't stuck
             if(distParcourue > -0.01)
@@ -80,19 +80,20 @@ double TWorld::reward(const Driver& d) {
 State* TWorld::observe(const Driver& d) {
     const tCarElt* car = d.getCar();
     State* s = new State;
-    s->stuck = d.isStuck();
+//     s->stuck = d.isStuck();
     s->angle = d.getAngle();
     s->speed = car->_speed_x;
     s->distanceFromMiddle = car->_trkPos.toMiddle;
     s->leftDistance = car->_trkPos.toLeft;
     s->rightDistance = car->_trkPos.toRight;
-    s->distanceToSegEnd = d.getDistToSegEnd();
+    s->straightLength = d.straightLength();
+
     return s;
 }
 
 State* TWorld::initialState() {
     State* s = new State;
-    s->stuck = 0;
+//     s->stuck = 0;
     s->angle = 0;
     s->speed = 0;
     s->distanceFromMiddle = -1.8;

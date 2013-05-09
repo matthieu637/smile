@@ -13,9 +13,6 @@ const float Driver::SHIFT = 0.9;							/* [-] (% of rpmredline) */
 const float Driver::SHIFT_MARGIN = 4.0;						/* [m/s] */
 const float Driver::UNSTUCK_TIME_LIMIT = 2.0;				/* [s] */
 
-const float Driver::LOOKAHEAD_CONST = 17.0;					/* [m] */
-const float Driver::LOOKAHEAD_FACTOR = 0.33;				/* [-] */
-
 
 Driver::Driver(int index, int intervalAction, float simu_time):simu_time(simu_time)
 {
@@ -31,7 +28,7 @@ Driver::Driver(int index, int intervalAction, float simu_time):simu_time(simu_ti
 
 Driver::~Driver()
 {
-  
+
 }
 
 /* Called for every track change or new race. */
@@ -71,9 +68,9 @@ void Driver::drive(tSituation *s)
             endRace();
             exit(1);
         }
-        
+
         reward = TWorld::reward(*this);
-	globalReward += reward;
+        globalReward += reward;
         decision();
         decision_each=0;
         lastDammage = car->_dammage;
@@ -105,47 +102,21 @@ float Driver::getDistToSegEnd() const
     }
 }
 
-v2d Driver::getTargetPoint() const
+float Driver::straightLength() const
 {
-	tTrackSeg *seg = car->_trkPos.seg;
-	float lookahead = LOOKAHEAD_CONST + car->_speed_x*LOOKAHEAD_FACTOR;
-	float length = getDistToSegEnd();
-	float offset = 0.0;
+    tTrackSeg *seg = car->_trkPos.seg;
+    int type = car->_trkPos.seg->type;
+    float length = getDistToSegEnd();
 
-	while (length < lookahead) {
-		seg = seg->next;
-		length += seg->length;
-	}
+    if(type == TR_STR) {
+        while (seg->next->type == type) {
+            seg = seg->next;
+            length += seg->length;
+        }
+        return length;
+    }
 
-	length = lookahead - length + seg->length;
-	float fromstart = seg->lgfromstart;
-	fromstart += length;
-
-	v2d s;
-	s.x = (seg->vertex[TR_SL].x + seg->vertex[TR_SR].x)/2.0;
-	s.y = (seg->vertex[TR_SL].y + seg->vertex[TR_SR].y)/2.0;
-
-	if ( seg->type == TR_STR) {
-		v2d d, n;
-		n.x = (seg->vertex[TR_EL].x - seg->vertex[TR_ER].x)/seg->length;
-		n.y = (seg->vertex[TR_EL].y - seg->vertex[TR_ER].y)/seg->length;
-		n.normalize();
-		d.x = (seg->vertex[TR_EL].x - seg->vertex[TR_SL].x)/seg->length;
-		d.y = (seg->vertex[TR_EL].y - seg->vertex[TR_SL].y)/seg->length;
-		return s + d*length + offset*n;
-	} else {
-		v2d c, n;
-		c.x = seg->center.x;
-		c.y = seg->center.y;
-		float arc = length/seg->radius;
-		float arcsign = (seg->type == TR_RGT) ? -1.0 : 1.0;
-		arc = arc*arcsign;
-		s = s.rotate(c, arc);
-
-		n = c - s;
-		n.normalize();
-		return s + arcsign*offset*n;
-	}
+    return -length;
 }
 
 /* Compute gear */

@@ -16,7 +16,13 @@ double Functor1D::call(const State& st, const DAction& ac)
     case TFeatures::f1D::angle:
         return sml::Utils::transform(st.angle, -max/2., max/2., 0., max);
     case TFeatures::f1D::speed:
-        return sml::Utils::transform(st.speed, -max/4., 3.*max/4., 0., max);
+        return sml::Utils::transform(st.speed, -max/5., 4.*max/5., 0., max);
+    case TFeatures::f1D::left:
+        return sml::Utils::transform(st.leftDistance, -2*max/5., 3.*max/5., 0., max);
+    case TFeatures::f1D::right:
+        return sml::Utils::transform(st.rightDistance, -2*max/5., 3.*max/5., 0., max);
+    case TFeatures::f1D::straight:
+        return sml::Utils::transform(st.straightLength, 0., max, 0., max);
     case TFeatures::f1D::action:
         return ac[action];
     }
@@ -24,29 +30,35 @@ double Functor1D::call(const State& st, const DAction& ac)
     return -1;
 }
 
-Feature<State>::featuring1D TFeatures::_1DMiddle(double road_width) {
+Feature<State>::featuring1D TFeatures::_1D(TFeatures::f1D type, double max) {
     Feature<State>::featuring1D fonctor;
-//     Functor1D* inst = new Functor1D( distanceFromMiddle , road_width);
-    Functor1D inst( distanceFromMiddle , road_width);
+    Functor1D inst( type , max);
     fonctor = boost::bind(&Functor1D::call, inst , _1, _2);
 
     return fonctor;
+}
+
+Feature<State>::featuring1D TFeatures::_1DMiddle(double road_width) {
+    return _1D(distanceFromMiddle , road_width);
 }
 
 Feature<State>::featuring1D TFeatures::_1DAngle(double angle_total) {
-    Feature<State>::featuring1D fonctor;
-    Functor1D inst( angle , angle_total);
-    fonctor = boost::bind(&Functor1D::call, inst , _1, _2);
-
-    return fonctor;
+    return _1D(angle , angle_total);
 }
 
 Feature<State>::featuring1D TFeatures::_1DSpeed(double total_speed) {
-    Feature<State>::featuring1D fonctor;
-    Functor1D inst( speed , total_speed);
-    fonctor = boost::bind(&Functor1D::call, inst , _1, _2);
+    return _1D(speed , total_speed);
+}
+Feature<State>::featuring1D TFeatures::_1DLeft(double road_width) {
+    return _1D(left , road_width);
+}
 
-    return fonctor;
+Feature<State>::featuring1D TFeatures::_1DRight(double road_width) {
+    return _1D(right , road_width);
+}
+
+Feature<State>::featuring1D TFeatures::_1DStraight(double length) {
+    return _1D(straight , length);
 }
 
 Feature<State>::featuring1D TFeatures::_1DAction(const string& acc) {
@@ -56,3 +68,5 @@ Feature<State>::featuring1D TFeatures::_1DAction(const string& acc) {
 
     return fonctor;
 }
+
+

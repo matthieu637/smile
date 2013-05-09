@@ -10,12 +10,17 @@ using sml::Feature;
 class TFeatures
 {
 public:
-  enum f1D { angle, distanceFromMiddle, speed, action};
+  enum f1D { angle, distanceFromMiddle, speed, left, right, straight, action};
   
   static Feature<State>::featuring1D _1DMiddle(double road_width);
+  static Feature<State>::featuring1D _1DLeft(double road_width);
+  static Feature<State>::featuring1D _1DRight(double road_width);
+  static Feature<State>::featuring1D _1DStraight(double length);
   static Feature<State>::featuring1D _1DAngle(double angle_total);
   static Feature<State>::featuring1D _1DSpeed(double total_speed);
   static Feature<State>::featuring1D _1DAction(const string& acc);
+private:
+  static Feature<State>::featuring1D _1D(f1D type,  double max);
 };
 
 class Functor1D

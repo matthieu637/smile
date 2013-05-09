@@ -6,13 +6,14 @@
 #include "bib/Logger.hpp"
 
 using std::pair;
+using std::vector;
 
 namespace sml {
 
 template<typename S>
 class Feature
 {
-    enum type { _1D, _2D, _3D, _4D, custom };
+    enum type { _ND, custom };
 
 public:
     typedef int (*featuring) (const S&, const DAction&, std::vector<double> params);
@@ -21,151 +22,101 @@ public:
     Feature(featuring f, const std::vector<double> &params, type t=custom):
         f(f), params(params), t(t) {}
 
-    Feature(featuring1D f, const std::vector<double> &params) :
-        f1d(f), params(params), t(_1D) {
-        assert(params.size()==2);
+    Feature(const vector<featuring1D>& featuresl, const std::vector<double> &params):
+        featuresl(featuresl), params(params), t(_ND), var(featuresl.size()), max(featuresl.size()), total(featuresl.size()), width(featuresl.size()), size(1)
+    {
+        assert(params.size()==featuresl.size()*2);
+
+        int index = 0;
+        for(int i=0; i< params.size(); i+=2) {
+            max[index] = params[i];
+            total[index] = params[i+1];
+            width[index] = total[index]/max[index];
+            size *= max[index];
+            index++;
+        }
     }
 
-    Feature(featuring1D f1, featuring1D f2, const std::vector<double> &params) :
-        f1d(f1), f1d2(f2), params(params), t(_2D) {
-        assert(params.size()==4);
+    int getSize() {
+        return size;
     }
-
-    Feature(featuring1D f1, featuring1D f2, featuring1D f3, const std::vector<double> &params) :
-        f1d(f1), f1d2(f2), f1d3(f3), params(params), t(_3D) {
-        assert(params.size()==6);
-    }
-
-    Feature(featuring1D f1, featuring1D f2, featuring1D f3, featuring1D f4, const std::vector<double> &params) :
-        f1d(f1), f1d2(f2), f1d3(f3), f1d4(f4), params(params), t(_3D) {
-        assert(params.size()==8);
-    }
-
 
     int calc(const S& st, const DAction& ac) {
         switch(t)
         {
-        case _1D:
-            return case1D(st, ac);
-        case _2D:
-            return case2D(st, ac);
-        case _3D:
-            return case3D(st, ac);
-        case _4D:
-            return case4D(st, ac);
+        case _ND:
+            return caseND(st, ac);
         case custom:
             return f(st, ac, params);
         }
         return -1;
     }
 
-    int case4D(const S& st, const DAction& ac) {
-        int xmax = params[0];
-        double xtotal = params[1];
+    int caseND(const S& st, const DAction& ac) {
 
-        int ymax = params[2];
-        double ytotal = params[3];
+        for(int index=0; index < featuresl.size(); index++) {
+            var[index] = floor( featuresl[index](st, ac) / width[index]);
+            if(var[index] < 0 || var[index] >= max[index])
+                return -1;
+        }
 
-        int zmax = params[4];
-        double ztotal = params[5];
-	
-	int umax = params[6];
-	double utotal = params[7];
+        int calc=0;
+        for(int i=featuresl.size() -1 ; i >= 0; i--) {
 
-        double x = f1d(st, ac);
-        double y = f1d2(st, ac);
-        double z = f1d3(st, ac);
-	double u = f1d4(st, ac);
-
-        double xwidth = xtotal/xmax;
-        double ywidth = ytotal/ymax;
-        double zwidth = ztotal/zmax;
-	double uwidth = utotal/umax;
-
-        int X = floor(x/xwidth);
-        int Y = floor(y/ywidth);
-        int Z = floor(z/zwidth);
-	int U = floor(u/uwidth);
-
-        if(X < 0 || X >= xmax || Y < 0 || Y >= ymax || Z < 0 || Z >= zmax || U < 0 || U >= umax)
-            return -1;
-
-        return U*zmax*ymax*xmax + Z*ymax*xmax + Y*xmax + X;
+            int factor = var[i];
+            for(int j= i - 1; j >= 0; j--) {
+                factor *= max[j];
+            }
+            calc += factor ;
+        }
+        return calc;
     }
 
-    int case3D(const S& st, const DAction& ac) {
-        int xmax = params[0];
-        double xtotal = params[1];
+    /*
+        int case4D(const S& st, const DAction& ac) {
+            int xmax = params[0];
+            double xtotal = params[1];
+            int ymax = params[2];
+            double ytotal = params[3];
+            int zmax = params[4];
+            double ztotal = params[5];
+            int umax = params[6];
+            double utotal = params[7];
 
-        int ymax = params[2];
-        double ytotal = params[3];
+            double x = f1d(st, ac);
+            double y = f1d2(st, ac);
+            double z = f1d3(st, ac);
+            double u = f1d4(st, ac);
 
-        int zmax = params[4];
-        double ztotal = params[5];
+            double xwidth = xtotal/xmax;
+            double ywidth = ytotal/ymax;
+            double zwidth = ztotal/zmax;
+            double uwidth = utotal/umax;
 
-        double x = f1d(st, ac);
-        double y = f1d2(st, ac);
-        double z = f1d3(st, ac);
+            int X = floor(x/xwidth);
+            int Y = floor(y/ywidth);
+            int Z = floor(z/zwidth);
+            int U = floor(u/uwidth);
 
-        double xwidth = xtotal/xmax;
-        double ywidth = ytotal/ymax;
-        double zwidth = ztotal/zmax;
+            if(X < 0 || X >= xmax || Y < 0 || Y >= ymax || Z < 0 || Z >= zmax || U < 0 || U >= umax)
+                return -1;
 
-        int X = floor(x/xwidth);
-        int Y = floor(y/ywidth);
-        int Z = floor(z/zwidth);
-
-        if(X < 0 || X >= xmax || Y < 0 || Y >= ymax || Z < 0 || Z >= zmax)
-            return -1;
-
-        return Z*ymax*xmax + Y*xmax + X;
-    }
-
-    int case2D(const S& st, const DAction& ac) {
-        int xmax = params[0];
-        double xtotal = params[1];
-
-        int ymax = params[2];
-        double ytotal = params[3];
-
-        double x = f1d(st, ac);
-        double y = f1d2(st, ac);
-
-        double xwidth = xtotal/xmax;
-        double ywidth = ytotal/ymax;
-
-        int X = floor(x/xwidth);
-        int Y = floor(y/ywidth);
-
-        if(X < 0 || X >= xmax || Y < 0 || Y >= ymax)
-            return -1;
-
-        return X*ymax + Y;
-    }
-
-    int case1D(const S& st, const DAction& ac) {
-        int xmax = params[0];
-        double xtotal = params[1];
-        double x = f1d(st, ac);
-
-        double xwidth = xtotal/xmax;
-
-        int X = floor(x/xwidth);
-
-        if(X < 0 || X >= xmax)
-            return -1;
-
-        return X;
-    }
+            return U*zmax*ymax*xmax + Z*ymax*xmax + Y*xmax + X;
+        }*/
 
 private:
     featuring f;
     featuring1D f1d;
-    featuring1D f1d2;
-    featuring1D f1d3;
-    featuring1D f1d4;
-    std::vector<double> params;
+    vector<featuring1D> featuresl;
+    vector<double> params;
     type t;
+
+    vector<int> var;
+    vector<int> max;
+    vector<double> total;
+    vector<double> width;
+
+    int size;
 };
 
 }
