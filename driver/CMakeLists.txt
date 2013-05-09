@@ -11,7 +11,7 @@ find_package(Boost COMPONENTS system serialization filesystem REQUIRED)
 find_package (Threads)
 find_package( TorcsLibs )
 
-include_directories(include ../torcs/torcs-1.3.4/export/include ${SMILE_INCLUDE_DIRS} ../torcs/torcs-1.3.4/export/include )
+include_directories(include ${TORCS_INCLUDE} ${SMILE_INCLUDE_DIRS})
 
 file ( GLOB_RECURSE HEADER include/*.hpp)
 file ( GLOB_RECURSE SOURCE src/*.cpp)
