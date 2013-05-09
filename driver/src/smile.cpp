@@ -31,16 +31,17 @@
 #include "QLearnGen.hpp"
 #include "QLearnGenCmplx.hpp"
 #include <QLearnGenFdb.hpp>
+#include <SarsaFdb.hpp>
 
-#define NBBOTS 5
+#define NBBOTS 6
 
 static const char* botname[NBBOTS] = {
-    "smile_0", "smile_1", "smile_2", "smile_3", "smile_4"
+    "smile_0", "smile_1", "smile_2", "smile_3", "smile_4","smile_5"
 };
 
 static const char* botdesc[NBBOTS] = {
     "Discretize Q learning", "Discretize Q learning (lamba)", "Q learning f. approximation",
-    "Q learning f. approximation Env Cmplx", "Q learning f. approximation Feedback"
+    "Q learning f. approximation Env Cmplx", "Q learning f. approximation Feedback","Sarsa Feedback"
 };
 
 static Driver *driver[NBBOTS];
@@ -99,6 +100,10 @@ static int InitFuncPt(int index, void *pt)
     case 4:
  	driver[index] = new QLearnGenFdb(index);
 	break;
+    case 5:
+ 	driver[index] = new SarsaFdb(index);
+	break;
+	
     }
     
     itf->rbNewTrack = initTrack;	/* Give the robot the track view called */
