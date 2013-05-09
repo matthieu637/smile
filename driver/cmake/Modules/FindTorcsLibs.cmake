@@ -4,7 +4,7 @@
 
 #Trouver lib
 
-set(TORCS_INCLUDE "${CMAKE_SOURCE_DIR}/../torcs/export/include/")
+set(TORCS_INCLUDE "${PARENT_DIR}/torcs/export/include/")
 
 find_library( TORCS_LIBS_ROBOTTOOLS
 			  NAMES robottools 

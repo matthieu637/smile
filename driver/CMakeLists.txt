@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 2.8.4)
 
-project(Driver CXX C)
+project(Driver CXX)
 
 set(CMAKE_CXX_FLAGS "-g -O2 -DDEBUG -Wall -Wextra -std=c++11 -fPIC -Wl,-z,defs")# -Wl,-z,defs") #Used for debug
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-set(SMILE_PATH "${CMAKE_SOURCE_DIR}/../library/" CACHE PATH "Chemin vers la librarie Bibliothèque")
+get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} PATH)
+
+set(SMILE_PATH "${PARENT_DIR}/library/" CACHE PATH "Chemin vers la librarie Bibliothèque")
 find_package(Smile REQUIRED)
 find_package(Boost COMPONENTS system serialization filesystem REQUIRED)
 find_package (Threads)
