@@ -6,11 +6,13 @@
 #include <sml/Action.hpp>
 #include <sml/Q.hpp>
 #include <sml/QLearning.hpp>
+#include <sml/Sarsa.hpp>
 
 using sml::DAction;
 using sml::DState;
 using sml::QTable;
 using sml::QLearning;
+using sml::Sarsa;
 
 class State;
 
@@ -47,6 +49,7 @@ private:
     static const sml::ActionTemplate ACTION_TEMPLATE;
     static const sml::StateTemplate STATE_TEMPLATE;
 
+    //Sarsa *q;
     QLearning* q;
 };
 
