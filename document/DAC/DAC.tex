@@ -34,6 +34,8 @@
 
 %\setcounter{tocdepth}{1} %hideallsubsections
 
+\graphicspath{{../images/}}
+
 \begin{document}
   \begin{titlepage}
    \def\titletype{Analyse et conception}
@@ -65,23 +67,83 @@
  
  
  
- \section{Diagrammes d’analyse (optionnel)}
-  On pourra le cas échéant inclure ici pour chaque fonctionnalité un diagramme correspondant 
-  (e.g. UML : cas, activités, séquences…)
-    \subsection{Fonctionnalité 1}
-    \subsection{Fonctionnalité 2}
-    ...
-  
+ \section{Diagrammes d’analyse}
+
+    \begin{figure}[H]
+      \begin{center}
+	\includegraphics[width=450px]{Diagrammedeclasses}
+	\caption{ Diagramme de classe }
+	\end{center}
+    \end{figure}
+ 
+    \subsection{Fonctionnalités}
+    Se référer au plan de développement.
   
   
   \section{Conception}
-  Ici la forme est assez libre , car elle diffère fortement suivant le type de TER.
-  On inclut dans cette partie les diagrammes de conception (e.g. UML), les algorithmes 
-  en pseudo-code, les spécifications détaillées des interfaces et structures de données, etc.
   
   \subsection{Algorithmes}
   
   
+        \begin{center}
+	\begin{tabular}{cc}
+	  \hspace*{-1cm}
+	  \begin{minipage}[b]{.52\linewidth}
+	    \begin{figure}[H]
+	      \includegraphics[width=270px]{QLearning}
+	      \caption{ Q-Learning  }
+	    \end{figure}
+	  \end{minipage}
+	  &
+	  \begin{minipage}[b]{.5\linewidth}
+	    \begin{figure}[H]
+	      \includegraphics[width=270px]{Sarsa}
+	      \caption{ Sarsa  }
+	    \end{figure}
+	  \end{minipage}
+	\end{tabular}
+      \end{center} 
+      
+  
+  
+        \begin{center}
+	\begin{tabular}{cc}
+	  \hspace*{-1cm}
+	  \begin{minipage}[b]{.52\linewidth}
+	    \begin{figure}[H]
+	      \includegraphics[width=270px]{QLearning_Lamb}
+	      \caption{ Q-Learning($\lambda$)  }
+	    \end{figure}
+	  \end{minipage}
+	  &
+	  \begin{minipage}[b]{.5\linewidth}
+	    \begin{figure}[H]
+	      \includegraphics[width=270px]{Sarsa_lamb}
+	      \caption{ Sarsa($\lambda$)  }
+	    \end{figure}
+	  \end{minipage}
+	\end{tabular}
+      \end{center} 
+      
+              \begin{center}
+	\begin{tabular}{cc}
+	  \hspace*{-1cm}
+	  \begin{minipage}[b]{.52\linewidth}
+	    \begin{figure}[H]
+	      \includegraphics[width=270px]{QLearning_Gradient}
+	      \caption{ Q-Learning descente de gradient  }
+	    \end{figure}
+	  \end{minipage}
+	  &
+	  \begin{minipage}[b]{.5\linewidth}
+	    \begin{figure}[H]
+	      \includegraphics[width=270px]{Sarsa_Gradient}
+	      \caption{ Sarsa descente de gradient  }
+	    \end{figure}
+	  \end{minipage}
+	\end{tabular}
+      \end{center} 
+      
 
 \addcontentsline{toc}{section}{Références}
 \bibliographystyle{../dependance/apalike}

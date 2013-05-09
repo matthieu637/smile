@@ -58,34 +58,44 @@
   \renewcommand{\labelitemiii}{$\diamond$}
   \renewcommand{\labelitemiv}{$\ast$}
   
-  \section{Spécifications}
-  Donner « noir sur blanc » les spécifications détaillées du système, 
-  c’est à dire une description précise de ce que fait le système : ensemble des fonctionnalités
+  \section{Comparaison des performances}
 
- 
- 
- 
- \section{Diagrammes d’analyse (optionnel)}
-  On pourra le cas échéant inclure ici pour chaque fonctionnalité un diagramme correspondant 
-  (e.g. UML : cas, activités, séquences…)
-    \subsection{Fonctionnalité 1}
-    \subsection{Fonctionnalité 2}
-    ...
-  
-  
-  
-  \section{Conception}
-  Ici la forme est assez libre , car elle diffère fortement suivant le type de TER.
-  On inclut dans cette partie les diagrammes de conception (e.g. UML), les algorithmes 
-  en pseudo-code, les spécifications détaillées des interfaces et structures de données, etc.
-  
-  \subsection{Algorithmes}
-  
-  
+     \begin{center}
+  \begin{scriptsize}
+    \begin{tabular}{|c||c|c|c|c|c|}
+      \hline
+      Index Robot & Algorithme & Etat & Action & Restriction & Performance \\ \hline \hline
+      0 & Q-Learning & distance au centre,  & direction &  vitesse = 30km/h  & 9:25 min \\ 
+       & & tangente à la route & & & \\ \hline
+       
+       1 & Q-Learning($\lambda$) & distance au centre, & 
+	  direction,  & vitesse < 70km/h  & 5:20 min\\ 
+	  & & tangente à la route & 4 actions vitesse & & \\ \hline
 
-\addcontentsline{toc}{section}{Références}
-\bibliographystyle{../dependance/apalike}
-\bibliography{../dependance/biblio}
+	2 & Q-Learning($\lambda$)  & distance au centre, &
+	  direction, & vitesse < 70km/h  & 4:56 min \\ 
+      & par descente de gradient & tangente à la route & 4 actions vitesse & & \\ \hline
+
+      	3 & Q-Learning($\lambda$)  & distance au centre, &
+	  direction, & Sans &  X \\ 
+	  & par descente de gradient & tangente à la route & 4 actions vitesse & & \\
+	  &  & vitesse &  & & \\
+      &  & prochain virage &  & & \\ \hline
+      
+	4 & Q-Learning($\lambda$)  & distance au centre, &
+	  direction, & vitesse < 70km/h & 4:56 min \\ 
+	  & par descente de gradient & tangente à la route & 4 actions vitesse & & \\  \hline
+      
+      	5 & Sarsa($\lambda$)  & distance au centre, &
+	  direction, & Sans & X \\ 
+	  & & tangente à la route, & 4 actions vitesse & & \\  
+	  & & vitesse & & & \\  \hline
+
+    \end{tabular}
+   \end{scriptsize}
+   \end{center}
+   
+   On remarque qu'à partir du moment où la vitesse n'est plus limité, l'aglorithme ne peut pas réussir à arriver au bout de la course.
 
 \end{document}
 
