@@ -1,0 +1,11 @@
+#!/bin/bash
+
+sudo rm -rf /usr/share/games/torcs
+sudo rm -rf /usr/bin/torcs
+sudo rm -rf /usr/lib/torcs/
+
+sudo rm -rf /usr/local/share/games/torcs
+sudo rm -rf /usr/local/bin/torcs
+sudo rm -rf /usr/local/lib/torcs/
+rm -rf ~/.torcs/
+

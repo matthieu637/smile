@@ -220,18 +220,91 @@ sudo apt-get install g++ cmake libboost-dev libboost-system-dev libboost-seriali
 ./makeDriver
     \end{lstlisting}
     
+    Voilà, tout est installé et les robots ont déjà pré-appris. Lire les sections suivantes pour l'utilisation.
+    
   \section{Désinstallation}
   
+  Pour désinstaller tous les fichiers, il suffit de se placer dans le dossier Sources/torcs et lancer
+    \begin{lstlisting}
+./uninstall
+    \end{lstlisting}
  
   \section{Paramètres de fonctionnement}
 
+  Il y a peu de paramètre à mettre en place sans modifier le code, donc voir la section associé dans le 
+  Manuel du Programmeur.
+  
+  On parlera quand même des paramètres possible pour les scripts présents dans Sources/driver, plus précisement
+  learnIA, clearLearn, playIA qui peuvent prendre quelques paramètres :
+  \begin{itemize}
+    \item playIA 
+    \begin{itemize}
+     \item le numéro du robot que l'on veut voir jouer (de 0 à 5)
+    \end{itemize}
+    \item clearLearn 
+      \begin{itemize}
+	\item le numéro du robot dont on veut supprimer l'historique (de 0 à 5)
+	\item sans paramètre pour déclencher des questions pour supprimer successivement l'historique de chaque robot
+      \end{itemize}
+      \item learnIA
+      \begin{itemize}
+	\item le numéro du robot dont on lance l'apprentissage
+	\item on peut ajouter un second paramètre pour lancer plusieurs simulations sur différents coeurs
+	(à utiliser de préférence avec un apprentissage restrictif, voir Manuel du Programmeur)
+      \end{itemize}
+  \end{itemize}
 
+  La liste des robots est décrite dans la section suivante.\\[1cm]
   
   
+  D'autres paramètres propre à TORCS peuvent être modifié si on s'interesse par exemple au nombre de tours qu'un 
+  robot doit faire, voir les fichiers Sources/torcs/xml.
   
+  \clearpage
   \section{Fonctionnalités et interactions utilisateur}
 
+  Liste des robots prédéfinis : 
+
+  \begin{center}
+  \begin{scriptsize}
+    \begin{tabular}{|c||c|c|c|c|c|}
+      \hline
+      Index Robot & Algorithme & Etat & Action & Feedback & Restriction \\ \hline \hline
+      0 & Q-Learning & distance au centre,  & direction & Sans & vitesse = 30km/h \\ 
+       & & tangente à la route & & & \\ \hline
+       
+       1 & Q-Learning($\lambda$) & distance au centre, & 
+	  direction,  & Sans & vitesse < 70km/h \\ 
+	  & & tangente à la route & 4 actions vitesse & & \\ \hline
+
+	2 & Q-Learning($\lambda$)  & distance au centre, &
+	  direction, & Sans & vitesse < 70km/h \\ 
+      & par descente de gradient & tangente à la route & 4 actions vitesse & & \\ \hline
+
+      	3 & Q-Learning($\lambda$)  & distance au centre, &
+	  direction, & Contrôle & Sans \\ 
+	  & par descente de gradient & tangente à la route & 4 actions vitesse & & \\
+	  &  & vitesse &  & & \\
+      &  & prochain virage &  & & \\ \hline
+      
+	4 & Q-Learning($\lambda$)  & distance au centre, &
+	  direction, & Superviseur & vitesse < 70km/h \\ 
+	  & par descente de gradient & tangente à la route & 4 actions vitesse & & \\  \hline
+      
+      	5 & Sarsa($\lambda$)  & distance au centre, &
+	  direction, & Contr& vitesse < 70km/h \\ 
+	  & & tangente à la route & 4 actions vitesse & & \\  \hline
+
+    \end{tabular}
+   \end{scriptsize}
+   \end{center}
+
+  Notons les 2 types de feedback, dont nous allons détailler un peu plus l'utilisation :
   
+  \paragraph{Superviseur} Le tuteur peut avec ce robot, lui envoyer un feedback sur ces récompenses
+  à l'aide des touches S, D, F, G.
+  
+  La définition de nouveaux robots se voit dans le Manuel du Programmeur.
   
 
 \addcontentsline{toc}{section}{Références}

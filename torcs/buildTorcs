@@ -1,9 +1,7 @@
 #!/bin/bash
 
-sudo rm -rf /usr/local/share/games/torcs
-sudo rm -rf /usr/local/bin/torcs
-sudo rm -rf /usr/local/lib/torcs
-rm -rf ~/.torcs/
+./uninstall
+
 rm -rf torcs-1.3.4
 echo "remove done"
 

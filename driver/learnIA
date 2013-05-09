@@ -1,5 +1,6 @@
 #!/bin/bash
 
+. path
 
 trap sigusr1 SIGUSR1
 
@@ -32,9 +33,9 @@ do
 
   wait $pid1
 
-  episod=`cat /usr/local/share/games/torcs/$file  | grep episode | sed 's/[^0-9]*//g'`
-  perf=`cat /usr/local/share/games/torcs/$file  | grep perf | sed 's/[^-0-9]*//g'`
-  lsize=`cat /usr/local/share/games/torcs/$file | grep -ve '\([^0-9]\|^\)0\([.]\|<\)' | wc -l`
+  episod=`cat $path/$file  | grep episode | sed 's/[^0-9]*//g'`
+  perf=`cat $path/$file  | grep perf | sed 's/[^-0-9]*//g'`
+  lsize=`cat $path/$file | grep -ve '\([^0-9]\|^\)0\([.]\|<\)' | wc -l`
   if [ $perf -ne $lperf  ] ; then
   	echo "episod : $episod | state learned : $lsize | perf : $perf"
   fi
