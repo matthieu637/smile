@@ -1,6 +1,12 @@
 #ifndef QLEARNGRADIENT_HPP
 #define QLEARNGRADIENT_HPP
 
+///
+///\file QLearnGradient.hpp
+///\brief Algorithme par descente de gradient de QLearning avec des fonctions d'approximation 
+///
+
+
 #include <boost/numeric/ublas/vector.hpp>
 #include <bib/XMLEngine.hpp>
 #include "sml/Q.hpp"
@@ -23,6 +29,14 @@ public:
     typedef typename featuredList::iterator fLiterator;
 
 public:
+
+///
+///\brief Construction
+///\param features : les quadrillages
+///       nbFeature : le nombre total de rectagle de tous les quadrillages
+/// 	  atmp : le modèle d'action
+///       initial : l'action initiale
+///       conf : la configuration d'apprentissage
     QLearnGradient(featuredList* features, unsigned int nbFeature, const ActionTemplate* atmp, const DAction& initial, const LearnConfig& conf) :
         LearnStat(conf),
         nbFeature(nbFeature),
@@ -38,12 +52,26 @@ public:
 
         lastAction = &initial;
     }
-
+    
+  
+///
+///\brief Retourner l'action à faire selon l'algorithme sans apprentissage 
+///\param state : l'état présent
     const DAction* decision(const S& state) {
         computeQa(state);
         return Qa.argmax();
     }
 
+
+///
+///\brief Retourner l'action à faire selon cet algorithme
+///\param state : l'état présent
+/// 	  r : la récompense
+///       lrate : le taux d'apprentissage
+///	  epsilon : politique "epsilon-greedy"
+///	  lambda : importance de l'historique
+///	  discount : importance du prochain état de la récompense 
+///	  accumulative : si les traces est accumulative ou non
     const DAction* learn(const S& state, double r, float lrate, float epsilon, float lamda, float discout, bool accumulative)
     {
         const DAction* a;
@@ -96,6 +124,16 @@ public:
         return a;
     }
 
+    
+///
+///\brief apprendre de ce que fait le tuteur
+///\param st : l'état présent
+///	  ac : l'action ce que le tuteur fait dans cet état
+/// 	  r : la récompense
+///       lrate : le taux d'apprentissage
+///	  lambda : importance de l'historique
+///	  discount : importance du prochain état de la récompense 
+///	  accumulative : si les traces est accumulative ou non
     void observeTutor(const S& st, const DAction& ac, double r, double lrate, double lambda, double discount, bool accumulative) {
         float delta = r - Qa(*lastAction);
 
@@ -132,7 +170,37 @@ public:
         //take action a, observe reward, and next state
         lastAction = &ac;
     }
+    
 
+///
+///\brief Mettre à jour ce que l'algorithme a appris
+///\param xml : le fichier XML
+    void update(const DAction& ac) {
+        lastAction = &ac;
+    }
+
+///
+///\brief Sauvegarder ce que l'algorithme a appris
+///\param xml : le fichier XML
+    void save(boost::archive::xml_oarchive* xml)
+    {
+        *xml << make_nvp("teta", teta);
+    }
+
+///
+///\brief Charger ce que l'algorithme a appris
+///\param xml : le fichier XML
+    void load(boost::archive::xml_iarchive* xml) {
+        *xml >> make_nvp("teta", teta);
+    }
+    
+    
+private:
+  
+  
+///
+///\brief Calculer la somme de feature pour chaque action disponible
+///\param state : l'état présent
     void computeQa(const S& state) {
 
         for(vector<DAction>::iterator ai = actions.begin(); ai != actions.end() ; ++ai) { // each actions
@@ -173,7 +241,10 @@ public:
 
             return actived;
         }*/
-
+    
+    
+///
+///\brief Retourner les indices des rectangles activés par cet état et action
     list<int>* extractFeatures(const S& state, const DAction& ac) {
         list<int>* actived = new list<int>;
 
@@ -191,18 +262,7 @@ public:
         return actived;
     }
 
-    void update(const DAction& ac) {
-        lastAction = &ac;
-    }
 
-    void save(boost::archive::xml_oarchive* xml)
-    {
-        *xml << make_nvp("teta", teta);
-    }
-
-    void load(boost::archive::xml_iarchive* xml) {
-        *xml >> make_nvp("teta", teta);
-    }
 
 private:
     int nbFeature;

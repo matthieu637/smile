@@ -13,6 +13,7 @@ QLearnDiscr::QLearnDiscr(int index):Driver(index, DECISION_EACH, simu_time)
 {
     State st = *TWorld::initialState();
     DState* dst = discretize(st);
+    //q = new sml::Sarsa(&STATE_TEMPLATE, &ACTION_TEMPLATE, *dst, *TWorld::initialAction(&ACTION_TEMPLATE), conf);
     q = new sml::QLearning(&STATE_TEMPLATE, &ACTION_TEMPLATE, *dst, *TWorld::initialAction(&ACTION_TEMPLATE), conf);
 }
 

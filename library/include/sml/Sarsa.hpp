@@ -1,9 +1,9 @@
-#ifndef QLEARNING_HPP
-#define QLEARNING_HPP
+#ifndef SARSA_HPP
+#define SARSA_HPP
 
 ///
-///\file QLearning.hpp
-///\brief Algorithme générique de QLearning
+///\file Sarsa.hpp
+///\brief Algorithme générique de SARSA
 ///
 
 #include "Q.hpp"
@@ -11,7 +11,7 @@
 
 namespace sml {
 
-class QLearning : public LearnStat
+class Sarsa : public LearnStat
 {
 
 public:
@@ -23,24 +23,23 @@ public:
 ///       s : l'état
 ///       a : l'action
 ///       conf : la configuration d'apprentissage
-    QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf);
-    
+    Sarsa(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf);
+
 ///
-///\brief Retourner l'action à faire selon l'algorithme de QLearning
+///\brief Retourner l'action à faire selon l'algorithme de SARSA
 ///\param s : le nouvel état
 /// 	  r : la récompense
 ///       lrate : le taux d'apprentissage
 ///	  epsilon : politique "epsilon-greedy"
-///	  discount : importance du prochain état de la récompense 
+///	  discount : importance du prochain état de la récompense     
     DAction* learn(const DState& s, double r, float lrate, float epsilon, float discount);
     
 ///
-///\brief Retourner l'action à faire selon l'algorithme QLearning sans apprentissage 
+///\brief Retourner l'action à faire selon l'algorithme de SARSA sans apprentissage 
 ///\param s : le nouvel état
     DAction* decision(const DState& s);
-    
 protected:
-
+  
 ///
 ///\brief Sauvegarder ce que l'algorithme a appris
 ///\param xml : le fichier XML
@@ -51,6 +50,7 @@ protected:
 ///\param xml : le fichier XML
     void load(boost::archive::xml_iarchive* xml);
     
+    
 private:
     QTable Q;
     const ActionTemplate* atmp;
@@ -60,4 +60,4 @@ private:
 };
 
 }
-#endif // QLEARNING_HPP
+#endif // SARSA_HPP

@@ -6,11 +6,13 @@
 #include <sml/Action.hpp>
 #include <sml/Q.hpp>
 #include <sml/QLearning.hpp>
+#include <sml/Sarsa.hpp>
 
 using sml::DAction;
 using sml::DState;
 using sml::QTable;
 using sml::QLearning;
+using sml::Sarsa;
 
 class State;
 
@@ -40,13 +42,14 @@ private:
     const float discount = 0.95;
     const float espilon = 0.01;
     
-    static const bool learn = false;
+    static const bool learn = true;
     sml::LearnConfig conf = {true, 0.1, 2000};
     static const unsigned int simu_time = 10; //in minutes
     
     static const sml::ActionTemplate ACTION_TEMPLATE;
     static const sml::StateTemplate STATE_TEMPLATE;
 
+    //Sarsa *q;
     QLearning* q;
 };
 

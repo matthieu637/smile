@@ -1,6 +1,12 @@
 #ifndef ACTIONTEMPLATE_HPP
 #define ACTIONTEMPLATE_HPP
 
+///
+///\file ActionTemplate.hpp
+///\brief le modèle pour un ensemble d'actions
+///
+///
+
 #include <string>
 #include <list>
 #include <boost/unordered/unordered_map.hpp>
@@ -16,11 +22,34 @@ namespace sml{
 class ActionTemplate {
 public:
     ActionTemplate();//empty constructor for serialization
+    
+///
+///\brief Construction
+///\param names : la liste des noms pour chaque action 
+/// 	  sizes : le nombre des valeurs possibles pour chaque action   
     ActionTemplate(const std::list<string>& names, const std::list<int>& sizes);
+    
+///
+///\brief Retourner la position de l'action dans la liste
+///\param name : le nom de l'action  
     int indexFor(const string& name) const;
+
+///
+///\brief Retourner le nombre des actions différentes( accélérer + diriger = 2 )
     int actionNumber() const;
+    
+///
+///\brief Retourner le nombre des valeurs possibles pour chaque action 
     const std::list<int>* sizesActions() const;
+
+///
+///\brief Comparer deux modèles d'action
+///\param ac : le modèle d'action à comparer
+///\return True si deux modèles d'action sont les mêmes, False sinon
     bool operator==(const ActionTemplate& ac) const;
+    
+///
+///\brief Retourner le taille necéssaire pour toutes les actions
     unsigned int sizeNeeded() const;
     /*
     template<class Archive>
