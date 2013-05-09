@@ -16,7 +16,7 @@
 .DS_Store
 
 # linux 
-.directory/
+.directory
 *~
 *.swp
 *.kate-swp

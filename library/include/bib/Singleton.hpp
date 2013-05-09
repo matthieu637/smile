@@ -4,7 +4,6 @@
 ///
 ///\file Singleton.hpp
 ///\brief Template de base pour le pattern singleton
-///\author matthieu
 ///
 ///
 /// \example Pour l'utiliser il suffit de faire hériter la classe par celle-ci

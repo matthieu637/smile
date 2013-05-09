@@ -1,0 +1,91 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8x]{inputenc} %fac
+%\usepackage[utf8]{inputenc} %fac
+
+%\usepackage[square,sort,comma]{natbib}
+%\usepackage{chapterbib}
+
+\usepackage[francais]{babel} %FR
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+
+\usepackage[pdftex]{graphicx} % img
+%\usepackage{wrapfig} %fac
+\usepackage{float}
+
+%\usepackage{algpseudocode} %fac
+\usepackage[hidelinks]{hyperref} %fac
+
+\usepackage[top=3.5cm, bottom=3.5cm, left=3cm, right=3cm]{geometry} %Réduire les marges
+
+% \usepackage{showkeys}
+% \usepackage{showlabels}
+\usepackage{nameref}
+
+% Style Page
+\pagestyle{fancy} % entêtes
+
+\setlength{\headheight}{15pt}
+\lhead{ \leftmark }
+\rhead{ %\rightmark 
+}
+
+\sloppy % ne pas faire déborder les lignes dans la marge
+
+%\setcounter{tocdepth}{1} %hideallsubsections
+
+\begin{document}
+  \begin{titlepage}
+   \def\titletype{Analyse et conception}
+   \input{../dependance/title_page.tex}
+  \end{titlepage}
+
+  
+  \clearpage
+
+  \tableofcontents
+  \addcontentsline{toc}{section}{Table de matière}
+  
+  %\vfill
+  %\begin{center}
+  %  \includegraphics[height=90mm]{images/torcs.png} 
+  %\end{center}
+
+  \clearpage
+  
+  \renewcommand{\labelitemi}{$\bullet$}
+  \renewcommand{\labelitemii}{$\circ$}
+  \renewcommand{\labelitemiii}{$\diamond$}
+  \renewcommand{\labelitemiv}{$\ast$}
+  
+  \section{Spécifications}
+  Donner « noir sur blanc » les spécifications détaillées du système, 
+  c’est à dire une description précise de ce que fait le système : ensemble des fonctionnalités
+
+ 
+ 
+ 
+ \section{Diagrammes d’analyse (optionnel)}
+  On pourra le cas échéant inclure ici pour chaque fonctionnalité un diagramme correspondant 
+  (e.g. UML : cas, activités, séquences…)
+    \subsection{Fonctionnalité 1}
+    \subsection{Fonctionnalité 2}
+    ...
+  
+  
+  
+  \section{Conception}
+  Ici la forme est assez libre , car elle diffère fortement suivant le type de TER.
+  On inclut dans cette partie les diagrammes de conception (e.g. UML), les algorithmes 
+  en pseudo-code, les spécifications détaillées des interfaces et structures de données, etc.
+  
+  
+
+\addcontentsline{toc}{section}{Références}
+\bibliographystyle{../dependance/apalike}
+\bibliography{../dependance/biblio}
+
+\end{document}
+
+
+

@@ -4,7 +4,6 @@
 ///
 ///\file StringUtils.hpp
 ///\brief Quelques méthodes de manipulation des strings
-///\author matthieu
 ///
 ///
 

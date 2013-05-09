@@ -4,7 +4,6 @@
 ///
 ///\file XMLEngine.hpp
 ///\brief Permet d'enregistrer et de lire des objets serializable
-///\author matthieu
 ///
 
 

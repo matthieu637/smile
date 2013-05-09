@@ -1,0 +1,84 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8x]{inputenc} %fac
+%\usepackage[utf8]{inputenc} %fac
+
+%\usepackage[square,sort,comma]{natbib}
+%\usepackage{chapterbib}
+
+\usepackage[francais]{babel} %FR
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+
+\usepackage[pdftex]{graphicx} % img
+%\usepackage{wrapfig} %fac
+\usepackage{float}
+
+%\usepackage{algpseudocode} %fac
+\usepackage[hidelinks]{hyperref} %fac
+
+\usepackage[top=3.5cm, bottom=3.5cm, left=3cm, right=3cm]{geometry} %Réduire les marges
+
+% \usepackage{showkeys}
+% \usepackage{showlabels}
+\usepackage{nameref}
+
+% Style Page
+\pagestyle{fancy} % entêtes
+
+\setlength{\headheight}{15pt}
+\lhead{ \leftmark }
+\rhead{ %\rightmark 
+}
+
+\sloppy % ne pas faire déborder les lignes dans la marge
+
+%\setcounter{tocdepth}{1} %hideallsubsections
+
+\begin{document}
+  \begin{titlepage}
+   \def\titletype{Manuel de l’utilisateur}
+   \input{../dependance/title_page.tex}
+  \end{titlepage}
+
+  
+  \clearpage
+
+  \tableofcontents
+  \addcontentsline{toc}{section}{Table de matière}
+  
+  %\vfill
+  %\begin{center}
+  %  \includegraphics[height=90mm]{images/torcs.png} 
+  %\end{center}
+
+  \clearpage
+  
+  \renewcommand{\labelitemi}{$\bullet$}
+  \renewcommand{\labelitemii}{$\circ$}
+  \renewcommand{\labelitemiii}{$\diamond$}
+  \renewcommand{\labelitemiv}{$\ast$}
+  
+  \section{Procédure d’installation}
+
+ 
+ 
+ 
+  \section{Paramètres de fonctionnement}
+
+
+  
+  
+  
+  \section{Fonctionnalités et interactions utilisateur}
+
+  
+  
+
+\addcontentsline{toc}{section}{Références}
+\bibliographystyle{../dependance/apalike}
+\bibliography{../dependance/biblio}
+
+\end{document}
+
+
+

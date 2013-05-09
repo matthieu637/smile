@@ -4,7 +4,6 @@
 ///
 ///\file Logger.hpp
 ///\brief Singleton de Logger afin d'écrire des logs
-///\author matthieu
 ///\example Dans LoggerTest.hpp
 ///
 ///
