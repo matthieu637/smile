@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.4)
 
-project(Driver CXX)
+project(Driver CXX C)
 
 set(CMAKE_CXX_FLAGS "-g -O2 -DDEBUG -Wall -Wextra -std=c++11 -fPIC -Wl,-z,defs")# -Wl,-z,defs") #Used for debug
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
