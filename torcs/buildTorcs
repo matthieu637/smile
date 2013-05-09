@@ -18,6 +18,13 @@ echo "cp done"
 cd torcs-1.3.4
 ./configure --enable-debug > /dev/null
 make > /dev/null
+cd src/libs/raceengineclient
+g++ -shared -o libraceengine.so singleplayer.o raceinit.o \
+racemain.o racemanmenu.o racestate.o racegl.o raceengine.o raceresults.o \
+-lracescreens -lrobottools -L../../../export/lib/ \
+ -lalut -lvorbisfile -L/usr/lib
+cd ../../../
+make > /dev/null
 echo "compil done"
 sudo make install > /dev/null
 sudo make datainstall > /dev/null
