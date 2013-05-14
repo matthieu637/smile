@@ -41,5 +41,5 @@ mv ~/.torcs/config/quickrace.xml ~/.torcs/config/raceman/
 echo "config done"
 
 . driver/path
-cp -r driver/workingState/* $path/
+sudo cp -r driver/workingState/* $path/
 

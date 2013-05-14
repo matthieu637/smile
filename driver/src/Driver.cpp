@@ -102,21 +102,31 @@ float Driver::getDistToSegEnd() const
     }
 }
 
-float Driver::straightLength() const
+std::pair<float, float> Driver::straightLength() const
 {
     tTrackSeg *seg = car->_trkPos.seg;
     int type = car->_trkPos.seg->type;
     float length = getDistToSegEnd();
 
-    if(type == TR_STR) {
-        while (seg->next->type == type) {
-            seg = seg->next;
-            length += seg->length;
-        }
-        return length;
+    while (seg->next->type == type) {
+        seg = seg->next;
+        length += seg->length;
     }
 
-    return -length;
+    seg = seg->next;
+    float nextArcSum = seg->arc;
+    int number = 1;
+    type = seg->type;
+    while (seg->next->type == type) {
+        seg = seg->next;
+        nextArcSum += seg->arc;
+        number++;
+    }
+    
+    if(type == TR_LFT)
+      number = -number;
+
+    return std::pair<float, float>(length, nextArcSum/number);
 }
 
 /* Compute gear */

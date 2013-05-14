@@ -15,12 +15,12 @@ double TWorld::reward(const Driver& d) {
     const double startMalus = 1000;
     const double malus = startMalus + 500;
 
-    if(d.isStuck() && distParcourue < -0.01)
+    if(d.isStuck() && distParcourue < -0.01 && car->_speed_x < -0.01)
         r = 15;
     else {
         if(distParcourue > 0.01 && !d.isStuck()) //increase reward if everything's ok r^3
         {
-            r+=4; // 4² -> 16 > 15
+            r+=10; // 4² -> 16 > 15
 //             r = r*r*r;//dist
             r=r*r;
         }
@@ -37,7 +37,7 @@ double TWorld::reward(const Driver& d) {
 
         // keep on the road
         // if near or out of the way
-        double limit = 1.5;
+        double limit = 0.8;
         double factor = 5;
         if(car->_trkPos.toRight < limit) {
             if(r>0)
@@ -86,7 +86,9 @@ State* TWorld::observe(const Driver& d) {
     s->distanceFromMiddle = car->_trkPos.toMiddle;
     s->leftDistance = car->_trkPos.toLeft;
     s->rightDistance = car->_trkPos.toRight;
-    s->straightLength = d.straightLength();
+    std::pair<float, float> p = d.straightLength();
+    s->straightLength = p.first;
+    s->nextArc = p.second;
 
     return s;
 }
@@ -182,7 +184,7 @@ void TWorld::applyAccelerationGear(const Driver& d, tCarElt* car, int accel) {
         car->ctrl.accelCmd = 0;
         break;
     case 3:
-        car->ctrl.gear = d.getGear();
+        car->ctrl.gear = d.getGear() > 2 ? 2 : d.getGear();
         car->ctrl.brakeCmd = 0;
         car->ctrl.accelCmd = 1;
         break;

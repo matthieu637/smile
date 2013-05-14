@@ -76,7 +76,7 @@ public:
     float getDistToSegEnd() const;
 ///
 ///\brief Retourner la longeur de la route droite
-    float straightLength() const;
+    std::pair<float, float> straightLength() const;
     
 protected:
   

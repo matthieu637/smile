@@ -47,8 +47,8 @@ DAction::DAction(const ActionTemplate* temp, int value) {
 }
 
 DAction::~DAction() {
-//   if(values != nullptr) FIXME
-//     delete[] values;
+   if(values != nullptr) //FIXME
+     delete[] values;
 }
 
 int DAction::get(const string& name) const {
@@ -122,6 +122,7 @@ std::ostream& operator<<(std::ostream& stream,
 }
 
 }
+
 
 
 

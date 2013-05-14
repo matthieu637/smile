@@ -1,0 +1,2 @@
+pdfpc -s --notes right presentation.pdf
+dspdfviewer presentation.pdf

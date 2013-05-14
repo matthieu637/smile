@@ -35,6 +35,7 @@ struct State {
     float rightDistance;
     float speed; //-40 / 40 ?
     float straightLength; // -3 / 300
+    float nextArc; // -0.2 // 0.2
 };
 
 

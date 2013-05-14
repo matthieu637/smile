@@ -1,0 +1,214 @@
+\documentclass[11pt, handout]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[french]{babel} 
+\usepackage{amsmath}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{pstricks}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{wrapfig}
+
+
+\usepackage{lmodern}
+
+ %\usepackage[noframe]{showframe}
+
+
+\usetheme{Singapore}
+%\usecolortheme{dolphin}
+
+\usepackage{multicol}
+% \setbeameroption{show only notes}
+\setbeameroption{show notes}
+
+\usepackage{pgfpages}
+\setbeameroption{show notes on second screen}
+
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{cloneBlue}{rgb}{0.2,0.2,0.698}
+
+
+\newenvironment{changemargin}[2]{%
+  \begin{list}{}{%
+    \setlength{\topsep}{0pt}%
+    \setlength{\leftmargin}{#1}%
+    \setlength{\rightmargin}{#2}%
+    \setlength{\listparindent}{\parindent}%
+    \setlength{\itemindent}{\parindent}%
+    \setlength{\parsep}{\parskip}%
+  }%
+  \item[]}{\end{list}} 
+
+\newenvironment{noitemize}
+{\begin{list}{}{%
+\setlength{\labelwidth}{0em}% largeur de la boite englobant l'étiquette
+\setlength{\labelsep}{2pt}% espace entre l'entrée de l'item et l'étiquette
+\setlength{\leftmargin}{0pt}% marge de gauche
+\renewcommand{\makelabel}{\small\color{cloneBlue}{\textbullet}}}}%
+{\end{list}}
+
+\newenvironment{minusitemize}
+{\begin{list}{}{%
+\setlength{\labelwidth}{0em}% largeur de la boite englobant l'étiquette
+\setlength{\labelsep}{2pt}% espace entre l'entrée de l'item et l'étiquette
+\setlength{\leftmargin}{-15pt}% marge de gauche
+\renewcommand{\makelabel}{\small\color{cloneBlue}{\textbullet}}}}%
+{\end{list}}
+
+
+\setbeamersize{text margin left=0.75cm}
+\setbeamersize{text margin right=0.75cm}
+
+\title{ \textbf{PIAD 2013}}
+\subtitle[\ldots]{Sujet 32 : Semi-supervised Learning Agents%\\[0.5cm]
+}
+
+\author{Auteurs : Lan \textsc{Zhou} \and \& \and Matthieu \textsc{Zimmer}\newline Encadrants : Paolo \textsc{Viappiani} \and \& \and Paul \textsc{Weng}}
+
+\institute{Université Pierre et Marie Curie}
+\date{14 Mai}
+\logo{\includegraphics[height=6mm]{images/logo.png}}
+
+% \addtobeamertemplate{footline}{\insertframenumber/\inserttotalframenumber}
+\addtobeamertemplate{footline}{\hfill\insertframenumber/\inserttotalframenumber}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\begin{document}
+
+% \usebackgroundtemplate{
+% \begin{picture}(200,200)
+% \put(5, 60){\includegraphics[width=100px]{images/torcs.png}}
+% \end{picture}
+% }
+
+\begin{frame}
+\maketitle
+\end{frame}
+
+\note{
+L'apprentissage semi-supervisé
+}
+
+
+\usebackgroundtemplate{}
+\begin{frame}
+
+\begin{center}{\Large Plan }\end{center}
+  \tableofcontents
+\end{frame}
+
+\note{
+
+\begin{itemize}
+ \item et ce qu'on propose dans notre bibliothèque
+ \item quelques algorithmes sarsa , qlearning
+ \item Mise en pratique
+\end{itemize}
+
+
+}
+% 
+% \usebackgroundtemplate{
+% \begin{picture}(200,300)
+% \put(220, 50){\includegraphics[width=90px]{images/embryo.jpg}}
+% \end{picture}
+% }
+% 
+
+
+\begin{frame}
+ \frametitle{Introduction}
+ \framesubtitle{Problématique}
+ 2 grande classe d'apprentissage :
+ \begin{itemize}
+  \item Apprentissage supervisé
+  \item Apprentissage non supervisé
+ \end{itemize}
+ --> apprentissage semi-supervisé <--\\[1cm]
+ 
+ Objectifs :
+ \begin{itemize}
+  \item Developper bibliothèque
+  \item Liaison simulateur
+ \end{itemize}
+
+ 
+ 
+\end{frame}
+\usebackgroundtemplate{}
+
+\note{ 
+Réseau de neurones, ...
+
+Parfois les agents apprendrons d'eux meme, quelques fois du superviseur
+
+Implémentation C++
+
+Pour arriver à un apprentissage semi supervisé, nous allons partir d'un apprentissage non supervisé
+: l'APR. Lan va donc vous introduire aux notions de bases.
+}
+
+
+\section{Théorie}
+
+\input{theorie.tex}
+
+
+\begin{frame}
+  \begin{center}{\Large Plan }\end{center}
+  \tableofcontents
+\end{frame}
+
+\note{
+Nous passons donc maintenant à la mise en pratique et à la liaison avec le simulateur.
+}
+
+
+\section{Pratique}
+
+\input{pratique.tex}
+
+
+\section{}
+
+\begin{frame}
+ \frametitle{Conclusion}
+ \framesubtitle{Aller plus loin...}
+ 
+ \begin{itemize}
+ \item 
+ \end{itemize}
+ 
+\end{frame}
+
+\note{
+Merci de nous avoir écouté.
+}
+
+
+\begin{frame}
+ \frametitle{References \& Remerciements}
+
+%  Livre : 
+ \begin{itemize}
+  \item Reinforcement Learning : An Introduction, 1998
+  \newline Sutton, Richard S and Barto, Andrew G 
+  \item Image Wikipédia : Apprentissage par renforcement
+ \end{itemize}
+
+\end{frame}
+
+
+
+\end{document}
+
+

@@ -23,6 +23,8 @@ double Functor1D::call(const State& st, const DAction& ac)
         return sml::Utils::transform(st.rightDistance, -2*max/5., 3.*max/5., 0., max);
     case TFeatures::f1D::straight:
         return sml::Utils::transform(st.straightLength, 0., max, 0., max);
+    case TFeatures::f1D::nextArc:
+        return sml::Utils::transform(st.nextArc, -max/2., max/2., 0., max);
     case TFeatures::f1D::action:
         return ac[action];
     }
@@ -59,6 +61,10 @@ Feature<State>::featuring1D TFeatures::_1DRight(double road_width) {
 
 Feature<State>::featuring1D TFeatures::_1DStraight(double length) {
     return _1D(straight , length);
+}
+
+Feature<State>::featuring1D TFeatures::_1DNextArc(double length) {
+    return _1D(nextArc , length);
 }
 
 Feature<State>::featuring1D TFeatures::_1DAction(const string& acc) {

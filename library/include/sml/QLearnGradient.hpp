@@ -157,8 +157,8 @@ public:
         }
 
 
-        list<int> activeIndex = *extractFeatures(st, ac);
-        for(list<int>::iterator it = activeIndex.begin(); it != activeIndex.end() ; ++it) {
+        list<int>* activeIndex = extractFeatures(st, ac);
+        for(list<int>::iterator it = activeIndex->begin(); it != activeIndex->end() ; ++it) {
             int index = *it;
             if(accumulative)
                 e[index] += 1.;
@@ -166,6 +166,7 @@ public:
                 e[index] = 1.;
             history.insert(index);
         }
+        delete activeIndex;
 
         //take action a, observe reward, and next state
         lastAction = &ac;
@@ -215,6 +216,7 @@ private:
 
 // 	    LOG_DEBUG("old :" << Qa(*ai) << " new :" << _Qa);
             Qa(*ai) = _Qa;
+	    delete actived;
         }
     }
 

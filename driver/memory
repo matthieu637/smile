@@ -1,0 +1,2 @@
+cd /usr/local/share/games/torcs
+LD_LIBRARY_PATH="/usr/local/lib/torcs/lib/" valgrind --leak-check=full /usr/local/lib/torcs/torcs-bin -l /home/matthieu/.torcs -L /usr/local/lib/torcs -D /usr/local/share/games/torcs -r /home/matthieu/.torcs/config/dtmrace3.xml

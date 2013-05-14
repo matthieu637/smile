@@ -3,6 +3,10 @@
 if [ -e /usr/bin/torcs ] ; then
   path=/usr/share/games/torcs
 else
-  path=/usr/local/share/games/torcs
+  if [ -e /usr/games/torcs ] ; then
+	path=/usr/share/games/torcs
+  else
+	path=/usr/local/share/games/torcs
+  fi
 fi
 

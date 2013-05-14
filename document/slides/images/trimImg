@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+#extra/imagemagick
+find . -name '*.jpeg' | while read file
+do
+	convert -trim $file $file
+	echo $file done
+done
+
+

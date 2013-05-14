@@ -1,0 +1,13 @@
+--- raceengine.cpp	2013-05-11 22:35:06.286215361 +0200
++++ raceengine2.cpp	2013-05-11 22:35:01.589541677 +0200
+@@ -409,8 +409,8 @@
+ 	if ((car->_curLapTime > 84.5 + ReInfo->track->length/10.0) &&
+ 		(car->_driverType != RM_DRV_HUMAN))
+ 	{
+-// 		car->_state |= RM_CAR_STATE_ELIMINATED;
+-// 	    return;
++		car->_state |= RM_CAR_STATE_ELIMINATED;
++	    return;
+ 	}
+ 
+ 	const int BUFSIZE = 1024;
