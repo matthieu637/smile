@@ -2,12 +2,12 @@
 
 #include <assert.h>
 
-namespace sml{
+namespace sml {
 
-ActionTemplate::ActionTemplate(){
-  
+ActionTemplate::ActionTemplate() {
+
 }
-  
+
 ActionTemplate::ActionTemplate(const std::list<string>& names, const std::list<int>& sizes): actionNames(names.size()), sizes(sizes) {
     assert(names.size() == sizes.size());
 
@@ -19,6 +19,20 @@ ActionTemplate::ActionTemplate(const std::list<string>& names, const std::list<i
     }
 }
 
+int ActionTemplate::actionNumber(const string& name) const {
+    unsigned int reach = actionNames.at(name);
+    unsigned int i = 0;
+
+    std::list<int>::const_iterator it;
+    for(it = sizes.begin(); it != sizes.end(); ++it) {
+        if(i==reach)
+            return *(it);
+        i++;
+    }
+
+    return (*it);
+}
+
 int ActionTemplate::indexFor(const string& name) const {
 //     LOG_DEBUG(name << " " << actionNames.size());
     assert(name.size() > 0 && actionNames.find(name) != actionNames.end());
@@ -28,6 +42,7 @@ int ActionTemplate::indexFor(const string& name) const {
 int ActionTemplate::actionNumber() const {
     return actionNames.size();
 }
+
 
 bool ActionTemplate::operator==(const ActionTemplate& ac) const {
     return actionNames == ac.actionNames && sizes == ac.sizes;
@@ -44,5 +59,5 @@ unsigned int ActionTemplate::sizeNeeded() const {
         r*=(*it);
     return r;
 }
-  
+
 }

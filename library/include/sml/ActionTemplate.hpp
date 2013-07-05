@@ -38,6 +38,8 @@ public:
 ///\brief Retourner le nombre des actions différentes( accélérer + diriger = 2 )
     int actionNumber() const;
     
+    
+    int actionNumber(const string& name) const;
 ///
 ///\brief Retourner le nombre des valeurs possibles pour chaque action 
     const std::list<int>* sizesActions() const;

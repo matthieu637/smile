@@ -28,6 +28,11 @@ DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon,
     return a;
 }
 
+void QLearning::should_done(const DState& s, const DAction& a, double r, float lrate)
+{
+    Q(s,a) = Q(s,a) + lrate*(r - Q(s,a));
+}
+
 DAction* QLearning::decision(const DState& s) {
     return Q.argmax(s);
 }

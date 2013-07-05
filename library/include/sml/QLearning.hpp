@@ -23,7 +23,7 @@ public:
 ///       s : l'état
 ///       a : l'action
 ///       conf : la configuration d'apprentissage
-    QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf);
+    QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf={false,0,0});
     
 ///
 ///\brief Retourner l'action à faire selon l'algorithme de QLearning
@@ -38,6 +38,9 @@ public:
 ///\brief Retourner l'action à faire selon l'algorithme QLearning sans apprentissage 
 ///\param s : le nouvel état
     DAction* decision(const DState& s);
+    
+    
+    void should_done(const DState& s, const DAction& a, double r, float lrate);
     
 protected:
 

@@ -1,64 +1,43 @@
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResult.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
+#include <cppunit/XmlOutputter.h>
 
-#include "sml/Q.hpp"
-#include "bib/Logger.hpp"
+int main(int argc, char* argv[])
+{
+// Retrieve test path from command line first argument. Default to "" which resolve
+// to the top level suite.
+    std::string testPath = (argc > 1) ? std::string(argv[1]) : std::string("");
 
-#define ACC "acceleration"
-#define DIR "direction"
-#define AGL "angle"
-#define DST "distanceFromMiddle"
-#define LDST "leftDistance"
-#define RDST "rightDistance"
-#define SPD "speed"
+// Create the event manager and test controller
+    CPPUNIT_NS::TestResult controller;
 
+// Add a listener that collects test result
+    CPPUNIT_NS::TestResultCollector result;
+    controller.addListener(&result);
 
+// Add a listener that print dots as test run.
+    CPPUNIT_NS::BriefTestProgressListener progress;
+    controller.addListener(&progress);
 
-#include <fstream>
-#include <string>
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/vector.hpp>
-#include "bib/Logger.hpp"
+// Add the top suite to the test runner
+    CPPUNIT_NS::TestRunner runner;
+    runner.addTest(CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest());
+    runner.run(controller);
 
-using std::ofstream;
-using std::ifstream;
-using std::string;
-using boost::archive::xml_oarchive;
-using boost::archive::xml_iarchive;
-using boost::serialization::make_nvp;
+// Print test in a compiler compatible format.
+    CPPUNIT_NS::CompilerOutputter outputter(&result, CPPUNIT_NS::stdCOut());
+    outputter.write();
 
+// Uncomment this for XML output
+    std::ofstream file("cppunit-report.xml");
 
-int STATES_ALPHA = 2;
-int STATES_DISTANCE = 2;
-int ACTIONS_ACC = 2;
-int ACTIONS_DIRECTION = 2;
+    CPPUNIT_NS::XmlOutputter xml(&result, file);
+    xml.write();
+    file.close();
 
-using namespace sml;
-using namespace bib;
-
-int main() {
-    sml::ActionTemplate ACTION_TEMPLATE( {ACC, DIR}, {ACTIONS_ACC, ACTIONS_DIRECTION});
-    sml::StateTemplate STATE_TEMPLATE( {AGL, DST}, {STATES_ALPHA, STATES_DISTANCE});
-
-    QTable Q(&ACTION_TEMPLATE, &STATE_TEMPLATE);
-    DAction a(&ACTION_TEMPLATE, {1,1});
-    LOG_DEBUG(a.hash());
-    DAction b(&ACTION_TEMPLATE, a.hash()-1);
-    LOG_DEBUG(b.get(0) << " " << b.get(1));
-    LOG_DEBUG(b.hash());
-    Q(a, b) = 180.1;
-    Q(a, a) = 0.278965421;
-    LOG_DEBUG(Q(a, b));
-    LOG_DEBUG(Q(a, DAction(&ACTION_TEMPLATE, {0,0})));
-    LOG_DEBUG(Q(a, DAction(&ACTION_TEMPLATE, {0,1})));
-    LOG_DEBUG("argmax " << Q.argmax(a)->get(0) << " " << Q.argmax(a)->get(1));
-
-//     Q.write("test.xml");
-//     Q.read("test.xml");
-    
-    LOG_DEBUG(Q(a, b));
-    LOG_DEBUG(Q(a, a));
-    LOG_DEBUG("argmax " << Q.argmax(a)->get(0) << " " << Q.argmax(a)->get(1));
-    
-    return 0;
+    return result.wasSuccessful() ? 0 : 1;
 }
