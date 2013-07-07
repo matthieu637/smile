@@ -1,6 +1,7 @@
 #include "sml/ActionTemplate.hpp"
 
 #include <assert.h>
+#include <bib/Logger.hpp>
 
 namespace sml {
 
@@ -17,6 +18,11 @@ ActionTemplate::ActionTemplate(const std::list<string>& names, const std::list<i
         actionNames[*it] = i;
         i++;
     }
+}
+
+ActionTemplate::~ActionTemplate(){
+    actionNames.clear();
+    sizes.clear();
 }
 
 int ActionTemplate::actionNumber(const string& name) const {

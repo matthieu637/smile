@@ -13,7 +13,9 @@ const ActionTemplate MCar::ACTION_TEMPLATE = ActionTemplate( {MOT}, {3});
 MCar::MCar(int nbPosStep, int nbVelStep)
 {
     stempl = new StateTemplate( {POS, VEL}, {nbPosStep, nbVelStep});
+    dst = new DState(stempl, 0);
 //     LOG_DEBUG(stempl->actionNumber(VEL));
+    
     init();
 }
 
@@ -22,13 +24,19 @@ MCar::MCar()
     init();
 }
 
+MCar::~MCar(){
+    delete stempl;
+    delete dst;
+}
+
 void MCar::init()
 {
     st.position = -0.5;
     st.velocity = 0.0;
+    computeDState();
 }
 
-MCar::State& MCar::step(const DAction& ac)
+void MCar::step(const DAction& ac)
 // Take action a, update state of car
 {
     int a = ac[MOT];
@@ -47,18 +55,19 @@ MCar::State& MCar::step(const DAction& ac)
     if (st.position==mcar_min_position && st.velocity<0)
         st.velocity = 0;
 
-    return st;
+    computeDState();
 }
 
-DState* MCar::computeDState() const {
-    DState* dst = new DState(stempl, 0);
-//     LOG_DEBUG(st.velocity << " "<< round(Utils::transform(st.velocity, -mcar_max_velocity, mcar_max_velocity, 0, 8 )) );
-    dst->set(POS,  round(Utils::transform(st.position, mcar_min_position, mcar_max_position, 0, stempl->actionNumber(POS) -1)) );
+const DState& MCar::getDState() const {
+    return *dst;
+}
+
+void MCar::computeDState() {
+    dst->set(POS, round(Utils::transform(st.position, mcar_min_position, mcar_max_position, 0, stempl->actionNumber(POS) -1)));
     dst->set(VEL, round(Utils::transform(st.velocity, -mcar_max_velocity, mcar_max_velocity, 0, stempl->actionNumber(VEL) -1)));
-    return dst;
 }
 
-MCar::State& MCar::getState(){
+const MCar::State& MCar::getState() const{
   return st;
 }
 

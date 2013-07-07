@@ -12,6 +12,7 @@ namespace sml {
 
 QTable::QTable(const StateTemplate* stmp, const ActionTemplate* atmp):stmpl(stmp), atmpl(atmp) {
     map = new hashmap(stmpl->sizeNeeded() * atmpl->sizeNeeded());
+//     LOG_DEBUG("sized " << stmpl->sizeNeeded() * atmpl->sizeNeeded() <<  " " << map->size() );
 
     for(unsigned int i=0; i< stmpl->sizeNeeded(); i++) {
         for(unsigned int j=0; j< atmpl->sizeNeeded(); j++) {
@@ -23,6 +24,7 @@ QTable::QTable(const StateTemplate* stmp, const ActionTemplate* atmp):stmpl(stmp
 QTable::QTable(const ActionTemplate* atmp):atmpl(atmp) {
     stmpl = new StateTemplate( {""}, {1}); // for file saving
     map = new hashmap(atmpl->sizeNeeded());
+//     LOG_DEBUG("call here");
 
     for(unsigned int j=0; j< atmpl->sizeNeeded(); j++)
         map->at(j) = 0.L;
@@ -33,7 +35,7 @@ DAction* QTable::argmax(const DState& name) const {
     unsigned int beginRange = hashState * atmpl->sizeNeeded();
 
     unsigned int imax = rand() % atmpl->sizeNeeded();
-//     LOG_DEBUG(imax << " " << hashState << " " << atmpl->sizeNeeded() << " " << name["angle"] << " " << name["distance"] );
+//     LOG_DEBUG(imax << " " << hashState << " " << atmpl->sizeNeeded() << " " << beginRange << " " << name << " " << map->size());
     for(unsigned int j=0; j< atmpl->sizeNeeded(); j++)
         if(map->at(beginRange + imax) < map->at(beginRange + j) )
             imax = j;

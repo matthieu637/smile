@@ -29,6 +29,8 @@ public:
 /// 	  sizes : le nombre des valeurs possibles pour chaque action   
     ActionTemplate(const std::list<string>& names, const std::list<int>& sizes);
     
+    ~ActionTemplate();
+    
 ///
 ///\brief Retourner la position de l'action dans la liste
 ///\param name : le nom de l'action  

@@ -44,6 +44,7 @@ public:
 ///
     DAction(const ActionTemplate* temp, int value);
    
+    DAction(const DAction& a);
     ~DAction();
     
 ///

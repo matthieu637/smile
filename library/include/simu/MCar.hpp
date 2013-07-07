@@ -34,17 +34,20 @@ public:
 
     MCar(int nbPosStep, int nbVelStep);
     MCar();
+    ~MCar();
 
-    State& step(const DAction& ac);                 // update car state for given action
+    void step(const DAction& ac);                 // update car state for given action
 
-    State& getState() ;
-    DState* computeDState() const;
+    const State& getState() const;
+    const DState& getDState() const;
     bool goal_p () const;                   // is car at goal?
     void init();                      // initialize car state
 
 private:
-
+    void computeDState();
+  
     State st;
+    DState* dst;
 public:
     const static ActionTemplate ACTION_TEMPLATE;
     const StateTemplate* stempl;

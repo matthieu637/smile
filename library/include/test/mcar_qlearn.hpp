@@ -13,15 +13,18 @@ using namespace sml;
 class MCarQLearn : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(MCarQLearn);
-    //CPPUNIT_TEST(mcar_qltable_learner);
+    
+    CPPUNIT_TEST(mcar_qltable_learner);
     CPPUNIT_TEST(mcar_qltable_teacher);
 
     CPPUNIT_TEST_SUITE_END();
 
-public:
-
+public: 
     void mcar_qltable_learner();
     void mcar_qltable_teacher();
+    
+//private:
+    static const StateTemplate t_stempl;
 };
 
 #endif

@@ -4,14 +4,15 @@
 namespace sml {
 
 QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf) :
-    LearnStat(conf), Q(stmp, atmp), atmp(atmp),ds(&s),da(&a)
+    LearnStat(conf), Q(stmp, atmp), atmp(atmp)
 {
-
-
+    ds = new DState(s);
+    da = new DState(a);
 }
 
 DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon, float discount)
 {
+//     LOG_DEBUG(s << " " << *ds);
     DAction *ap = Q.argmax(s);
     Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(s, *ap) - Q(ds, da) );
 
@@ -19,10 +20,15 @@ DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon,
     DAction* a = ap ; //Q.argmax(s); // Choose a from s
 
     //exploration
-    if(sml::Utils::rand01() < epsilon )
-        a = new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});//TODO:memory
+    if(sml::Utils::rand01() < epsilon ){
+	delete a;
+        a = new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
+    }
 
-    ds = &s;
+    delete ds;
+    delete da;
+    
+    ds = new DState(s);
     da = a;
 
     return a;

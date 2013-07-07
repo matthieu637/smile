@@ -39,7 +39,7 @@ public:
 ///       s : l'état
 ///       a : l'action
 ///       conf : la configuration d'apprentissage
-    QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, DState& s, DAction& a, const LearnConfig& conf);
+    QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf={false, 0, 0});
     
     
 ///
@@ -58,6 +58,9 @@ public:
 ///\brief Retourner l'action à faire selon l'algorithme QLearning sans apprentissage 
 ///\param s : le nouvel état
     DAction* decision(DState& s);
+    
+    
+    void clear_history();
     
 protected:
   
