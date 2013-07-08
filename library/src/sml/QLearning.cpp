@@ -44,8 +44,23 @@ void QLearning::should_done(const DState& s, const DAction& a, double r, float l
     Q(s,a) = Q(s,a) + lrate*(r - Q(s,a));
 }
 
-DAction* QLearning::decision(const DState& s) {
+DAction* QLearning::decision(const DState& s, float epsilon) {
+    if(sml::Utils::rand01() < epsilon ){
+        return new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
+    }
     return Q.argmax(s);
+}
+
+void QLearning::should_do(const DState& s, const DAction& a, double r, float lrate, float discount){
+    DAction *ap = Q.argmax(s);
+    Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(s, *ap) - Q(ds, da) );
+    
+    delete ap;
+    delete ds;
+    delete da;
+    
+    ds = new DState(s);
+    da = new DAction(a);
 }
 
 void QLearning::save(boost::archive::xml_oarchive* xml)

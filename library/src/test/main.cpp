@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
     } else {
         MCarQLearn m;
  	m.mcar_qltable_teacher();
+// 	m.mcar_qltable_teacher_annonce();
 // 	m.mcar_qltable_learner();
     }
 }

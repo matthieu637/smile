@@ -9,21 +9,19 @@ CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
 #define lambda 0.95                     // trace-decay parameters
 #define gamma 0.8                        // discount-rate parameters
 
-#define cost 0.0001
-
 #define nbPosStep 8
 #define nbVelStep 12
 
 // 3 conditions to work : gamma < 1 | trace non-accumulative | reward depending of step
 
-const StateTemplate MCarQLearn::t_stempl({POS, VEL, MOT},{nbPosStep, nbVelStep, 3});
+// const StateTemplate MCarQLearn::t_stempl({POS, VEL, MOT},{nbPosStep, nbVelStep, 3});
 
-DState* getTeachState(const DState& sl, const DAction& al){
+DState* getTeachState_annonce(const DState& sl, const DAction& al){
   DState* ts = new DState(&MCarQLearn::t_stempl, {sl[POS], sl[VEL], al[MOT]});
   return ts;
 }
 
-int mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher) {
+int mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* teacher) {
     DAction* ac = new DAction(&MCar::ACTION_TEMPLATE, 0);
     DAction* fac = ac;
 
@@ -31,35 +29,43 @@ int mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher) {
     DState* ts;
 
     int step = 0;
-    bool have_advise = false;
     int nb_advise = 0;
+    bool del_ac = false;
     do
     {
         step++;
         prob->step(*ac);
         DState dst = prob->getDState();
-        ac = learner.learn(dst, -1, alpha, epsilon, gamma);//here
-
-
-	ts = getTeachState(dst, *ac);
-	DAction* tac = teacher->learn(*ts, have_advise?-10*(1 + cost):-10, alpha, epsilon, gamma, lambda, false);
-
+	
+	if(del_ac) 
+	  delete ac;
+	
+	ac = learner.decision(dst);
+	del_ac = false;
+	
+	ts = getTeachState_annonce(dst, *ac);
+	DAction* tac = teacher->learn(*ts, -1, alpha, epsilon, gamma, lambda, false);
+	
 	int aa = tac->get(MOT);
-	if( aa != 3){
-	  learner.should_done(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 1, alpha);
-	  have_advise = true;
+	if( aa != 3 && aa != ac->get(MOT)){
+	  learner.should_do(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 1, alpha, gamma);
+	  delete ac;
+	  ac = tac;
 	  nb_advise++;
-	} else have_advise = false;
+	} else del_ac = true;
 	
         delete ts;
     }
-    while(!prob->goal_p() && step < 10000);
+    while(!prob->goal_p() && step < 50000);
     
-     ts = getTeachState(prob->getDState(), *ac);
-     teacher->learn(*ts, (3000-step)/*-5*nb_advise*/, alpha, 0, 0, 1, false);
+     ts = getTeachState_annonce(prob->getDState(), *ac);
+     teacher->learn(*ts, 3000-step, alpha, 0, 0, 1, false);
      delete ts;
      
      delete fac;
+     
+     if(del_ac)
+       delete ac;
 
      LOG_DEBUG("DONE WITH " << step << " advice : " << nb_advise );
 
@@ -68,7 +74,7 @@ int mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher) {
 
 
 
-void MCarQLearn::mcar_qltable_teacher() {
+void MCarQLearn::mcar_qltable_teacher_annonce() {
     srand(time(NULL));
 //     srand(0);
 
@@ -85,7 +91,7 @@ void MCarQLearn::mcar_qltable_teacher() {
     do
     {
         episod++;
-        int step = mcar_qltable_teacher_run(&prob, &teacher);
+        int step = mcar_qltable_teacher_annonce_run(&prob, &teacher);
 	score += step;
 	prob.init();
 	teacher.clear_history(fs, fa);

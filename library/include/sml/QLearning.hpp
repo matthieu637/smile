@@ -39,10 +39,11 @@ public:
 ///
 ///\brief Retourner l'action à faire selon l'algorithme QLearning sans apprentissage 
 ///\param s : le nouvel état
-    DAction* decision(const DState& s);
+    DAction* decision(const DState& s, float epsilon=0.L);
     
     
     void should_done(const DState& s, const DAction& a, double r, float lrate);
+    void should_do(const DState& s, const DAction& a, double r, float lrate, float discount);
     
 protected:
 

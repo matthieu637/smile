@@ -21,9 +21,15 @@ class MCarQLearn : public CppUnit::TestFixture
 
 public: 
     void mcar_qltable_learner();
+    
     void mcar_qltable_teacher();
     
+    void mcar_qltable_teacher_annonce();
+    
+private:
+    
 //private:
+public:
     static const StateTemplate t_stempl;
 };
 
