@@ -60,8 +60,7 @@ DAction::DAction ( const DAction& a )
 
 DAction::~DAction()
 {
-    if ( values != nullptr ) //FIXME
-        delete[] values;
+  delete[] values;
 }
 
 int DAction::get ( const string& name ) const

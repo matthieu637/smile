@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
         return result.wasSuccessful() ? 0 : 1;
     } else {
         MCarQLearn m;
-	m.mcar_qltable_teacher();
+ 	m.mcar_qltable_teacher();
 // 	m.mcar_qltable_learner();
     }
 }

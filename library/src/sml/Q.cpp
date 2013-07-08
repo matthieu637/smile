@@ -30,6 +30,10 @@ QTable::QTable(const ActionTemplate* atmp):atmpl(atmp) {
         map->at(j) = 0.L;
 }
 
+QTable::~QTable(){
+    delete map;
+}
+
 DAction* QTable::argmax(const DState& name) const {
     unsigned int hashState = name.hash();
     unsigned int beginRange = hashState * atmpl->sizeNeeded();

@@ -41,6 +41,7 @@ public:
 ///       conf : la configuration d'apprentissage
     QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf={false, 0, 0});
     
+    ~QLearningLamb();
     
 ///
 ///\brief Retourner l'action à faire selon l'algorithme avec l'historique de QLearning

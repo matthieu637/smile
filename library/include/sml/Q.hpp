@@ -34,6 +34,8 @@ public:
 ///\brief Constructeur pour créer le tableau "Action"
 ///\param atmp : le modèle d'action
     QTable(const ActionTemplate* atmp);
+    
+    ~QTable();
 
 ///
 ///\brief Retourner toutes les actions posiibles pour un état donné

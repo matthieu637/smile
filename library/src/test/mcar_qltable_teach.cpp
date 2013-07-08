@@ -25,6 +25,7 @@ int teach_reward(const DState& ts){
 
 int mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher) {
     DAction* ac = new DAction(&MCar::ACTION_TEMPLATE, 0);
+    DAction* fac = ac;
 
     QLearning learner(prob->stempl, &MCar::ACTION_TEMPLATE , *ac, prob->getDState() );
     DState* ts;
@@ -52,6 +53,8 @@ int mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher) {
      ts = getTeachState(prob->getDState(), *ac);
      teacher->learn(*ts, 3500-step, alpha, epsilon, gamma, lambda, false);
      delete ts;
+     
+     delete fac;
 
 //     LOG_DEBUG("DONE WITH " << step );
 
@@ -68,9 +71,9 @@ void MCarQLearn::mcar_qltable_teacher() {
     ActionTemplate t_atempl({MOT}, {4});
     
     const DState& tmp = prob.getDState();
-    DState* fs = new DState(&MCarQLearn::t_stempl, {tmp[POS], tmp[VEL], 2});
-    DAction* fa = new DAction(&t_atempl, 3);
-    QLearningLamb teacher(&MCarQLearn::t_stempl, &t_atempl, *fs, *fa);
+    DState fs(&MCarQLearn::t_stempl, {tmp[POS], tmp[VEL], 2});
+    DAction fa(&t_atempl, 3);
+    QLearningLamb teacher(&MCarQLearn::t_stempl, &t_atempl, fs, fa);
 
     int episod = 0;
     int score = 0;

@@ -9,10 +9,11 @@ QLearningLamb::QLearningLamb ( const StateTemplate* stmp, const ActionTemplate* 
 {
     this->s = new DState ( ds );
     this->a = new DState ( da );
-//     LOG_DEBUG("avant");
-//     Q.argmax(s);
-//     LOG_DEBUG("apres");
-// 	LOG_DEBUG("map size " << Q.map->size());
+}
+
+QLearningLamb::~QLearningLamb(){
+    delete s;
+    delete a;
 }
 
 DAction* QLearningLamb::learn ( DState& sp, double r, float lrate, float epsilon, float discount, float lambda, bool accumulative )
@@ -20,11 +21,10 @@ DAction* QLearningLamb::learn ( DState& sp, double r, float lrate, float epsilon
     //Take action a, observe r, s'
 
     //Choose a' from s' using policy derived from Q
-    DAction* as = Q.argmax ( sp ); //TODO:memory leak
+    DAction* as = Q.argmax ( sp ); 
     //if a' ties for the max, then a* <- a'
     DAction* ap = as;
     if ( sml::Utils::rand01() < epsilon ) {
-        delete ap;
         ap = new DAction ( atmp, rand() % ( int ) atmp->sizeNeeded() ); //TODO:memory
     }
 
@@ -35,7 +35,12 @@ DAction* QLearningLamb::learn ( DState& sp, double r, float lrate, float epsilon
         N ( s,a ) = N ( s, a ) + 1.;
     else
         N ( s,a ) = 1.;
-    history.insert ( std::pair< DState* , DAction* > ( s, a ) );
+    
+    bool inserted = history.insert ( std::pair< DState* , DAction* > ( s, a ) ).second;
+    if(!inserted){
+      delete s;
+      delete a;
+    }
 
     for ( std::set< std::pair<DState* , DAction* >, HistoryComparator >::iterator it = history.begin(); it != history.end(); ++it ) {
         DState* sa = it->first;
@@ -51,8 +56,10 @@ DAction* QLearningLamb::learn ( DState& sp, double r, float lrate, float epsilon
         }
     }
 
-    if ( ap != as )
+    if ( ap != as ){
+	delete as;
         history.clear();
+    }
 
     a = ap;
     s = new DState ( sp );

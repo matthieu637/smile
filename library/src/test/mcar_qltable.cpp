@@ -13,6 +13,7 @@ int mcar_qltable_run() {
 
     MCar prob(8,12);
     DAction* ac = new DAction(&prob.ACTION_TEMPLATE, 0);
+    DAction* fac = ac;
 
     QLearning ql(prob.stempl, &MCar::ACTION_TEMPLATE , *ac, prob.getDState() );
 
@@ -29,6 +30,8 @@ int mcar_qltable_run() {
     while(!prob.goal_p());
 
 //     LOG_DEBUG("DONE WITH " << step );
+    
+    delete fac;
 
     return step;
 }
@@ -43,7 +46,7 @@ void MCarQLearn::mcar_qltable_learner() {
         episod++;
         score += mcar_qltable_run();
     }
-    while(episod < 10);
+    while(episod < 1000);
 
     LOG_DEBUG("FINAL SCORE : " << (float)score/episod);
     

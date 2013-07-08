@@ -10,6 +10,11 @@ QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, cons
     da = new DState(a);
 }
 
+QLearning::~QLearning(){
+    delete ds;
+    delete da;
+}
+
 DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon, float discount)
 {
 //     LOG_DEBUG(s << " " << *ds);
