@@ -6,11 +6,13 @@ CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
 // Standard RL parameters:
 #define epsilon 0.01                    // probability of random action
 #define alpha 0.5                      // step size parameter
-#define lambda 1                     // trace-decay parameters
-#define gamma 1.5                        // discount-rate parameters
+#define lambda 0.95                     // trace-decay parameters
+#define gamma 0.8                        // discount-rate parameters
 
 #define nbPosStep 8
 #define nbVelStep 12
+
+// 3 conditions to work : gamma < 1 | trace non-accumulative | reward depending of step
 
 const StateTemplate MCarQLearn::t_stempl({POS, VEL, MOT},{nbPosStep, nbVelStep, 3});
 
@@ -40,23 +42,23 @@ int mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher) {
 
 
 	ts = getTeachState(dst, *ac);
-	DAction* tac = teacher->learn(*ts, 0, alpha, epsilon, gamma, lambda, false);
+	DAction* tac = teacher->learn(*ts, -1, alpha, epsilon, gamma, lambda, false);
 
 	int aa = tac->get(MOT);
 	if( aa != 3)
-	  learner.should_done(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 0.1, alpha);
+	  learner.should_done(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 1, alpha);
 	
         delete ts;
     }
-    while(!prob->goal_p());
+    while(!prob->goal_p() && step < 50000);
     
      ts = getTeachState(prob->getDState(), *ac);
-     teacher->learn(*ts, 3500-step, alpha, epsilon, gamma, lambda, false);
+     teacher->learn(*ts, 3000-step, alpha, 0, 0, 1, false);
      delete ts;
      
      delete fac;
 
-//     LOG_DEBUG("DONE WITH " << step );
+//      LOG_DEBUG("DONE WITH " << step );
 
     return step;
 }
@@ -64,8 +66,8 @@ int mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher) {
 
 
 void MCarQLearn::mcar_qltable_teacher() {
-//     srand(time(NULL));
-    srand(0);
+    srand(time(NULL));
+//     srand(0);
 
     MCar prob(nbPosStep, nbVelStep);
     ActionTemplate t_atempl({MOT}, {4});
@@ -80,11 +82,14 @@ void MCarQLearn::mcar_qltable_teacher() {
     do
     {
         episod++;
-        score += mcar_qltable_teacher_run(&prob, &teacher);
+        int step = mcar_qltable_teacher_run(&prob, &teacher);
+	score += step;
 	prob.init();
-	teacher.clear_history();
+	teacher.clear_history(fs, fa);
+	
+	LOG_DEBUG("MOY : " << (float)score/episod << "\tstep : " << step );
     }
-    while(episod < 3000);
+    while(episod < 20000);
 
     LOG_DEBUG("FINAL SCORE : " << (float)score/episod);
 }

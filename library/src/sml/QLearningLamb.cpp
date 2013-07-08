@@ -69,8 +69,14 @@ DAction* QLearningLamb::learn ( DState& sp, double r, float lrate, float epsilon
     return ap;
 }
 
-void QLearningLamb::clear_history()
+void QLearningLamb::clear_history(const DState& ds, const DAction& da)
 {
+    delete s;
+    delete a;
+    
+    this->s = new DState ( ds );
+    this->a = new DState ( da );
+  
     for ( std::set< std::pair<DState* , DAction* >, HistoryComparator >::iterator it = history.begin(); it != history.end(); ++it ) {
         DState* sa = it->first;
         DAction* aa = it->second;

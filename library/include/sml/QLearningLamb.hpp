@@ -61,7 +61,7 @@ public:
     DAction* decision(DState& s);
     
     
-    void clear_history();
+    void clear_history(const DState& ds, const DAction& da);
     
 protected:
   
