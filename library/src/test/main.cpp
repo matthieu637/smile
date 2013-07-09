@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	  case "mcar_qltable_learner"_hash:
 	    m.mcar_qltable_learner();
 	    break;
-	  case "mcar_qltable_tearner"_hash:
+	  case "mcar_qltable_teacher"_hash:
 	    m.mcar_qltable_teacher(atof(argv[2]));
 	    break;
 	  case "mcar_qltable_teacher_annonce"_hash:

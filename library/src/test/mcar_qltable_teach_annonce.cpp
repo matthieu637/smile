@@ -99,14 +99,14 @@ void MCarQLearn::mcar_qltable_teacher_annonce(float cost) {
         episod++;
 	pair<int, int> stat = *mcar_qltable_teacher_annonce_run(&prob, &teacher, cost);
         int step = stat.first;
-	advicePerStep = stat.first/stat.second;
+	advicePerStep = (float)stat.first/stat.second;
 	score += step;
 	prob.init();
 	teacher.clear_history(fs, fa);
 	
 // 	LOG_DEBUG("MOY : " << (float)score/episod << "\tstep : " << step );
     }
-    while(episod < 20000);
+    while(episod < 5000);
 
     LOG((float)score/episod << " " << cost << " " << advicePerStep);
 }

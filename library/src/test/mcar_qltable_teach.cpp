@@ -89,7 +89,7 @@ void MCarQLearn::mcar_qltable_teacher(float cost) {
         pair<int, int> stat = *mcar_qltable_teacher_run(&prob, &teacher, cost);
 	int step = stat.first;
 	score += step;
-	advicePerStep = stat.first/stat.second;
+	advicePerStep = (float)stat.first/stat.second;
 	prob.init();
 	teacher.clear_history(fs, fa);
 	

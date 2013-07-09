@@ -1,20 +1,21 @@
 #!/bin/bash
 
 EXEC="../build/stest"
-#TEST="mcar_qltable_learner"
-TEST="mcar_qltable_tearner 0.007"
-#TEST="mcar_qltable_tearner_annonce 0.001"
 DATA="../data/"
 
 . job_pool.sh
 . cpu.sh
 
+function launch_test(){
+
 job_pool_init $(nbcpu) 0
 echo "start a pool of $(nbcpu) thread"
 
+TEST=$1
+fusion=$2
 test_nospace=`echo $TEST | sed -e 's/ /_/g'`
 
-for i in {1..15}
+for i in {1..30}
 do
 	job_pool_run "$EXEC $TEST > $DATA/$test_nospace.$i 2>&1"
 	./usleep 1000000
@@ -23,6 +24,25 @@ done
 job_pool_wait
 job_pool_shutdown
 
-cat $DATA/$test_nospace.* > $DATA/$test_nospace
-rm $DATA/$test_nospace.*
+if [ $fusion -eq 1 ] ; then
+	cat $DATA/$test_nospace.* > $DATA/$test_nospace
+	rm $DATA/$test_nospace.*
+fi
+
+}
+
+
+#graphA1
+#launch_test "mcar_qltable_learner" 1
+
+
+k=".001"
+incr=".001"
+end=".04"
+while [ `echo "$k <= $end" | bc` -eq 1 ]
+do
+	echo $k
+	launch_test "mcar_qltable_teacher $k" 1
+	k=`echo $k + $incr | bc`
+done
 
