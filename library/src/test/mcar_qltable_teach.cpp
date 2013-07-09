@@ -1,7 +1,7 @@
 #include "test/mcar_qlearn.hpp"
 #include <sml/QLearningLamb.hpp>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
+// CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
 
 // Standard RL parameters:
 #define epsilon 0.01                    // probability of random action
@@ -9,7 +9,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
 #define lambda 0.95                     // trace-decay parameters
 #define gamma 0.8                        // discount-rate parameters
 
-#define cost 0.0001
+// #define cost 0.0001
 
 #define nbPosStep 8
 #define nbVelStep 12
@@ -23,7 +23,7 @@ DState* getTeachState(const DState& sl, const DAction& al){
   return ts;
 }
 
-int mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher) {
+pair<int, int>* mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher, float cost) {
     DAction* ac = new DAction(&MCar::ACTION_TEMPLATE, 0);
     DAction* fac = ac;
 
@@ -56,22 +56,22 @@ int mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher) {
     while(!prob->goal_p() && step < 10000);
     
      ts = getTeachState(prob->getDState(), *ac);
-     teacher->learn(*ts, (3000-step)/*-5*nb_advise*/, alpha, 0, 0, 1, false);
+     teacher->learn(*ts, (3000-step), alpha, 0, 0, 1, false);
      delete ts;
      
      delete fac;
 
-     LOG_DEBUG("DONE WITH " << step << " advice : " << nb_advise );
+//      LOG_DEBUG("DONE WITH " << step << "\tadvice : " << nb_advise );
 
-    return step;
+    return new pair<int, int> (step, nb_advise);
 }
 
 
 
-void MCarQLearn::mcar_qltable_teacher() {
-    srand(time(NULL));
+void MCarQLearn::mcar_qltable_teacher(float cost) {
 //     srand(0);
-
+    srand(time(NULL));
+  
     MCar prob(nbPosStep, nbVelStep);
     ActionTemplate t_atempl({MOT}, {4});
     
@@ -82,21 +82,21 @@ void MCarQLearn::mcar_qltable_teacher() {
 
     int episod = 0;
     int score = 0;
+    float advicePerStep = 0L;
     do
     {
         episod++;
-        int step = mcar_qltable_teacher_run(&prob, &teacher);
+        pair<int, int> stat = *mcar_qltable_teacher_run(&prob, &teacher, cost);
+	int step = stat.first;
 	score += step;
+	advicePerStep = stat.first/stat.second;
 	prob.init();
 	teacher.clear_history(fs, fa);
 	
-	LOG_DEBUG("MOY : " << (float)score/episod << "\tstep : " << step );
+// 	LOG_DEBUG("MOY : " << (float)score/episod << "\tstep : " << step );
     }
-    while(episod < 20000);
+    while(episod < 5000);
 
-    LOG_DEBUG("FINAL SCORE : " << (float)score/episod);
+    LOG((float)score/episod << " " << cost << " " << advicePerStep);
 }
-
-
-
 

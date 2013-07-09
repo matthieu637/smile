@@ -47,3 +47,5 @@ build/
 #doc
 
 doc/
+
+library/data

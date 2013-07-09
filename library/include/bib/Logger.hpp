@@ -14,6 +14,9 @@
 #include "Singleton.hpp"
 
 
+#define LOG(stream) \
+  std::cout << stream << std::endl
+
 #define LOG_DEBUG(stream) \
   bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << "DEBUG :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
 

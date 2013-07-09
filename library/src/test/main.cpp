@@ -1,52 +1,57 @@
-#include <cppunit/BriefTestProgressListener.h>
-#include <cppunit/CompilerOutputter.h>
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/TestResult.h>
-#include <cppunit/TestResultCollector.h>
-#include <cppunit/TestRunner.h>
-#include <cppunit/XmlOutputter.h>
 #include <test/mcar_qlearn.hpp>
+#include "bib/Logger.hpp"
+
+// FNV-1a constants
+static constexpr unsigned long long basis = 14695981039346656037ULL;
+static constexpr unsigned long long prime = 1099511628211ULL;
+ 
+// compile-time hash helper function
+constexpr unsigned long long hash_one(char c, const char* remain, unsigned long long value)
+{
+    return c == 0 ? value : hash_one(remain[0], remain + 1, (value ^ c) * prime);
+}
+ 
+// compile-time hash
+constexpr unsigned long long hash_(const char* str)
+{
+    return hash_one(str[0], str + 1, basis);
+}
+ 
+// run-time hash
+unsigned long long hash_rt(const char* str) {
+    unsigned long long hash = basis;
+    while (*str != 0) {
+        hash ^= str[0];
+        hash *= prime;
+        ++str;
+    }
+    return hash;
+}
+constexpr long long operator"" _hash( const char* str, size_t n ) {
+    return hash_( str );
+}
 
 
 int main(int argc, char* argv[])
 {
-    if(false) {
-// Retrieve test path from command line first argument. Default to "" which resolve
-// to the top level suite.
-        std::string testPath = (argc > 1) ? std::string(argv[1]) : std::string("");
 
-// Create the event manager and test controller
-        CPPUNIT_NS::TestResult controller;
+    MCarQLearn m;
+    if(argc > 1 ) {
 
-// Add a listener that collects test result
-        CPPUNIT_NS::TestResultCollector result;
-        controller.addListener(&result);
-
-// Add a listener that print dots as test run.
-        CPPUNIT_NS::BriefTestProgressListener progress;
-        controller.addListener(&progress);
-
-// Add the top suite to the test runner
-        CPPUNIT_NS::TestRunner runner;
-        runner.addTest(CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest());
-        runner.run(controller);
-
-// Print test in a compiler compatible format.
-        CPPUNIT_NS::CompilerOutputter outputter(&result, CPPUNIT_NS::stdCOut());
-        outputter.write();
-
-// Uncomment this for XML output
-        std::ofstream file("cppunit-report.xml");
-
-        CPPUNIT_NS::XmlOutputter xml(&result, file);
-        xml.write();
-        file.close();
-
-        return result.wasSuccessful() ? 0 : 1;
-    } else {
-        MCarQLearn m;
- 	m.mcar_qltable_teacher();
-// 	m.mcar_qltable_teacher_annonce();
-// 	m.mcar_qltable_learner();
+        switch(hash_(argv[1])) {
+	  case "mcar_qltable_learner"_hash:
+	    m.mcar_qltable_learner();
+	    break;
+	  case "mcar_qltable_tearner"_hash:
+	    m.mcar_qltable_teacher(atof(argv[2]));
+	    break;
+	  case "mcar_qltable_teacher_annonce"_hash:
+	    m.mcar_qltable_teacher_annonce(atof(argv[2]));
+	    break;
+        }
     }
+    else {
+
+    }
+
 }

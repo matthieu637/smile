@@ -1,7 +1,7 @@
 #include "test/mcar_qlearn.hpp"
 #include <sml/QLearningLamb.hpp>
 
-CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
+// CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
 
 // Standard RL parameters:
 #define epsilon 0.01                    // probability of random action
@@ -21,7 +21,7 @@ DState* getTeachState_annonce(const DState& sl, const DAction& al){
   return ts;
 }
 
-int mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* teacher) {
+pair<int, int>*  mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* teacher, float cost) {
     DAction* ac = new DAction(&MCar::ACTION_TEMPLATE, 0);
     DAction* fac = ac;
 
@@ -31,6 +31,7 @@ int mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* teacher) {
     int step = 0;
     int nb_advise = 0;
     bool del_ac = false;
+    bool have_advise = false;
     do
     {
         step++;
@@ -44,7 +45,7 @@ int mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* teacher) {
 	del_ac = false;
 	
 	ts = getTeachState_annonce(dst, *ac);
-	DAction* tac = teacher->learn(*ts, -1, alpha, epsilon, gamma, lambda, false);
+	DAction* tac = teacher->learn(*ts, have_advise?-10*(1 + cost):-10, alpha, epsilon, gamma, lambda, false);
 	
 	int aa = tac->get(MOT);
 	if( aa != 3 && aa != ac->get(MOT)){
@@ -52,7 +53,11 @@ int mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* teacher) {
 	  delete ac;
 	  ac = tac;
 	  nb_advise++;
-	} else del_ac = true;
+	  have_advise = true;
+	} else {
+	  del_ac = true;
+	  have_advise = false;
+	}
 	
         delete ts;
     }
@@ -67,14 +72,14 @@ int mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* teacher) {
      if(del_ac)
        delete ac;
 
-     LOG_DEBUG("DONE WITH " << step << " advice : " << nb_advise );
+//      LOG_DEBUG("DONE WITH " << step << " advice : " << nb_advise );
 
-    return step;
+    return new pair<int, int> (step, nb_advise);
 }
 
 
 
-void MCarQLearn::mcar_qltable_teacher_annonce() {
+void MCarQLearn::mcar_qltable_teacher_annonce(float cost) {
     srand(time(NULL));
 //     srand(0);
 
@@ -88,19 +93,22 @@ void MCarQLearn::mcar_qltable_teacher_annonce() {
 
     int episod = 0;
     int score = 0;
+    float advicePerStep = 0L;
     do
     {
         episod++;
-        int step = mcar_qltable_teacher_annonce_run(&prob, &teacher);
+	pair<int, int> stat = *mcar_qltable_teacher_annonce_run(&prob, &teacher, cost);
+        int step = stat.first;
+	advicePerStep = stat.first/stat.second;
 	score += step;
 	prob.init();
 	teacher.clear_history(fs, fa);
 	
-	LOG_DEBUG("MOY : " << (float)score/episod << "\tstep : " << step );
+// 	LOG_DEBUG("MOY : " << (float)score/episod << "\tstep : " << step );
     }
     while(episod < 20000);
 
-    LOG_DEBUG("FINAL SCORE : " << (float)score/episod);
+    LOG((float)score/episod << " " << cost << " " << advicePerStep);
 }
 
 

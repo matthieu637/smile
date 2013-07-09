@@ -9,7 +9,8 @@
 #define gamma 1.5                        // discount-rate parameters
 
 
-int mcar_qltable_run() {
+void MCarQLearn::mcar_qltable_learner() {
+    srand(time(NULL));
 
     MCar prob(8,12);
     DAction* ac = new DAction(&prob.ACTION_TEMPLATE, 0);
@@ -33,22 +34,5 @@ int mcar_qltable_run() {
     
     delete fac;
 
-    return step;
+    LOG(step);
 }
-
-void MCarQLearn::mcar_qltable_learner() {
-    srand(time(NULL));
-    int episod = 0;
-    int score = 0;
-    
-    do
-    {
-        episod++;
-        score += mcar_qltable_run();
-    }
-    while(episod < 1000);
-
-    LOG_DEBUG("FINAL SCORE : " << (float)score/episod);
-    
-}
-

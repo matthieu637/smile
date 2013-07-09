@@ -10,21 +10,15 @@
 using namespace simu;
 using namespace sml;
 
-class MCarQLearn : public CppUnit::TestFixture
+class MCarQLearn
 {
-    CPPUNIT_TEST_SUITE(MCarQLearn);
-    
-    CPPUNIT_TEST(mcar_qltable_learner);
-    CPPUNIT_TEST(mcar_qltable_teacher);
-
-    CPPUNIT_TEST_SUITE_END();
-
+  
 public: 
     void mcar_qltable_learner();
     
-    void mcar_qltable_teacher();
+    void mcar_qltable_teacher(float cost);
     
-    void mcar_qltable_teacher_annonce();
+    void mcar_qltable_teacher_annonce(float cost);
     
 private:
     
