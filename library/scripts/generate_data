@@ -6,6 +6,11 @@ DATA="../data/"
 . job_pool.sh
 . cpu.sh
 
+if [ -e $DATA ] ;
+	mkdir $DATA
+	mkdir $DATA/graphs
+fi
+
 function launch_test(){
 
 job_pool_init $(nbcpu) 0

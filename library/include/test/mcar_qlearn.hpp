@@ -1,9 +1,6 @@
 #ifndef MCAR_QLEARN_HPP
 #define MCAR_QLEARN_HPP
 
-#include <cppunit/TestFixture.h>
-#include <cppunit/extensions/HelperMacros.h>
-
 #include "sml/QLearning.hpp"
 #include "simu/MCar.hpp"
 
