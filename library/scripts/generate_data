@@ -1,20 +1,32 @@
 #!/bin/bash
 
 EXEC="../build/stest"
-DATA="../data/"
+DATA="../data"
 
 . job_pool.sh
-. cpu.sh
 
-if [ -e $DATA ] ;
+if [ $# -eq 1 ]; then
+	CPU=$1
+else
+	. cpu.sh
+	CPU=$(nbcpu)
+fi
+
+if [ ! -e $DATA ] ; then
+	echo "create data dir"
 	mkdir $DATA
 	mkdir $DATA/graphs
 fi
 
+if [ ! -e $EXEC ] ; then
+	echo "cannot find executable"
+	exit 1
+fi
+
 function launch_test(){
 
-job_pool_init $(nbcpu) 0
-echo "start a pool of $(nbcpu) thread"
+job_pool_init $CPU 0
+echo "start a pool of $CPU thread"
 
 TEST=$1
 fusion=$2
@@ -44,10 +56,19 @@ fi
 k=".001"
 incr=".001"
 end=".04"
+
+#while [ `echo "$k <= $end" | bc` -eq 1 ]
+#do
+#	echo $k
+#	launch_test "mcar_qltable_teacher $k" 1
+#	k=`echo $k + $incr | bc`
+#done
+
+
 while [ `echo "$k <= $end" | bc` -eq 1 ]
 do
 	echo $k
-	launch_test "mcar_qltable_teacher $k" 1
+	launch_test "mcar_qltable_teacher_annonce $k" 1
 	k=`echo $k + $incr | bc`
 done
 
