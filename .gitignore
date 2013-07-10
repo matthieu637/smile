@@ -49,3 +49,5 @@ build/
 doc/
 
 library/data
+
+octave-core

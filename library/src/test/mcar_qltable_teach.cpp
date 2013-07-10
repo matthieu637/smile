@@ -9,8 +9,6 @@
 #define lambda 0.95                     // trace-decay parameters
 #define gamma 0.8                        // discount-rate parameters
 
-// #define cost 0.0001
-
 #define nbPosStep 8
 #define nbVelStep 12
 
@@ -46,7 +44,7 @@ pair<int, int>* mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher, flo
 
 	int aa = tac->get(MOT);
 	if( aa != 3){
-	  learner.should_done(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 1, alpha);
+	  learner.should_done(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 100, alpha);
 	  have_advise = true;
 	  nb_advise++;
 	} else have_advise = false;
@@ -61,7 +59,7 @@ pair<int, int>* mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher, flo
      
      delete fac;
 
-//      LOG_DEBUG("DONE WITH " << step << "\tadvice : " << nb_advise );
+      LOG_DEBUG("DONE WITH " << step << "\tadvice : " << nb_advise );
 
     return new pair<int, int> (step, nb_advise);
 }

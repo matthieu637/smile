@@ -49,7 +49,7 @@ pair<int, int>*  mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* tea
 	
 	int aa = tac->get(MOT);
 	if( aa != 3 && aa != ac->get(MOT)){
-	  learner.should_do(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 1, alpha, gamma);
+	  learner.should_do(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 100, alpha, gamma);
 	  delete ac;
 	  ac = tac;
 	  nb_advise++;

@@ -51,7 +51,8 @@ int main(int argc, char* argv[])
         }
     }
     else {
-
+      m.mcar_qltable_teacher(0.5);
+      m.mcar_qltable_teacher_annonce(0.5);
     }
 
 }
