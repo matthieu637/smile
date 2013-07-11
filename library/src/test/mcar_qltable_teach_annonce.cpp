@@ -16,9 +16,9 @@
 
 // const StateTemplate MCarQLearn::t_stempl({POS, VEL, MOT},{nbPosStep, nbVelStep, 3});
 
-DState* getTeachState_annonce(const DState& sl, const DAction& al){
-  DState* ts = new DState(&MCarQLearn::t_stempl, {sl[POS], sl[VEL], al[MOT]});
-  return ts;
+DState* getTeachState_annonce(const DState& sl, const DAction& al) {
+    DState* ts = new DState(&MCarQLearn::t_stempl, {sl[POS], sl[VEL], al[MOT]});
+    return ts;
 }
 
 pair<int, int>*  mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* teacher, float cost) {
@@ -37,40 +37,40 @@ pair<int, int>*  mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* tea
         step++;
         prob->step(*ac);
         DState dst = prob->getDState();
-	
-	if(del_ac) 
-	  delete ac;
-	
-	ac = learner.decision(dst);
-	del_ac = false;
-	
-	ts = getTeachState_annonce(dst, *ac);
-	DAction* tac = teacher->learn(*ts, have_advise?-10*(1 + cost):-10, alpha, epsilon, gamma, lambda, false);
-	
-	int aa = tac->get(MOT);
-	if( aa != 3 && aa != ac->get(MOT)){
-	  learner.should_do(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 100, alpha, gamma);
-	  delete ac;
-	  ac = tac;
-	  nb_advise++;
-	  have_advise = true;
-	} else {
-	  del_ac = true;
-	  have_advise = false;
-	}
-	
+
+        if(del_ac)
+            delete ac;
+
+        ac = learner.decision(dst);
+        del_ac = false;
+
+        ts = getTeachState_annonce(dst, *ac);
+        DAction* tac = teacher->learn(*ts, have_advise?-10*(1 + cost):-10, alpha, epsilon, gamma, lambda, false);
+
+        int aa = tac->get(MOT);
+        if( aa != 3 && aa != ac->get(MOT)) {
+            learner.should_do(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 100, alpha, gamma);
+            delete ac;
+            ac = tac;
+            nb_advise++;
+            have_advise = true;
+        } else {
+            del_ac = true;
+            have_advise = false;
+        }
+
         delete ts;
     }
     while(!prob->goal_p() && step < 10000);
-    
-     ts = getTeachState_annonce(prob->getDState(), *ac);
-     teacher->learn(*ts, 3000-step, alpha, 0, 0, 1, false);
-     delete ts;
-     
-     delete fac;
-     
-     if(del_ac)
-       delete ac;
+
+    ts = getTeachState_annonce(prob->getDState(), *ac);
+    teacher->learn(*ts, 3000-step, alpha, 0, 0, 1, false);
+    delete ts;
+
+    delete fac;
+
+    if(del_ac)
+        delete ac;
 
 //      LOG_DEBUG("DONE WITH " << step << " advice : " << nb_advise );
 
@@ -84,8 +84,8 @@ void MCarQLearn::mcar_qltable_teacher_annonce(float cost) {
 //     srand(0);
 
     MCar prob(nbPosStep, nbVelStep);
-    ActionTemplate t_atempl({MOT}, {4});
-    
+    ActionTemplate t_atempl( {MOT}, {4});
+
     const DState& tmp = prob.getDState();
     DState fs(&MCarQLearn::t_stempl, {tmp[POS], tmp[VEL], 2});
     DAction fa(&t_atempl, 3);
@@ -97,13 +97,13 @@ void MCarQLearn::mcar_qltable_teacher_annonce(float cost) {
     do
     {
         episod++;
-	pair<int, int> stat = *mcar_qltable_teacher_annonce_run(&prob, &teacher, cost);
+        pair<int, int> stat = *mcar_qltable_teacher_annonce_run(&prob, &teacher, cost);
         int step = stat.first;
-	advicePerStep = (float)stat.first/stat.second;
-	score += step;
-	prob.init();
-	teacher.clear_history(fs, fa);
-	
+        advicePerStep = (float)stat.first/stat.second;
+        score += step;
+        prob.init();
+        teacher.clear_history(fs, fa);
+
 // 	LOG_DEBUG("MOY : " << (float)score/episod << "\tstep : " << step );
     }
     while(episod < 5000);

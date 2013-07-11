@@ -2,6 +2,7 @@
 #define MCAR_HPP
 
 #include "sml/Action.hpp"
+#include "simu/Environnement.hpp"
 
 ///
 ///\file MCar.hpp
@@ -15,7 +16,7 @@ using namespace sml;
 
 namespace simu {
 
-class MCar {
+class MCar : public Environnement {
 
 #define POS "position"
 #define VEL "velocity"
@@ -42,6 +43,10 @@ public:
     const DState& getDState() const;
     bool goal_p () const;                   // is car at goal?
     void init();                      // initialize car state
+    
+    double reward() const;
+    const sml::ActionTemplate* getActions() const;
+    DAction* getInitialAction() const;
 
 private:
     void computeDState();

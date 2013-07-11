@@ -59,7 +59,7 @@ pair<int, int>* mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher, flo
      
      delete fac;
 
-      LOG_DEBUG("DONE WITH " << step << "\tadvice : " << nb_advise );
+//       LOG_DEBUG("DONE WITH " << step << "\tadvice : " << nb_advise );
 
     return new pair<int, int> (step, nb_advise);
 }

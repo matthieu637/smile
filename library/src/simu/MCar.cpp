@@ -58,6 +58,18 @@ void MCar::step(const DAction& ac)
     computeDState();
 }
 
+double MCar::reward() const {
+    return -1.;
+}
+
+const sml::ActionTemplate* MCar::getActions() const{
+    return &MCar::ACTION_TEMPLATE;
+}
+
+DAction* MCar::getInitialAction() const{
+    return new DAction(getActions(), 1);
+}
+
 const DState& MCar::getDState() const {
     return *dst;
 }
