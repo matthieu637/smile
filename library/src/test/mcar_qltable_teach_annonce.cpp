@@ -61,7 +61,7 @@ pair<int, int>*  mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* tea
 
         delete ts;
     }
-    while(!prob->goal_p() && step < 10000);
+    while(!prob->goal() && step < 10000);
 
     ts = getTeachState_annonce(prob->getDState(), *ac);
     teacher->learn(*ts, 3000-step, alpha, 0, 0, 1, false);

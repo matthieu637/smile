@@ -28,7 +28,7 @@ void MCarQLearn::mcar_qltable_learner() {
         
 //      LOG_DEBUG("etat " << dst << " action " << *ac << " ");
     }
-    while(!prob.goal_p());
+    while(!prob.goal());
 
 //     LOG_DEBUG("DONE WITH " << step );
     

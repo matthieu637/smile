@@ -16,7 +16,12 @@ using namespace sml;
 
 namespace simu {
 
-class MCar : public Environnement {
+struct MCarState {
+    float position;
+    float velocity;
+};  
+  
+class MCar : public Environnement<int> {
 
 #define POS "position"
 #define VEL "velocity"
@@ -28,30 +33,26 @@ class MCar : public Environnement {
 #define mcar_goal_position 0.5
 
 public:
-    struct State {
-        float position;
-        float velocity;
-    };
+
 
     MCar(int nbPosStep, int nbVelStep);
     MCar();
     ~MCar();
 
     void step(const DAction& ac);                 // update car state for given action
-
-    const State& getState() const;
-    const DState& getDState() const;
-    bool goal_p () const;                   // is car at goal?
+    
     void init();                      // initialize car state
     
     double reward() const;
     const sml::ActionTemplate* getActions() const;
     DAction* getInitialAction() const;
+    bool goal() const;
+    unsigned int maxStep() const;
 
 private:
     void computeDState();
   
-    State st;
+    MCarState st;
     DState* dst;
 public:
     const static ActionTemplate ACTION_TEMPLATE;

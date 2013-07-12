@@ -19,11 +19,6 @@ MCar::MCar(int nbPosStep, int nbVelStep)
     init();
 }
 
-MCar::MCar()
-{
-    init();
-}
-
 MCar::~MCar(){
     delete stempl;
     delete dst;
@@ -70,23 +65,17 @@ DAction* MCar::getInitialAction() const{
     return new DAction(getActions(), 1);
 }
 
-const DState& MCar::getDState() const {
-    return *dst;
+bool MCar::goal() const{
+    return st.position >= mcar_goal_position;
+}
+
+unsigned int MCar::maxStep() const{
+    return 5000;
 }
 
 void MCar::computeDState() {
     dst->set(POS, round(Utils::transform(st.position, mcar_min_position, mcar_max_position, 0, stempl->actionNumber(POS) -1)));
     dst->set(VEL, round(Utils::transform(st.velocity, -mcar_max_velocity, mcar_max_velocity, 0, stempl->actionNumber(VEL) -1)));
-}
-
-const MCar::State& MCar::getState() const{
-  return st;
-}
-
-bool MCar::goal_p () const
-// Is Car within goal region?
-{
-    return st.position >= mcar_goal_position;
 }
 
 }
