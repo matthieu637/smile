@@ -16,7 +16,7 @@ QLearningLamb::~QLearningLamb(){
     delete a;
 }
 
-DAction* QLearningLamb::learn ( DState& sp, double r, float lrate, float epsilon, float discount, float lambda, bool accumulative )
+DAction* QLearningLamb::learn (const DState& sp, double r, float lrate, float epsilon, float discount, float lambda, bool accumulative )
 {
     //Take action a, observe r, s'
 
@@ -25,10 +25,8 @@ DAction* QLearningLamb::learn ( DState& sp, double r, float lrate, float epsilon
     //if a' ties for the max, then a* <- a'
     DAction* ap = as;
     if ( sml::Utils::rand01() < epsilon ) {
-        ap = new DAction ( atmp, rand() % ( int ) atmp->sizeNeeded() ); //TODO:memory
+        ap = new DAction ( atmp, rand() % ( int ) atmp->sizeNeeded() );
     }
-
-
 
     double delta = r + discount*Q ( sp, *as ) - Q ( s,a );
     if ( accumulative )

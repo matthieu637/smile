@@ -41,7 +41,7 @@ public:
 ///       conf : la configuration d'apprentissage
     QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf={false, 0, 0});
     
-    ~QLearningLamb();
+    virtual  ~QLearningLamb();
     
 ///
 ///\brief Retourner l'action à faire selon l'algorithme avec l'historique de QLearning
@@ -52,7 +52,7 @@ public:
 ///	  discount : importance du prochain état de la récompense 
 ///	  lambda : importance de l'historique
 ///	  accumulative : si les traces est accumulative ou non
-    DAction* learn(DState& s, double r, float lrate, float epsilon, float discount, float lambda, bool accumulative);
+    DAction* learn(const DState& s, double r, float lrate, float epsilon, float discount, float lambda, bool accumulative);
  
     
 ///

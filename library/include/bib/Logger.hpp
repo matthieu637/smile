@@ -11,11 +11,12 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <list>
 #include "Singleton.hpp"
 
 
 #define LOG(stream) \
-  std::cout << stream << std::endl
+   bib::Logger::getInstance()->isBufferEnable() ? bib::Logger::getInstance()->registerBuffer() << stream : std::cout << stream << std::endl
 
 #define LOG_DEBUG(stream) \
   bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << "DEBUG :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
@@ -47,9 +48,32 @@ class Logger : public Singleton<Logger> {
 
 public:
     enum LogLevel { DEBUGGING, INFO, WARNING, ERROR };
+    
+    std::stringstream& registerBuffer(){
+	std::stringstream* n = new std::stringstream;
+ 	buff.push_back(n);
+	return *n;
+    }
+    
+    void flushBuffer(){
+	for(std::list<std::stringstream*>::iterator it = buff.begin();it != buff.end();++it){
+	    std::cout << (*it)->str() << " " ;
+	    delete *it;
+	}
+	std::cout << std::endl;
+	buff.clear();
+    }
+    
+    void enableBuffer(){
+	enable_buffer = true;
+    }
 
     bool isEnabled(LogLevel l) {
         return level <= l;
+    }
+    
+    bool isBufferEnable(){
+	return enable_buffer;
     }
 
     void setLevel(LogLevel l) {
@@ -83,6 +107,10 @@ protected:
 
 private :
     LogLevel level;
+    
+    bool enable_buffer = false;
+    std::list<std::stringstream*> buff;
+    unsigned int buffer_index = 0;
 };
 
 }

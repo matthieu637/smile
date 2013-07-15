@@ -25,7 +25,7 @@ public:
 ///       conf : la configuration d'apprentissage
     QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf={false,0,0});
     
-    ~QLearning();
+    virtual ~QLearning();
     
 ///
 ///\brief Retourner l'action à faire selon l'algorithme de QLearning

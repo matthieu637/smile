@@ -1,5 +1,6 @@
 #include "test/mcar_qlearn.hpp"
 #include <sml/QLearningLamb.hpp>
+#include "test/MCarQLTableT.hpp"
 
 // CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
 
@@ -51,7 +52,7 @@ pair<int, int>* mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher, flo
 	
         delete ts;
     }
-    while(!prob->goal() && step < 10000);
+    while(!prob->goal() && step < 5000);
     
      ts = getTeachState(prob->getDState(), *ac);
      teacher->learn(*ts, (3000-step), alpha, 0, 0, 1, false);

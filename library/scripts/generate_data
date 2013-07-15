@@ -30,12 +30,14 @@ echo "start a pool of $CPU thread"
 
 TEST=$1
 fusion=$2
+nbtest=$3
+
 test_nospace=`echo $TEST | sed -e 's/ /_/g'`
 
-for i in {1..30}
+for i in $(seq 1 1 ${nbtest})
 do
 	job_pool_run "$EXEC $TEST > $DATA/$test_nospace.$i 2>&1"
-	./usleep 1000000
+	./usleep 10000
 done
 
 job_pool_wait
@@ -50,25 +52,25 @@ fi
 
 
 #graphA1
-#launch_test "mcar_qltable_learner" 1
+launch_test "mcar_qltable_learner" 1 3000
 
 
-k=".001"
-incr=".001"
-end=".04"
-
-#while [ `echo "$k <= $end" | bc` -eq 1 ]
-#do
-#	echo $k
-#	launch_test "mcar_qltable_teacher $k" 1
-#	k=`echo $k + $incr | bc`
-#done
-
-
-while [ `echo "$k <= $end" | bc` -eq 1 ]
-do
-	echo $k
-	launch_test "mcar_qltable_teacher_annonce $k" 1
-	k=`echo $k + $incr | bc`
-done
+# k=".001"
+# incr=".001"
+# end=".04"
+# 
+# #while [ `echo "$k <= $end" | bc` -eq 1 ]
+# #do
+# #	echo $k
+# #	launch_test "mcar_qltable_teacher $k" 1
+# #	k=`echo $k + $incr | bc`
+# #done
+# 
+# 
+# while [ `echo "$k <= $end" | bc` -eq 1 ]
+# do
+# 	echo $k
+# 	launch_test "mcar_qltable_teacher_annonce $k" 1
+# 	k=`echo $k + $incr | bc`
+# done
 

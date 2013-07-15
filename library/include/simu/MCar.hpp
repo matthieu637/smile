@@ -1,7 +1,6 @@
 #ifndef MCAR_HPP
 #define MCAR_HPP
 
-#include "sml/Action.hpp"
 #include "simu/Environnement.hpp"
 
 ///
@@ -19,7 +18,7 @@ namespace simu {
 struct MCarState {
     float position;
     float velocity;
-};  
+};
   
 class MCar : public Environnement<MCarState> {
 

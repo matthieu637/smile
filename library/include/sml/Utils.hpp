@@ -31,6 +31,7 @@ public :
 ///	  c,d: intervalle [c,d]
     static double transform(double x, double a, double b, double c, double d);
 
+    static time_t srand_mili(bool zero=false);
 
 };
 

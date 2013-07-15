@@ -6,10 +6,10 @@ project(SmileLib CXX C)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 find_package(Boost COMPONENTS system serialization filesystem REQUIRED)
-find_package(Threads)
+find_package(Threads) #semaphore
 # find_package(CppUnit)
 
-include_directories(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS} ) # ${CPPUNIT_INCLUDE_DIR} )
+include_directories(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS} ${CPPUNIT_INCLUDE_DIR} )
 
 
 file ( GLOB_RECURSE sources src/bib/*.cpp include/bib/*.hpp src/sml/*.cpp include/sml/*.hpp )
@@ -28,9 +28,10 @@ endif()
 
 target_link_libraries(smile ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_executable(stest ${sources_test} ${sources})
-target_link_libraries(stest ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ) # ${CPPUNIT_LIBRARIES})
-
 if(CMAKE_BUILD_TYPE MATCHES Debug)
   set_target_properties(smile PROPERTIES DEBUG_POSTFIX -d)
 endif()
+
+add_executable(stest ${sources_test} ${sources})
+target_link_libraries(stest ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ) # ${CPPUNIT_LIBRARIES})
+

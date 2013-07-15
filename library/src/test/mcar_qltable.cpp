@@ -1,38 +1,22 @@
 #include "test/mcar_qlearn.hpp"
-
-// CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
-
-// Standard RL parameters:
-#define epsilon 0.01                    // probability of random action
-#define alpha 0.5                      // step size parameter
-#define lambda 0.9                     // trace-decay parameters
-#define gamma 1.5                        // discount-rate parameters
+#include <test/MCarQLTable.hpp>
+#include <sml/Utils.hpp>
 
 
 void MCarQLearn::mcar_qltable_learner() {
-    srand(time(NULL));
-
-    MCar prob(8,12);
-    DAction* ac = new DAction(prob.getActions(), 0);
-    DAction* fac = ac;
-
-    QLearning ql(prob.getStates(), prob.getActions() , *ac, prob.getDState() );
-
-    int step = 0;
-    do
-    {
-        step++;
-        prob.apply(*ac);
-	
-        ac = ql.learn(prob.getDState(), -1, alpha, epsilon, gamma);
-        
-//      LOG_DEBUG("etat " << dst << " action " << *ac << " ");
-    }
-    while(!prob.goal());
-
-//     LOG_DEBUG("DONE WITH " << step );
+    time_t s = Utils::srand_mili();
+//     Utils::srand_mili(0);
     
-    delete fac;
+//     bib::Logger::getInstance()->enableBuffer();
 
-    LOG(step);
+    test::MCarQLTable m(true);
+    m.run();
+
+    srand(s);
+
+    test::MCarQLTable m2(false);
+    m2.run();
+    m2.keepRun(1000);
+    
+    bib::Logger::getInstance()->flushBuffer();
 }

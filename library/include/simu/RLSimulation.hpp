@@ -1,18 +1,8 @@
-/*
- *
- */
-
 #ifndef RLSimulation_HPP
 #define RLSimulation_HPP
 
 #include "simu/MCar.hpp"
 #include "bib/Logger.hpp"
-
-// Standard RL parameters:
-#define epsilon 0.01                    // probability of random action
-#define alpha 0.5                      // step size parameter
-#define lambda 0.9                     // trace-decay parameters
-#define gamma 0.8                        // discount-rate parameters
 
 namespace simu {
 
@@ -21,8 +11,7 @@ class RLSimulation
 {
 
 public:
-    RLSimulation() {
-        prob = new MCar(8,12);
+    RLSimulation(Environnement<State>* prob):prob(prob) {
         fac = prob->getInitialAction();;
     }
 
@@ -31,36 +20,58 @@ public:
         delete prob;
     }
 
-    void run() {
+    int run() {
         this->createAgent(prob->getDState(), prob->getState(), *fac);
 
-        DAction* ac;
+	return local_run();
+    }
+
+    int keepRun(int additional_step) {
+      
+	prob->init();
+	int min_step = local_run();
+	
+	do{
+	    additional_step--;
+	    prob->init();
+	    int score = local_run();
+	    if(score < min_step)
+	      min_step = score;
+	}
+	while(additional_step > 0);
+	
+	LOG(min_step);
+	
+	return min_step;
+    }
+    
+private:
+    int local_run(){
+      	DAction* ac = fac;
         int step = 0;
+        double total_reward = 0;
         do
         {
             step++;
             prob->apply(*ac);
+            total_reward += prob->reward();
 
-//    	ac = this->step(prob->getDState(), prob->getState(), prob->reward());
-//         ac = ql.learn(prob.getDState(), -1, alpha, epsilon, gamma);
-
-//      LOG_DEBUG("etat " << dst << " action " << *ac << " ");
+            ac = this->step(prob->getDState(), prob->getState(), prob->reward());
         }
-        while(!prob->goal() && step < prob->maxStep());
+        while(!prob->goal() && step < (int)prob->maxStep());
 
-        LOG(step);
+        LOG(step<< " " << total_reward);
+	
+	return step;
     }
 
 protected:
-    virtual void createAgent(const DState& dst, const MCarState& st, const DAction& a) = 0;
-    virtual DAction* step() = 0;
-    //virtual void
-
+    virtual void createAgent(const DState& dst, const State& st, const DAction& a) = 0;
+    virtual DAction* step(const DState& dst, const State& st, double reward) = 0;
 
 protected:
-    MCar* prob;
+    Environnement<State>* prob;
     DAction* fac;
-
 };
 
 }
