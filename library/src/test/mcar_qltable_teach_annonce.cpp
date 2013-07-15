@@ -22,10 +22,10 @@ DState* getTeachState_annonce(const DState& sl, const DAction& al) {
 }
 
 pair<int, int>*  mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* teacher, float cost) {
-    DAction* ac = new DAction(&MCar::ACTION_TEMPLATE, 0);
+    DAction* ac = new DAction(prob->getActions(), 0);
     DAction* fac = ac;
 
-    QLearning learner(prob->stempl, &MCar::ACTION_TEMPLATE , *ac, prob->getDState() );
+    QLearning learner(prob->getStates(), prob->getActions() , *ac, prob->getDState() );
     DState* ts;
 
     int step = 0;
@@ -35,7 +35,7 @@ pair<int, int>*  mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* tea
     do
     {
         step++;
-        prob->step(*ac);
+        prob->apply(*ac);
         DState dst = prob->getDState();
 
         if(del_ac)
@@ -49,7 +49,7 @@ pair<int, int>*  mcar_qltable_teacher_annonce_run(MCar* prob, QLearningLamb* tea
 
         int aa = tac->get(MOT);
         if( aa != 3 && aa != ac->get(MOT)) {
-            learner.should_do(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 100, alpha, gamma);
+            learner.should_do(dst, DAction(prob->getActions(), {aa}));
             delete ac;
             ac = tac;
             nb_advise++;

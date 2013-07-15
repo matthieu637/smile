@@ -5,37 +5,67 @@
 
 namespace simu {
 
+using namespace sml;
+
 template <typename State>
 class Environnement
 {
 public:
-    virtual sml::DAction* getInitialAction() const = 0;
+    virtual DAction* getInitialAction() const = 0;
     virtual double reward() const = 0;
-    virtual const sml::ActionTemplate* getActions() const = 0;
     virtual bool goal() const = 0;
     virtual unsigned int maxStep() const = 0;
+protected:
+    virtual void applyOn(const DAction& ac) = 0;
+    virtual void computeDState() = 0;
+    virtual void initState() = 0;
 
-    Environnement(){
-	state = new State;
-// 	dstate = new DState();
+    
+public:
+    Environnement(const StateTemplate* st, const ActionTemplate* at):stempl(st), atempl(at) {
+        state = new State;
+        dstate = new DState(stempl, 0);
+    }
+
+    virtual ~Environnement() {
+        delete state;
+        delete dstate;
+        delete atempl;
+        delete stempl;
     }
     
-    virtual ~Environnement(){
-      delete state;
-      delete dstate;
+    void apply(const DAction& ac){
+	applyOn(ac);
+	computeDState();
     }
     
-    const State& getState() const{
-	return *state;
+    void init(){
+	initState();
+	computeDState();
+    }
+
+    const State& getState() const {
+        return *state;
+    }
+
+    const DState& getDState() const {
+        return *dstate;
+    }
+
+    const sml::ActionTemplate* getActions() const {
+        return atempl;
     }
     
-    const sml::DState& getDState() const{
-	return *dstate;
+    const sml::StateTemplate* getStates() const {
+	return stempl;
     }
-    
+
 protected:
     State* state;
-    sml::DState* dstate;
+    DState* dstate;
+
+    const StateTemplate* stempl;
+    const ActionTemplate* atempl;
 };
 
 }

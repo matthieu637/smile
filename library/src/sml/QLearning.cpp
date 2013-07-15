@@ -39,9 +39,9 @@ DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon,
     return a;
 }
 
-void QLearning::should_done(const DState& s, const DAction& a, double r, float lrate)
+void QLearning::should_done(const DState& s, const DAction& a)
 {
-    Q(s,a) = r;
+    Q(s,a) = 10000;
 }
 
 DAction* QLearning::decision(const DState& s, float epsilon) {
@@ -51,10 +51,10 @@ DAction* QLearning::decision(const DState& s, float epsilon) {
     return Q.argmax(s);
 }
 
-void QLearning::should_do(const DState& s, const DAction& a, double r, float lrate, float discount){
+void QLearning::should_do(const DState& s, const DAction& a){
 //     DAction *ap = Q.argmax(s);
 //     Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(s, *ap) - Q(ds, da) );
-    Q(s,a)=r;
+    Q(s,a)= 10000;
     
 //     delete ap;
     delete ds;

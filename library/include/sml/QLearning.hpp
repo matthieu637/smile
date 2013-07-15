@@ -42,8 +42,8 @@ public:
     DAction* decision(const DState& s, float epsilon=0.L);
     
     
-    void should_done(const DState& s, const DAction& a, double r, float lrate);
-    void should_do(const DState& s, const DAction& a, double r, float lrate, float discount);
+    void should_done(const DState& s, const DAction& a);
+    void should_do(const DState& s, const DAction& a);
     
 protected:
 

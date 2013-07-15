@@ -22,10 +22,10 @@ DState* getTeachState(const DState& sl, const DAction& al){
 }
 
 pair<int, int>* mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher, float cost) {
-    DAction* ac = new DAction(&MCar::ACTION_TEMPLATE, 0);
+    DAction* ac = new DAction(prob->getActions(), 0);
     DAction* fac = ac;
 
-    QLearning learner(prob->stempl, &MCar::ACTION_TEMPLATE , *ac, prob->getDState() );
+    QLearning learner(prob->getStates(), prob->getActions() , *ac, prob->getDState() );
     DState* ts;
 
     int step = 0;
@@ -34,7 +34,7 @@ pair<int, int>* mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher, flo
     do
     {
         step++;
-        prob->step(*ac);
+        prob->apply(*ac);
         DState dst = prob->getDState();
         ac = learner.learn(dst, -1, alpha, epsilon, gamma);//here
 
@@ -44,7 +44,7 @@ pair<int, int>* mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher, flo
 
 	int aa = tac->get(MOT);
 	if( aa != 3){
-	  learner.should_done(dst, DAction(&MCar::ACTION_TEMPLATE, {aa}), 100, alpha);
+	  learner.should_done(dst, DAction(prob->getActions(), {aa}));
 	  have_advise = true;
 	  nb_advise++;
 	} else have_advise = false;

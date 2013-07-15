@@ -21,7 +21,7 @@ struct MCarState {
     float velocity;
 };  
   
-class MCar : public Environnement<int> {
+class MCar : public Environnement<MCarState> {
 
 #define POS "position"
 #define VEL "velocity"
@@ -33,30 +33,17 @@ class MCar : public Environnement<int> {
 #define mcar_goal_position 0.5
 
 public:
-
-
     MCar(int nbPosStep, int nbVelStep);
-    MCar();
-    ~MCar();
-
-    void step(const DAction& ac);                 // update car state for given action
     
-    void init();                      // initialize car state
     
     double reward() const;
-    const sml::ActionTemplate* getActions() const;
     DAction* getInitialAction() const;
     bool goal() const;
     unsigned int maxStep() const;
-
-private:
+protected:
+    void applyOn(const DAction& ac);
     void computeDState();
-  
-    MCarState st;
-    DState* dst;
-public:
-    const static ActionTemplate ACTION_TEMPLATE;
-    const StateTemplate* stempl;
+    void initState();
 };
 
 }

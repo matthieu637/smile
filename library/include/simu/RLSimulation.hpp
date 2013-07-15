@@ -23,7 +23,6 @@ class RLSimulation
 public:
     RLSimulation() {
         prob = new MCar(8,12);
-        prob->getActions();
         fac = prob->getInitialAction();;
     }
 
@@ -40,14 +39,14 @@ public:
         do
         {
             step++;
-            prob->step(*ac);
+            prob->apply(*ac);
 
 //    	ac = this->step(prob->getDState(), prob->getState(), prob->reward());
 //         ac = ql.learn(prob.getDState(), -1, alpha, epsilon, gamma);
 
 //      LOG_DEBUG("etat " << dst << " action " << *ac << " ");
         }
-        while(!prob->goal());
+        while(!prob->goal() && step < prob->maxStep());
 
         LOG(step);
     }

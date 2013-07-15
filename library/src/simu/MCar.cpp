@@ -8,74 +8,55 @@ using namespace sml;
 
 namespace simu {
 
-const ActionTemplate MCar::ACTION_TEMPLATE = ActionTemplate( {MOT}, {3});
-
-MCar::MCar(int nbPosStep, int nbVelStep)
+MCar::MCar(int nbPosStep, int nbVelStep) : Environnement< MCarState >(new StateTemplate( {POS, VEL}, {nbPosStep, nbVelStep}), new ActionTemplate( {MOT}, {3}))
 {
-    stempl = new StateTemplate( {POS, VEL}, {nbPosStep, nbVelStep});
-    dst = new DState(stempl, 0);
-//     LOG_DEBUG(stempl->actionNumber(VEL));
-    
     init();
 }
 
-MCar::~MCar(){
-    delete stempl;
-    delete dst;
+void MCar::initState() {
+    state->position = -0.5;
+    state->velocity = 0.0;
 }
 
-void MCar::init()
-{
-    st.position = -0.5;
-    st.velocity = 0.0;
-    computeDState();
-}
-
-void MCar::step(const DAction& ac)
+void MCar::applyOn(const DAction& ac)
 // Take action a, update state of car
 {
     int a = ac[MOT];
-    st.velocity += (a-1)*0.001 + cos(3*st.position)*(-0.0025);
+    state->velocity += (a-1)*0.001 + cos(3*state->position)*(-0.0025);
 
-    if (st.velocity > mcar_max_velocity)
-        st.velocity = mcar_max_velocity;
-    if (st.velocity < -mcar_max_velocity)
-        st.velocity = -mcar_max_velocity;
-    st.position += st.velocity;
+    if (state->velocity > mcar_max_velocity)
+        state->velocity = mcar_max_velocity;
+    if (state->velocity < -mcar_max_velocity)
+        state->velocity = -mcar_max_velocity;
+    state->position += state->velocity;
 
-    if (st.position > mcar_max_position)
-        st.position = mcar_max_position;
-    if (st.position < mcar_min_position)
-        st.position = mcar_min_position;
-    if (st.position==mcar_min_position && st.velocity<0)
-        st.velocity = 0;
-
-    computeDState();
+    if (state->position > mcar_max_position)
+        state->position = mcar_max_position;
+    if (state->position < mcar_min_position)
+        state->position = mcar_min_position;
+    if (state->position==mcar_min_position && state->velocity<0)
+        state->velocity = 0;
 }
 
 double MCar::reward() const {
     return -1.;
 }
 
-const sml::ActionTemplate* MCar::getActions() const{
-    return &MCar::ACTION_TEMPLATE;
-}
-
-DAction* MCar::getInitialAction() const{
+DAction* MCar::getInitialAction() const {
     return new DAction(getActions(), 1);
 }
 
-bool MCar::goal() const{
-    return st.position >= mcar_goal_position;
+bool MCar::goal() const {
+    return state->position >= mcar_goal_position;
 }
 
-unsigned int MCar::maxStep() const{
+unsigned int MCar::maxStep() const {
     return 5000;
 }
 
 void MCar::computeDState() {
-    dst->set(POS, round(Utils::transform(st.position, mcar_min_position, mcar_max_position, 0, stempl->actionNumber(POS) -1)));
-    dst->set(VEL, round(Utils::transform(st.velocity, -mcar_max_velocity, mcar_max_velocity, 0, stempl->actionNumber(VEL) -1)));
+    dstate->set(POS, round(Utils::transform(state->position, mcar_min_position, mcar_max_position, 0, stempl->actionNumber(POS) -1)));
+    dstate->set(VEL, round(Utils::transform(state->velocity, -mcar_max_velocity, mcar_max_velocity, 0, stempl->actionNumber(VEL) -1)));
 }
 
 }
