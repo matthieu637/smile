@@ -29,11 +29,13 @@ public:
     int keepRun(int additional_step) {
       
 	prob->init();
+	this->resetAgent(prob->getDState(), prob->getState(), *fac);
 	int min_step = local_run();
 	
 	do{
 	    additional_step--;
 	    prob->init();
+	    this->resetAgent(prob->getDState(), prob->getState(), *fac);
 	    int score = local_run();
 	    if(score < min_step)
 	      min_step = score;
@@ -45,8 +47,8 @@ public:
 	return min_step;
     }
     
-private:
-    int local_run(){
+protected:
+    virtual int local_run(){
       	DAction* ac = fac;
         int step = 0;
         double total_reward = 0;
@@ -67,6 +69,7 @@ private:
 
 protected:
     virtual void createAgent(const DState& dst, const State& st, const DAction& a) = 0;
+    virtual void resetAgent(const DState& dst, const State& st, const DAction& a) = 0;
     virtual DAction* step(const DState& dst, const State& st, double reward) = 0;
 
 protected:

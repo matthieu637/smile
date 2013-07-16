@@ -26,8 +26,11 @@ public:
 
 private:
     void createAgent(const DState& dst, const MCarState& st, const DAction& a);
+    void resetAgent(const DState& dst, const MCarState& st, const DAction& a);
     DAction* step(const DState& dst, const MCarState& st, double reward);
 
+    int local_run();
+    
     QLearning* algo1;
     QLearningLamb* algo2;
     bool easy;

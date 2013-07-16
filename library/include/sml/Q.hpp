@@ -88,6 +88,8 @@ public:
 ///
 ///\brief Renvoyer toutes les actions    
     hashmap* getWholeCouple();
+    
+    void print(bool perState=true) const;
 
 private:
     hashmap *map = nullptr;

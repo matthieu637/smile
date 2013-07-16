@@ -17,16 +17,20 @@ MCarQLTableT::~MCarQLTableT() {
 void MCarQLTableT::createAgent(const DState& dst, const TeacherState& st, const DAction& a) {
     (void) st;
     
-    MCarQLTable bestPol(false);
-    bestPol.run();
-    bestPol.keepRun(2000);
+     MCarQLTable bestPol(false);
+     bestPol.run();
+     bestPol.keepRun(2000);
     
     teacher = new QLearningLamb(prob->getStates(), prob->getActions(), dst, a);
 }
 
+void MCarQLTableT::resetAgent(const DState& dst, const TeacherState& st, const DAction& a) {
+  
+}
+
 DAction* MCarQLTableT::step(const DState& dst, const TeacherState& st, double reward) {
     (void) st;
-    return teacher->learn(dst, reward, alpha, epsilon, gamma, lambda, accumu);
+    return teacher->learn(dst, reward, alpha, epsilon, gamma, lambda, true);
 }
 
 }

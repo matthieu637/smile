@@ -27,6 +27,7 @@ public:
 
 private:
     void createAgent(const DState& dst, const TeacherState& st, const DAction& a);
+    void resetAgent(const DState& dst, const TeacherState& st, const DAction& a);
     DAction* step(const DState& dst, const TeacherState& st, double reward);
 
     QLearningLamb* teacher;

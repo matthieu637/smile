@@ -35,7 +35,9 @@ public:
 ///
 protected:
     Singleton() {}
-    ~Singleton() {}
+    ~Singleton() {
+	delete _singleton;
+    }
 
 private:
     static T* _singleton;

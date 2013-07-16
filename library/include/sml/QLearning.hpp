@@ -42,8 +42,11 @@ public:
     DAction* decision(const DState& s, float epsilon=0.L);
     
     
+    void clear_history(const DState& ds, const DAction& da);
+    
     void should_done(const DState& s, const DAction& a);
     void should_do(const DState& s, const DAction& a);
+    const QTable& getPolicy();
     
 protected:
 

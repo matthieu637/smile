@@ -10,7 +10,7 @@ QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, cons
     da = new DState(a);
 }
 
-QLearning::~QLearning(){
+QLearning::~QLearning() {
     delete ds;
     delete da;
 }
@@ -25,14 +25,14 @@ DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon,
     DAction* a = ap ; //Q.argmax(s); // Choose a from s
 
     //exploration
-    if(sml::Utils::rand01() < epsilon ){
-	delete a;
+    if(sml::Utils::rand01() < epsilon ) {
+        delete a;
         a = new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
     }
 
     delete ds;
     delete da;
-    
+
     ds = new DState(s);
     da = a;
 
@@ -45,23 +45,30 @@ void QLearning::should_done(const DState& s, const DAction& a)
 }
 
 DAction* QLearning::decision(const DState& s, float epsilon) {
-    if(sml::Utils::rand01() < epsilon ){
+    if(sml::Utils::rand01() < epsilon ) {
         return new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
     }
     return Q.argmax(s);
 }
 
-void QLearning::should_do(const DState& s, const DAction& a){
+void QLearning::clear_history(const DState& s, const DAction& a)
+{
+    delete ds;
+    delete da;
+    ds = new DState(s);
+    da = new DAction(a);
+}
+
+void QLearning::should_do(const DState& s, const DAction& a) {
 //     DAction *ap = Q.argmax(s);
 //     Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(s, *ap) - Q(ds, da) );
     Q(s,a)= 10000;
-    
-//     delete ap;
-    delete ds;
-    delete da;
-    
-    ds = new DState(s);
-    da = new DAction(a);
+
+    clear_history(s, a);
+}
+
+const QTable& QLearning::getPolicy(){
+    return Q;
 }
 
 void QLearning::save(boost::archive::xml_oarchive* xml)

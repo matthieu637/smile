@@ -30,7 +30,7 @@ QTable::QTable(const ActionTemplate* atmp):atmpl(atmp) {
         map->at(j) = 0.L;
 }
 
-QTable::~QTable(){
+QTable::~QTable() {
     delete map;
 }
 
@@ -115,6 +115,28 @@ void QTable::load(boost::archive::xml_iarchive* xml)
     hashmap* obj = new hashmap;
     *xml >> make_nvp("QTable", *obj);
     map = obj;
+}
+
+void QTable::print(bool perState) const {
+//     std::cout.set(ios::fixed, ios::floatfield);
+    std::cout.precision(2);
+
+    int imax, jmax;
+    if(!perState) {
+
+        for(int i=0; i<  stmpl->sizeNeeded(); i++) {
+            for(int j=0; j < atmpl->sizeNeeded(); j++)
+                std::cout << map->at(i*atmpl->sizeNeeded()+j) << " ";
+            std::cout << std::endl;
+        }
+    }{
+        for(int i=0; i< atmpl->sizeNeeded(); i++) {
+            for(int j=0; j < stmpl->sizeNeeded(); j++)
+                std::cout << map->at(i+atmpl->sizeNeeded()*j) << " ";
+            std::cout << std::endl;
+        }
+    }
+    std::cout << "####################################################" << std::endl;
 }
 
 }

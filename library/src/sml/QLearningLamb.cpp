@@ -9,6 +9,7 @@ QLearningLamb::QLearningLamb ( const StateTemplate* stmp, const ActionTemplate* 
 {
     this->s = new DState ( ds );
     this->a = new DState ( da );
+//     history.insert ( std::pair< DState* , DAction* > ( s, a ) );
 }
 
 QLearningLamb::~QLearningLamb(){
@@ -84,6 +85,8 @@ void QLearningLamb::clear_history(const DState& ds, const DAction& da)
     }
 
     history.clear();
+//     N.print();
+    Q.print();
 }
 
 DAction* QLearningLamb::decision ( DState& s )
