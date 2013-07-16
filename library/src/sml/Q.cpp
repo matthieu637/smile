@@ -122,7 +122,7 @@ void QTable::print(bool perState) const {
     std::cout.precision(2);
 
     int imax, jmax;
-    if(!perState) {
+    if(perState) {
 
         for(int i=0; i<  stmpl->sizeNeeded(); i++) {
             for(int j=0; j < atmpl->sizeNeeded(); j++)

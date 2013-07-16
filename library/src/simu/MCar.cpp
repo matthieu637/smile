@@ -41,7 +41,7 @@ void MCar::applyOn(const DAction& ac)
 double MCar::reward() const {
     if(!goal())
         return -1.;
-    return 100;
+    return 0;
 }
 
 DAction* MCar::getInitialAction() const {

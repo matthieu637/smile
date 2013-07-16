@@ -9,14 +9,18 @@ MCarQLTable::MCarQLTable(bool easy) : RLSimulation<MCarState>(new MCar(8,12)), e
 }
 
 MCarQLTable::~MCarQLTable() {
-    delete algo1;
-    delete algo2;
+    if(easy)
+        delete algo1;
+    else
+        delete algo2;
 }
 
 void MCarQLTable::createAgent(const DState& dst, const MCarState& st, const DAction& a) {
     (void) st;
-    algo1 = new QLearning(prob->getStates(), prob->getActions(), dst, a);
-    algo2 = new QLearningLamb(prob->getStates(), prob->getActions(), dst, a);
+    if(easy)
+        algo1 = new QLearning(prob->getStates(), prob->getActions(), dst, a);
+    else
+        algo2 = new QLearningLamb(prob->getStates(), prob->getActions(), dst, a);
 }
 
 void MCarQLTable::resetAgent(const DState& dst, const MCarState& st, const DAction& a) {

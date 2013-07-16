@@ -9,7 +9,7 @@
 // Standard RL parameters:
 #define epsilon 0.01                    // probability of random action
 #define alpha 0.5                      // step size parameter
-#define lambda 0.9                     // trace-decay parameters
+#define lambda 0.1                     // trace-decay parameters
 #define gamma 0.75                        // discount-rate parameters
 #define accumu false
 

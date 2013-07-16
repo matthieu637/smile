@@ -86,7 +86,7 @@ void QLearningLamb::clear_history(const DState& ds, const DAction& da)
 
     history.clear();
 //     N.print();
-    Q.print();
+//     Q.print();
 }
 
 DAction* QLearningLamb::decision ( DState& s )
