@@ -8,10 +8,11 @@
 
 #include "Q.hpp"
 #include "LearnStat.hpp"
+#include "Policy.hpp"
 
 namespace sml {
 
-class QLearning : public LearnStat
+class QLearning : public LearnStat, public DPolicy
 {
 
 public:

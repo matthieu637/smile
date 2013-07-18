@@ -12,7 +12,7 @@ QLearningLamb::QLearningLamb ( const StateTemplate* stmp, const ActionTemplate* 
 //     history.insert ( std::pair< DState* , DAction* > ( s, a ) );
 }
 
-QLearningLamb::~QLearningLamb(){
+QLearningLamb::~QLearningLamb() {
     delete s;
     delete a;
 }
@@ -22,7 +22,7 @@ DAction* QLearningLamb::learn (const DState& sp, double r, float lrate, float ep
     //Take action a, observe r, s'
 
     //Choose a' from s' using policy derived from Q
-    DAction* as = Q.argmax ( sp ); 
+    DAction* as = Q.argmax ( sp );
     //if a' ties for the max, then a* <- a'
     DAction* ap = as;
     if ( sml::Utils::rand01() < epsilon ) {
@@ -34,11 +34,11 @@ DAction* QLearningLamb::learn (const DState& sp, double r, float lrate, float ep
         N ( s,a ) = N ( s, a ) + 1.;
     else
         N ( s,a ) = 1.;
-    
+
     bool inserted = history.insert ( std::pair< DState* , DAction* > ( s, a ) ).second;
-    if(!inserted){
-      delete s;
-      delete a;
+    if(!inserted) {
+        delete s;
+        delete a;
     }
 
     for ( std::set< std::pair<DState* , DAction* >, HistoryComparator >::iterator it = history.begin(); it != history.end(); ++it ) {
@@ -55,8 +55,8 @@ DAction* QLearningLamb::learn (const DState& sp, double r, float lrate, float ep
         }
     }
 
-    if ( ap != as ){
-	delete as;
+    if ( ap != as ) {
+        delete as;
         history.clear();
     }
 
@@ -72,10 +72,10 @@ void QLearningLamb::clear_history(const DState& ds, const DAction& da)
 {
     delete s;
     delete a;
-    
+
     this->s = new DState ( ds );
     this->a = new DState ( da );
-  
+
     for ( std::set< std::pair<DState* , DAction* >, HistoryComparator >::iterator it = history.begin(); it != history.end(); ++it ) {
         DState* sa = it->first;
         DAction* aa = it->second;
@@ -89,8 +89,11 @@ void QLearningLamb::clear_history(const DState& ds, const DAction& da)
 //     Q.print();
 }
 
-DAction* QLearningLamb::decision ( DState& s )
+DAction* QLearningLamb::decision (const DState& s, float epsilon)
 {
+    if(sml::Utils::rand01() < epsilon ) {
+        return new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
+    }
     return Q.argmax ( s );
 }
 

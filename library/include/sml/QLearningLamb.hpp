@@ -10,6 +10,7 @@
 
 #include "Q.hpp"
 #include "LearnStat.hpp"
+#include "Policy.hpp"
 
 namespace sml {
 
@@ -27,7 +28,7 @@ public:
 };
 
 
-class QLearningLamb : public sml::LearnStat
+class QLearningLamb : public sml::LearnStat, public DPolicy
 {
 
 public:
@@ -58,7 +59,7 @@ public:
 ///
 ///\brief Retourner l'action à faire selon l'algorithme QLearning sans apprentissage 
 ///\param s : le nouvel état
-    DAction* decision(DState& s);
+    DAction* decision(const DState& s, float epsilon=0.L);
     
     
     void clear_history(const DState& ds, const DAction& da);

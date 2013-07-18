@@ -121,17 +121,16 @@ void QTable::print(bool perState) const {
 //     std::cout.set(ios::fixed, ios::floatfield);
     std::cout.precision(2);
 
-    int imax, jmax;
     if(perState) {
 
-        for(int i=0; i<  stmpl->sizeNeeded(); i++) {
-            for(int j=0; j < atmpl->sizeNeeded(); j++)
+        for(unsigned int i=0; i<  stmpl->sizeNeeded(); i++) {
+            for(unsigned int j=0; j < atmpl->sizeNeeded(); j++)
                 std::cout << map->at(i*atmpl->sizeNeeded()+j) << " ";
             std::cout << std::endl;
         }
     }{
-        for(int i=0; i< atmpl->sizeNeeded(); i++) {
-            for(int j=0; j < stmpl->sizeNeeded(); j++)
+        for(unsigned int i=0; i< atmpl->sizeNeeded(); i++) {
+            for(unsigned int j=0; j < stmpl->sizeNeeded(); j++)
                 std::cout << map->at(i+atmpl->sizeNeeded()*j) << " ";
             std::cout << std::endl;
         }

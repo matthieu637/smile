@@ -4,12 +4,6 @@
 
 // CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
 
-// Standard RL parameters:
-#define epsilon 0.01                    // probability of random action
-#define alpha 0.5                      // step size parameter
-#define lambda 0.95                     // trace-decay parameters
-#define gamma 0.8                        // discount-rate parameters
-
 #define nbPosStep 8
 #define nbVelStep 12
 

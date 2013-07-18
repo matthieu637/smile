@@ -3,53 +3,80 @@
 
 #include "simu/MCar.hpp"
 #include "bib/Logger.hpp"
+#include <sml/Policy.hpp>
 
 namespace simu {
 
-template<typename State>
-class RLSimulation
+
+class DiscretizeSelection{
+
+protected:
+  template<typename EnvState> 
+  const DState& getState(Environnement<EnvState>* env)
+  {
+    return env->getDState();
+  }
+};
+
+  
+template<typename EnvState, typename PolicyState, typename StateType>
+class RLSimulation : private StateType
 {
+   using StateType::getState;
 
 public:
-    RLSimulation(Environnement<State>* prob):prob(prob) {
+    struct stats {
+        int nbStep;
+        double total_reward;
+        int min_step;
+    };
+
+    RLSimulation(Environnement<EnvState>* prob):prob(prob) {
         fac = prob->getInitialAction();;
     }
 
     virtual ~RLSimulation() {
         delete fac;
         delete prob;
+        delete agent;
     }
 
-    int run() {
-        this->createAgent(prob->getDState(), prob->getState(), *fac);
+    stats run() {
+        agent = this->createAgent(getState(prob), *fac);
 
-	return local_run();
+        return local_run();
     }
 
-    int keepRun(int additional_step) {
-      
-	prob->init();
-	this->resetAgent(prob->getDState(), prob->getState(), *fac);
-	int min_step = local_run();
-	
-	do{
-	    additional_step--;
-	    prob->init();
-	    this->resetAgent(prob->getDState(), prob->getState(), *fac);
-	    int score = local_run();
-	    if(score < min_step)
-	      min_step = score;
-	}
-	while(additional_step > 0);
-	
-	LOG(min_step);
-	
-	return min_step;
+    stats keepRun(int additional_step) {
+
+        prob->init();
+        agent->clear_history(getState(prob), *fac);
+        stats s = local_run();
+        int min_step = s.min_step;
+        int nbStep = s.nbStep;
+        double total_reward = s.total_reward;
+
+        do {
+            additional_step--;
+            prob->init();
+            agent->clear_history(getState(prob), *fac);
+            stats s = local_run();
+            min_step = s.min_step;
+            nbStep = s.nbStep;
+            total_reward = s.total_reward;
+            if(nbStep < min_step)
+                min_step = nbStep;
+        }
+        while(additional_step > 0);
+
+        LOG(min_step);
+
+        return {nbStep, total_reward, min_step};
     }
-    
+
 protected:
-    virtual int local_run(){
-      	DAction* ac = fac;
+    virtual stats local_run() {
+        DAction* ac = fac;
         int step = 0;
         double total_reward = 0;
         do
@@ -58,23 +85,23 @@ protected:
             prob->apply(*ac);
             total_reward += prob->reward();
 
-            ac = this->step(prob->getDState(), prob->getState(), prob->reward());
+            ac = this->step(getState(prob), prob->reward());
         }
         while(!prob->goal() && step < (int)prob->maxStep());
 
         LOG(step<< " " << total_reward);
-	
-	return step;
+
+        return {step, total_reward, step};
     }
 
 protected:
-    virtual void createAgent(const DState& dst, const State& st, const DAction& a) = 0;
-    virtual void resetAgent(const DState& dst, const State& st, const DAction& a) = 0;
-    virtual DAction* step(const DState& dst, const State& st, double reward) = 0;
+    virtual Policy<PolicyState>* createAgent(const PolicyState& s, const DAction& a) = 0;
+    virtual DAction* step(const PolicyState& s, double reward) = 0;
 
 protected:
-    Environnement<State>* prob;
+    Environnement<EnvState>* prob;
     DAction* fac;
+    Policy<PolicyState>* agent;
 };
 
 }

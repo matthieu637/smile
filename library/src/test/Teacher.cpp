@@ -12,7 +12,7 @@ new ActionTemplate( {FDB}, {2}) ) , prob(prob), feedbacks(prob->getStates())
 }
 
 void Teacher::initState() {
-    state->feedback = false;
+//     state->feedback = false;
     state->car = prob->getState();
     state->action = prob->getInitialAction()->get(MOT);
 }
@@ -25,7 +25,7 @@ void Teacher::applyOn(const DAction& ac)
     
     MCarState car = prob->getState();
     DState dcar = prob->getDState();
-    state->feedback = feedbacks(dcar);
+//     state->feedback = feedbacks(dcar);
     state->car.position = car.position;
     state->car.velocity = car.velocity;
 //     state->action = prob->
@@ -48,7 +48,7 @@ unsigned int Teacher::maxStep() const {
 }
 
 void Teacher::computeDState() {
-    dstate->set(FDB, (int) state->feedback);
+//     dstate->set(FDB, (int) state->feedback);
     dstate->set(POS, prob->getDState()[POS]);
     dstate->set(VEL, prob->getDState()[VEL]);
     dstate->set(MOT, (int) state->action);

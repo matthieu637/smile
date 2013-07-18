@@ -12,7 +12,7 @@ using namespace simu;
 namespace test {
   
 struct TeacherState{
-    bool feedback;
+//     bool feedback;
     MCarState car;
     int action;
 };

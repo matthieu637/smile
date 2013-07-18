@@ -23,13 +23,13 @@
 
 #define LOG_DEBUGS(stream) \
   bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << "DEBUG :" << __FILE__ << "."<< __LINE__ << " : " << stream
-  
+
 #define LOG_DEBUGC(stream) \
-  bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << stream 
+  bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << stream
 
 #define LOG_DEBUGE(stream) \
   bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << std::endl
-  
+
 #define LOG_INFO(stream) \
   bib::Logger::getInstance()->isEnabled(bib::Logger::INFO) && std::cout << "INFO :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
 
@@ -48,38 +48,47 @@ class Logger : public Singleton<Logger> {
 
 public:
     enum LogLevel { DEBUGGING, INFO, WARNING, ERROR };
-    
-    std::stringstream& registerBuffer(){
-	std::stringstream* n = new std::stringstream;
- 	buff.push_back(n);
-	return *n;
+
+    std::stringstream& registerBuffer() {
+        std::stringstream* n = new std::stringstream;
+
+        if(!ignored_buffer_enable)
+            buff.push_back(n);
+        else
+            ignored_buffer.push_back(n);
+
+        return *n;
     }
-    
-    void flushBuffer(){
-	for(std::list<std::stringstream*>::iterator it = buff.begin();it != buff.end();++it){
-	    std::cout << (*it)->str() << " " ;
-	    delete *it;
-	}
-	std::cout << std::endl;
-	buff.clear();
+
+    void flushBuffer() {
+        for(std::list<std::stringstream*>::iterator it = buff.begin(); it != buff.end(); ++it) {
+            std::cout << (*it)->str() << " " ;
+            delete *it;
+        }
+        std::cout << std::endl;
+        buff.clear();
     }
-    
-    void enableBuffer(){
-	enable_buffer = true;
+
+    void enableBuffer() {
+        enable_buffer = true;
     }
 
     bool isEnabled(LogLevel l) {
         return level <= l;
     }
-    
-    bool isBufferEnable(){
-	return enable_buffer;
+
+    bool isBufferEnable() {
+        return enable_buffer;
     }
 
     void setLevel(LogLevel l) {
         level = l;
     }
-    
+
+    void setIgnoredBuffer(bool val) {
+        ignored_buffer_enable = val;
+    }
+
     template <class T>
     static inline void PRINT_ELEMENTS (const T& coll, const char* optcstr="")
     {
@@ -88,17 +97,17 @@ public:
         LOG_DEBUGS(optcstr);
         for (pos=coll.begin(); pos!=coll.end(); ++pos)
             LOG_DEBUGC(*pos << ", ");
-        
+
         LOG_DEBUGE();
     }
-    
+
     template <class T>
     static inline void PRINT_ELEMENTS (const T& coll, int length, const char* optcstr="")
     {
         LOG_DEBUGS(optcstr);
-        for (int i=0;i<length;i++)
+        for (int i=0; i<length; i++)
             LOG_DEBUGC(coll[i] << ", ");
-        
+
         LOG_DEBUGE();
     }
 
@@ -107,9 +116,11 @@ protected:
 
 private :
     LogLevel level;
-    
+
     bool enable_buffer = false;
+    bool ignored_buffer_enable = false;
     std::list<std::stringstream*> buff;
+    std::list<std::stringstream*> ignored_buffer;
     unsigned int buffer_index = 0;
 };
 

@@ -6,19 +6,13 @@
 #include <sml/QLearning.hpp>
 #include <sml/QLearningLamb.hpp>
 #include "Teacher.hpp"
-
-// Standard RL parameters:
-#define epsilon 0.01                    // probability of random action
-#define alpha 0.5                      // step size parameter
-#define lambda 0.9                     // trace-decay parameters
-#define gamma 0.8                        // discount-rate parameters
-#define accumu false
+#include <test/MCarQLTable.hpp>
 
 using namespace simu;
 
 namespace test {
 
-class MCarQLTableT : public RLSimulation<TeacherState>
+class MCarQLTableT : public RLSimulation<TeacherState, DState, DiscretizeSelection>
 {
 
 public:
@@ -29,8 +23,10 @@ private:
     void createAgent(const DState& dst, const TeacherState& st, const DAction& a);
     void resetAgent(const DState& dst, const TeacherState& st, const DAction& a);
     DAction* step(const DState& dst, const TeacherState& st, double reward);
+    DAction* policy(const DState& dst, const TeacherState& st);
 
     QLearningLamb* teacher;
+    MCarQLTable* bestPol;
 };
 
 }
