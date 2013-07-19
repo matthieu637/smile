@@ -7,7 +7,12 @@ QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, cons
     LearnStat(conf), Q(stmp, atmp), atmp(atmp)
 {
     ds = new DState(s);
-    da = new DState(a);
+    da = new DAction(a);
+}
+
+QLearning::QLearning(const QLearning& q):LearnStat(q.conf), Q(q.Q), atmp(q.atmp){
+    ds = new DState(*q.ds);
+    da = new DAction(*q.da);
 }
 
 QLearning::~QLearning() {
@@ -41,7 +46,10 @@ DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon,
 
 void QLearning::should_done(const DState& s, const DAction& a)
 {
-    Q(s,a) = 10000;
+//     LOG_DEBUG("ok");
+    DAction* ba = Q.argmax(s);
+    Q(s,a) = Q(s,*ba);
+    delete ba;
 }
 
 DAction* QLearning::decision(const DState& s, float epsilon) {
@@ -65,6 +73,10 @@ void QLearning::should_do(const DState& s, const DAction& a) {
     Q(s,a)= 10000;
 
     clear_history(s, a);
+}
+
+Policy<DState>* QLearning::copyPolicy(){
+    return new QLearning(*this);
 }
 
 const QTable& QLearning::getPolicy(){

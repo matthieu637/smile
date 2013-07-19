@@ -30,6 +30,10 @@ QTable::QTable(const ActionTemplate* atmp):atmpl(atmp) {
         map->at(j) = 0.L;
 }
 
+QTable::QTable(const QTable& q):stmpl(q.stmpl), atmpl(q.atmpl) {
+    map = new hashmap(*q.map);
+}
+
 QTable::~QTable() {
     delete map;
 }
@@ -39,7 +43,7 @@ DAction* QTable::argmax(const DState& name) const {
     unsigned int beginRange = hashState * atmpl->sizeNeeded();
 
     unsigned int imax = rand() % atmpl->sizeNeeded();
-//     LOG_DEBUG(imax << " " << hashState << " " << atmpl->sizeNeeded() << " " << beginRange << " " << name << " " << map->size());
+//      LOG_DEBUG(imax << " " << hashState << " " << atmpl->sizeNeeded() << " " << beginRange << " " << name << " " << map->size());
     for(unsigned int j=0; j< atmpl->sizeNeeded(); j++)
         if(map->at(beginRange + imax) < map->at(beginRange + j) )
             imax = j;

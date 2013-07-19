@@ -42,6 +42,8 @@ public:
 ///       conf : la configuration d'apprentissage
     QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf={false, 0, 0});
     
+    QLearningLamb(const QLearningLamb& q);
+    
     virtual  ~QLearningLamb();
     
 ///
@@ -63,6 +65,11 @@ public:
     
     
     void clear_history(const DState& ds, const DAction& da);
+    
+    void should_done(const DState& s, const DAction& a);
+    void should_do(const DState& s, const DAction& a);
+    
+    Policy<DState>* copyPolicy();
     
 protected:
   

@@ -30,6 +30,8 @@ public:
 /// 	  atmp : le modèle d'action
     QTable(const StateTemplate* stmp, const ActionTemplate* atmp);
     
+    QTable(const QTable& q);
+    
 ///
 ///\brief Constructeur pour créer le tableau "Action"
 ///\param atmp : le modèle d'action

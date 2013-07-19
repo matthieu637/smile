@@ -1,5 +1,5 @@
 #include "test/mcar_qlearn.hpp"
-#include <test/MCarQLTable.hpp>
+#include <simu/RLTable.hpp>
 #include <sml/Utils.hpp>
 
 
@@ -9,7 +9,7 @@ void MCarQLearn::mcar_qltable_learner() {
     
     bib::Logger::getInstance()->enableBuffer();
     bib::Logger::getInstance()->setIgnoredBuffer(true);
-    test::MCarQLTable m(true);
+    simu::RLTable<MCarState> m(simu::QL, new MCar(8, 12));
     m.run();
     int score = m.keepRun(10).min_step;
     bib::Logger::getInstance()->setIgnoredBuffer(false);
@@ -18,7 +18,7 @@ void MCarQLearn::mcar_qltable_learner() {
     srand(s);
 
     bib::Logger::getInstance()->setIgnoredBuffer(true);
-    test::MCarQLTable m2(false);
+    simu::RLTable<MCarState> m2(simu::QL_trace, new MCar(8, 12));
     m2.run();
     score = m2.keepRun(10).min_step;
     bib::Logger::getInstance()->setIgnoredBuffer(false);

@@ -4,10 +4,15 @@
 
 // CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
 
+#define epsilon 0.05                    // probability of random action
+#define alpha 0.08                      // step size parameter
+#define lambda 0.9                     // trace-decay parameters
+#define gamma 1.                        // discount-rate parameters
+#define accumu false
+
+
 #define nbPosStep 8
 #define nbVelStep 12
-
-// 3 conditions to work : gamma < 1 | trace non-accumulative | reward depending of step
 
 const StateTemplate MCarQLearn::t_stempl({POS, VEL, MOT},{nbPosStep, nbVelStep, 3});
 

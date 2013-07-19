@@ -12,6 +12,11 @@ QLearningLamb::QLearningLamb ( const StateTemplate* stmp, const ActionTemplate* 
 //     history.insert ( std::pair< DState* , DAction* > ( s, a ) );
 }
 
+QLearningLamb::QLearningLamb(const QLearningLamb& q):LearnStat(q.conf), Q(q.Q), N(q.N), atmp(q.atmp) {
+    this->s = new DState ( *q.s );
+    this->a = new DState ( *q.a );
+}
+
 QLearningLamb::~QLearningLamb() {
     delete s;
     delete a;
@@ -87,6 +92,18 @@ void QLearningLamb::clear_history(const DState& ds, const DAction& da)
     history.clear();
 //     N.print();
 //     Q.print();
+}
+
+void QLearningLamb::should_done(const DState& s, const DAction& a) {
+    
+}
+
+void QLearningLamb::should_do(const DState& s, const DAction& a) {
+
+}
+
+Policy<DState>* QLearningLamb::copyPolicy() {
+    return new QLearningLamb(*this);
 }
 
 DAction* QLearningLamb::decision (const DState& s, float epsilon)

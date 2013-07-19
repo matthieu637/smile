@@ -8,21 +8,21 @@
 namespace simu {
 
 
-class DiscretizeSelection{
+class DiscretizeSelection {
 
 protected:
-  template<typename EnvState> 
-  const DState& getState(Environnement<EnvState>* env)
-  {
-    return env->getDState();
-  }
+    template<typename EnvState>
+    const DState& getState(Environnement<EnvState>* env)
+    {
+        return env->getDState();
+    }
 };
 
-  
+
 template<typename EnvState, typename PolicyState, typename StateType>
 class RLSimulation : private StateType
 {
-   using StateType::getState;
+    using StateType::getState;
 
 public:
     struct stats {
@@ -33,18 +33,22 @@ public:
 
     RLSimulation(Environnement<EnvState>* prob):prob(prob) {
         fac = prob->getInitialAction();;
+        best_policy = nullptr;
     }
 
     virtual ~RLSimulation() {
         delete fac;
         delete prob;
         delete agent;
+        delete best_policy;
     }
 
     stats run() {
         agent = this->createAgent(getState(prob), *fac);
 
-        return local_run();
+        stats s = local_run();
+        best_policy = agent->copyPolicy();
+        return s;
     }
 
     stats keepRun(int additional_step) {
@@ -55,17 +59,21 @@ public:
         int min_step = s.min_step;
         int nbStep = s.nbStep;
         double total_reward = s.total_reward;
+        delete best_policy;
+        best_policy = agent->copyPolicy();
 
         do {
             additional_step--;
             prob->init();
             agent->clear_history(getState(prob), *fac);
             stats s = local_run();
-            min_step = s.min_step;
             nbStep = s.nbStep;
             total_reward = s.total_reward;
-            if(nbStep < min_step)
+            if(nbStep < min_step) {
                 min_step = nbStep;
+                delete best_policy;
+                best_policy = agent->copyPolicy();
+            }
         }
         while(additional_step > 0);
 
@@ -73,6 +81,29 @@ public:
 
         return {nbStep, total_reward, min_step};
     }
+
+    Policy<PolicyState>* get_best_policy() {
+        return best_policy;
+    }
+
+    Policy<PolicyState>* get_policy() {
+        return agent;
+    }
+
+    Environnement<EnvState>* getEnv() {
+        return prob;
+    }
+
+    void reset() {
+        prob->init();
+        delete agent;
+        agent = this->createAgent(getState(prob), *fac);
+        delete best_policy;
+    }
+
+    virtual Policy<PolicyState>* createAgent(const PolicyState& s, const DAction& a) = 0;
+    virtual DAction* step(const PolicyState& s, double reward) = 0;
+
 
 protected:
     virtual stats local_run() {
@@ -95,13 +126,10 @@ protected:
     }
 
 protected:
-    virtual Policy<PolicyState>* createAgent(const PolicyState& s, const DAction& a) = 0;
-    virtual DAction* step(const PolicyState& s, double reward) = 0;
-
-protected:
     Environnement<EnvState>* prob;
     DAction* fac;
     Policy<PolicyState>* agent;
+    Policy<PolicyState>* best_policy;
 };
 
 }

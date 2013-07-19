@@ -1,6 +1,7 @@
 #include <test/mcar_qlearn.hpp>
 #include <test/MCarQLTableT.hpp>
 #include "bib/Logger.hpp"
+#include "simu/TeacherMCar.hpp"
 
 // FNV-1a constants
 static constexpr unsigned long long basis = 14695981039346656037ULL;
@@ -28,9 +29,13 @@ unsigned long long hash_rt(const char* str) {
     }
     return hash;
 }
+
 constexpr long long operator"" _hash( const char* str, size_t n ) {
     return hash_( str );
 }
+
+
+// using namespace test;
 
 
 int main(int argc, char* argv[])
@@ -56,9 +61,12 @@ int main(int argc, char* argv[])
 //       m.mcar_qltable_teacher(0.5);
 //       m.mcar_qltable_teacher_annonce(0.5);
 
-// 	srand(time(NULL));
-//         test::MCarQLTableT m2;
-//         m2.run();
+	srand(time(NULL));
+	RLTable<TeacherState> r(QL_trace, new TeacherMCar(new RLTable<MCarState>(simu::QL, new MCar(8, 12))));
+	r.run();
+	int min_step = r.keepRun(2000).min_step;
+	LOG(min_step);
+	bib::Logger::getInstance()->flushBuffer();
     }
 
 }

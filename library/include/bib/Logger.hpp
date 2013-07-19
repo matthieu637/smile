@@ -67,6 +67,14 @@ public:
         }
         std::cout << std::endl;
         buff.clear();
+	
+	clearIgnoredBuffer();
+    }
+
+    void clearIgnoredBuffer() {
+        for(std::list<std::stringstream*>::iterator it = ignored_buffer.begin(); it != ignored_buffer.end(); ++it)
+            delete *it;
+        ignored_buffer.clear();
     }
 
     void enableBuffer() {

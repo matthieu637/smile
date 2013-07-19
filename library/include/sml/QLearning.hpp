@@ -26,6 +26,8 @@ public:
 ///       conf : la configuration d'apprentissage
     QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf={false,0,0});
     
+    QLearning(const QLearning& q);
+    
     virtual ~QLearning();
     
 ///
@@ -48,6 +50,8 @@ public:
     void should_done(const DState& s, const DAction& a);
     void should_do(const DState& s, const DAction& a);
     const QTable& getPolicy();
+    Policy<DState>* copyPolicy();
+    
     
 protected:
 
