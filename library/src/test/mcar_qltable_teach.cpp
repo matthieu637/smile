@@ -1,6 +1,5 @@
 #include "test/mcar_qlearn.hpp"
 #include <sml/QLearningLamb.hpp>
-#include "test/MCarQLTableT.hpp"
 
 // CPPUNIT_TEST_SUITE_REGISTRATION( MCarQLearn );
 
@@ -66,35 +65,35 @@ pair<int, int>* mcar_qltable_teacher_run(MCar* prob, QLearningLamb* teacher, flo
 
 
 
-void MCarQLearn::mcar_qltable_teacher(float cost) {
-//     srand(0);
-    srand(time(NULL));
-  
-    MCar prob(nbPosStep, nbVelStep);
-    ActionTemplate t_atempl({MOT}, {4});
-    
-    const DState& tmp = prob.getDState();
-    DState fs(&MCarQLearn::t_stempl, {tmp[POS], tmp[VEL], 2});
-    DAction fa(&t_atempl, 3);
-    QLearningLamb teacher(&MCarQLearn::t_stempl, &t_atempl, fs, fa);
-
-    int episod = 0;
-    int score = 0;
-    float advicePerStep = 0L;
-    do
-    {
-        episod++;
-        pair<int, int> stat = *mcar_qltable_teacher_run(&prob, &teacher, cost);
-	int step = stat.first;
-	score += step;
-	advicePerStep = (float)stat.first/stat.second;
-	prob.init();
-	teacher.clear_history(fs, fa);
-	
-// 	LOG_DEBUG("MOY : " << (float)score/episod << "\tstep : " << step );
-    }
-    while(episod < 5000);
-
-    LOG((float)score/episod << " " << cost << " " << advicePerStep);
-}
+// void MCarQLearn::mcar_qltable_teacher(float cost) {
+// //     srand(0);
+//     srand(time(NULL));
+//   
+//     MCar prob(nbPosStep, nbVelStep);
+//     ActionTemplate t_atempl({MOT}, {4});
+//     
+//     const DState& tmp = prob.getDState();
+//     DState fs(&MCarQLearn::t_stempl, {tmp[POS], tmp[VEL], 2});
+//     DAction fa(&t_atempl, 3);
+//     QLearningLamb teacher(&MCarQLearn::t_stempl, &t_atempl, fs, fa);
+// 
+//     int episod = 0;
+//     int score = 0;
+//     float advicePerStep = 0L;
+//     do
+//     {
+//         episod++;
+//         pair<int, int> stat = *mcar_qltable_teacher_run(&prob, &teacher, cost);
+// 	int step = stat.first;
+// 	score += step;
+// 	advicePerStep = (float)stat.first/stat.second;
+// 	prob.init();
+// 	teacher.clear_history(fs, fa);
+// 	
+// // 	LOG_DEBUG("MOY : " << (float)score/episod << "\tstep : " << step );
+//     }
+//     while(episod < 5000);
+// 
+//     LOG((float)score/episod << " " << cost << " " << advicePerStep);
+// }
 

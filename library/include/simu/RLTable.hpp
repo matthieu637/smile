@@ -43,7 +43,7 @@ public:
         return nullptr;
     }
 
-    DAction* step(const DState& dst, double reward) {
+    DAction* computeNextAction(const DState& dst, double reward) {
 
         switch(type) {
         case QL:

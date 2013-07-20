@@ -1,5 +1,4 @@
 #include <test/mcar_qlearn.hpp>
-#include <test/MCarQLTableT.hpp>
 #include "bib/Logger.hpp"
 #include "simu/TeacherMCar.hpp"
 
@@ -57,16 +56,9 @@ int main(int argc, char* argv[])
         }
     }
     else {
-      m.mcar_qltable_learner();
-//       m.mcar_qltable_teacher(0.5);
+//         m.mcar_qltable_learner();
+        m.mcar_qltable_teacher(0.5);
 //       m.mcar_qltable_teacher_annonce(0.5);
-
-	srand(time(NULL));
-	RLTable<TeacherState> r(QL_trace, new TeacherMCar(new RLTable<MCarState>(simu::QL, new MCar(8, 12))));
-	r.run();
-	int min_step = r.keepRun(2000).min_step;
-	LOG(min_step);
-	bib::Logger::getInstance()->flushBuffer();
     }
 
 }

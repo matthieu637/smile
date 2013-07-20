@@ -18,6 +18,11 @@ protected:
     }
 };
 
+struct stats {
+    int nbStep;
+    double total_reward;
+    int min_step;
+};
 
 template<typename EnvState, typename PolicyState, typename StateType>
 class RLSimulation : private StateType
@@ -25,15 +30,10 @@ class RLSimulation : private StateType
     using StateType::getState;
 
 public:
-    struct stats {
-        int nbStep;
-        double total_reward;
-        int min_step;
-    };
+
 
     RLSimulation(Environnement<EnvState>* prob):prob(prob) {
-        fac = prob->getInitialAction();;
-        best_policy = nullptr;
+        fac = prob->getInitialAction();
     }
 
     virtual ~RLSimulation() {
@@ -49,16 +49,18 @@ public:
         stats s = local_run();
         best_policy = agent->copyPolicy();
         return s;
-    }
+    }//best_policy not cleared
 
-    stats keepRun(int additional_step) {
+    std::list<stats>* keepRun(int additional_step) {
+        std::list<stats>* stats_history = new std::list<stats>;
 
+	additional_step--;
         prob->init();
         agent->clear_history(getState(prob), *fac);
         stats s = local_run();
         int min_step = s.min_step;
-        int nbStep = s.nbStep;
-        double total_reward = s.total_reward;
+        stats_history->push_back(s);
+
         delete best_policy;
         best_policy = agent->copyPolicy();
 
@@ -67,19 +69,19 @@ public:
             prob->init();
             agent->clear_history(getState(prob), *fac);
             stats s = local_run();
-            nbStep = s.nbStep;
-            total_reward = s.total_reward;
-            if(nbStep < min_step) {
-                min_step = nbStep;
+            
+            if(s.nbStep < min_step) {
+                min_step = s.nbStep;
                 delete best_policy;
                 best_policy = agent->copyPolicy();
             }
+            s.min_step = min_step;
+//             LOG_INFO(s.nbStep << " " << s.total_reward << " " << s.min_step << " " << additional_step);
+            stats_history->push_back( s);
         }
         while(additional_step > 0);
 
-        LOG(min_step);
-
-        return {nbStep, total_reward, min_step};
+        return stats_history;
     }
 
     Policy<PolicyState>* get_best_policy() {
@@ -99,10 +101,11 @@ public:
         delete agent;
         agent = this->createAgent(getState(prob), *fac);
         delete best_policy;
+        best_policy = agent->copyPolicy();
     }
 
     virtual Policy<PolicyState>* createAgent(const PolicyState& s, const DAction& a) = 0;
-    virtual DAction* step(const PolicyState& s, double reward) = 0;
+    virtual DAction* computeNextAction(const PolicyState& s, double reward) = 0;
 
 
 protected:
@@ -116,11 +119,13 @@ protected:
             prob->apply(*ac);
             total_reward += prob->reward();
 
-            ac = this->step(getState(prob), prob->reward());
+            ac = this->computeNextAction(getState(prob), prob->reward());
         }
         while(!prob->goal() && step < (int)prob->maxStep());
 
-        LOG(step<< " " << total_reward);
+//      LOG(step<< " " << total_reward);
+// 	LOG(step);
+// 	LOG(total_reward);
 
         return {step, total_reward, step};
     }
