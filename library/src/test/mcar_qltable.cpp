@@ -1,6 +1,6 @@
 #include "test/mcar_qlearn.hpp"
 #include <simu/RLTable.hpp>
-#include "simu/TeacherMCar.hpp"
+#include "simu/DTeacher.hpp"
 #include <sml/Utils.hpp>
 
 using namespace simu;
@@ -37,8 +37,8 @@ void MCarQLearn::mcar_qltable_teacher(float cost) {
     teacher_repr.setSize(POS, 8);
     teacher_repr.setSize(VEL, 12);
     
-    TeacherMCar<FavorAdvice, MCarState>* teach = new TeacherMCar<FavorAdvice, MCarState>(leaner_agent, teacher_repr, cost, simu::after);
-    RLTable<TeacherState> r(simu::QL_trace, teach);
+    DTeacher<FavorAdvice, MCarState>* teach = new DTeacher<FavorAdvice, MCarState>(leaner_agent, teacher_repr, cost, simu::after);
+    RLTable<TeacherState<MCarState> > r(simu::QL_trace, teach);
     r.run();
     std::list<stats>* l = r.keepRun(10000);
     

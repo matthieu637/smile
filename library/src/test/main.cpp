@@ -1,6 +1,6 @@
 #include <test/mcar_qlearn.hpp>
 #include "bib/Logger.hpp"
-#include "simu/TeacherMCar.hpp"
+#include "simu/DTeacher.hpp"
 
 // FNV-1a constants
 static constexpr unsigned long long basis = 14695981039346656037ULL;

@@ -10,9 +10,9 @@
 
 namespace simu {
 
+template<typename EnvState>
 struct TeacherState {
-//     bool feedback;
-    MCarState learner_state;
+    EnvState learner_state;
     DAction* learner_action;
 };
 
@@ -32,24 +32,24 @@ protected:
 };
 
 template<typename PolicyReward, typename EnvState>
-class TeacherMCar : public Environnement<TeacherState>, protected PolicyReward {
+class DTeacher : public Environnement < TeacherState < EnvState > >, protected PolicyReward {
 
     using PolicyReward::policy_reward;
 
 public:
-    TeacherMCar(RLTable<MCarState>* learner, const StateTemplate& st, float advice_cost, AdviseStrategy astart):
-        Environnement< TeacherState >(new StateTemplate( st, *learner->getEnv()->getActions()) , new ActionTemplate( {FDB}, {2}) ) ,
+    DTeacher(RLTable<EnvState>* learner, const StateTemplate& st, float advice_cost, AdviseStrategy astart):
+        Environnement< TeacherState < EnvState > >(new StateTemplate( st, *learner->getEnv()->getActions()) , new ActionTemplate( {FDB}, {2}) ) ,
                    prob(learner->getEnv()),
                    learner(learner),
                    advice_cost(advice_cost),
                    astart(astart)
     {
         // Compute the best policy of the learner for the teacher
-// 	RLTable<MCarState> m(simu::QL_trace, new MCar(8, 12)); TODO: compute best policy in teacher representation
+// 	RLTable<EnvState> m(simu::QL_trace, new MCar(8, 12)); TODO: compute best policy in teacher representation
         learner->run();
         std::list<stats>* hist = learner->keepRun(10000);
         best_policy = learner->get_best_policy()->copyPolicy();
-        init();
+        this->init();
 
         best_policy_teacher = hist->back().min_step;
         delete hist;
@@ -60,7 +60,7 @@ public:
     }
 
     DAction* getInitialAction() const {
-        return new DAction(getActions(), 1);
+        return new DAction(this->getActions(), 1);
     }
 
     bool goal() const {
@@ -85,7 +85,7 @@ protected:
         DState dstate_leaner = prob->getDState();
         switch(astart) {
         case after:
-            prob->apply(*state->learner_action);
+            prob->apply(*this->state->learner_action);
 
             if(giveAdvise) {
                 DAction* best_action = best_policy->decision(dstate_leaner);
@@ -104,7 +104,7 @@ protected:
                 delete best_action;
             }
             else
-                prob->apply(*state->learner_action);
+                prob->apply(*this->state->learner_action);
 
             learner_next_action = learner->get_policy()->decision(prob->getDState());
             break;
@@ -113,25 +113,25 @@ protected:
 
 // 	LOG_DEBUG(prob->getDState() << " " << *learner_action << " " << giveAdvise);
 
-        MCarState car = prob->getState();
-        state->learner_state = car;
-        state->learner_action = learner_next_action;
+        EnvState car = prob->getState();
+        this->state->learner_state = car;
+        this->state->learner_action = learner_next_action;
     }
 
-    void computeDState(const TeacherState& s, DState* dst, const StateTemplate* repr) {
+    void computeDState(const TeacherState<EnvState>& s, DState* dst, const StateTemplate* repr) {
 	prob->computeDState(prob->getState(), dst, repr);
         dst->copyValuesOf(*s.learner_action);
     }
 
     void initState() {
         learner->reset();
-        state->learner_state = prob->getState();
-        state->learner_action = prob->getInitialAction();
+        this->state->learner_state = prob->getState();
+        this->state->learner_action = prob->getInitialAction();
     }
 
 private:
-    Environnement<MCarState>* prob;
-    RLTable<MCarState>* learner;
+    Environnement<EnvState>* prob;
+    RLTable<EnvState>* learner;
     Policy<DState>* best_policy;
     bool giveAdvise;
     float advice_cost;
@@ -143,3 +143,4 @@ private:
 }
 
 #endif
+
