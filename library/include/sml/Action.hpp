@@ -64,6 +64,8 @@ public:
 ///       value : la valeur de l'action    
     void set(const string& name, int value);
     
+    void copyValuesOf(const DAction& ac);
+    
 ///
 ///\brief Comparer deux actions
 ///\param ac : l'action à comparer

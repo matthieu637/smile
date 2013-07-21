@@ -41,7 +41,7 @@ public:
     unsigned int maxStep() const;
 protected:
     void applyOn(const DAction& ac);
-    void computeDState();
+    void computeDState(const MCarState& s, DState* dst, const StateTemplate* repr);
     void initState();
 };
 

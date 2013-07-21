@@ -15,9 +15,9 @@ public:
     virtual double reward() const = 0;
     virtual bool goal() const = 0;
     virtual unsigned int maxStep() const = 0;
+    virtual void computeDState(const State& s, DState* dst, const StateTemplate* repr) = 0;
 protected:
     virtual void applyOn(const DAction& ac) = 0;
-    virtual void computeDState() = 0;
     virtual void initState() = 0;
 
     
@@ -36,12 +36,12 @@ public:
     
     void apply(const DAction& ac){
 	applyOn(ac);
-	computeDState();
+	computeDState(*state, dstate, stempl);
     }
     
     void init(){
 	initState();
-	computeDState();
+	computeDState(*state, dstate, stempl);
     }
 
     const State& getState() const {

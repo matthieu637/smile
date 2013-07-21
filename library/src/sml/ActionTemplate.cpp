@@ -5,8 +5,23 @@
 
 namespace sml {
 
-ActionTemplate::ActionTemplate() {
+ActionTemplate::ActionTemplate(const sml::ActionTemplate& a, const sml::ActionTemplate& b): actionNames(a.actionNames.size() + b.actionNames.size()), sizes(a.sizes) {
+    for(boost::unordered_map< string, int>::const_iterator it= a.actionNames.cbegin(); it != a.actionNames.cend(); ++it) {
+        actionNames[it->first] = it->second;
+    }
+    for(boost::unordered_map< string, int>::const_iterator it= b.actionNames.cbegin(); it != b.actionNames.cend(); ++it) {
+        actionNames[it->first] = it->second;
+    }
+    for(std::list<int>::const_iterator it = b.sizes.cbegin(); it != b.sizes.cend(); ++it) {
+        sizes.push_back(*it);
+    }
 
+}
+
+ActionTemplate::ActionTemplate(const sml::ActionTemplate& a): actionNames(a.actionNames.size()), sizes(a.sizes) {
+    for(boost::unordered_map< string, int>::const_iterator it= a.actionNames.cbegin(); it != a.actionNames.cend(); ++it) {
+        actionNames[it->first] = it->second;
+    }
 }
 
 ActionTemplate::ActionTemplate(const std::list<string>& names, const std::list<int>& sizes): actionNames(names.size()), sizes(sizes) {
@@ -20,7 +35,7 @@ ActionTemplate::ActionTemplate(const std::list<string>& names, const std::list<i
     }
 }
 
-ActionTemplate::~ActionTemplate(){
+ActionTemplate::~ActionTemplate() {
     actionNames.clear();
     sizes.clear();
 }
@@ -58,10 +73,24 @@ const std::list<int>* ActionTemplate::sizesActions() const {
     return &this->sizes;
 }
 
+const boost::unordered_map< string, int>* ActionTemplate::getActionNames() const {
+    return &actionNames;
+}
+
+void ActionTemplate::setSize(const string& s, int val) {
+    int index = indexFor(s);
+    int i=0;
+    for(list<int>::iterator it = sizes.begin(); it != sizes.end(); ++it) {
+        if(i==index)
+            *it = val;
+        i++;
+    }
+}
+
 unsigned int ActionTemplate::sizeNeeded() const {
     unsigned int r = 1;
 
-    for(list<int>::const_iterator it = sizes.begin(); it != sizes.end(); ++it)
+    for(list<int>::const_iterator it = sizes.cbegin(); it != sizes.cend(); ++it)
         r*=(*it);
     return r;
 }

@@ -56,9 +56,9 @@ unsigned int MCar::maxStep() const {
     return 5000;
 }
 
-void MCar::computeDState() {
-    dstate->set(POS, round(Utils::transform(state->position, mcar_min_position, mcar_max_position, 0, stempl->actionNumber(POS) -1)));
-    dstate->set(VEL, round(Utils::transform(state->velocity, -mcar_max_velocity, mcar_max_velocity, 0, stempl->actionNumber(VEL) -1)));
+void MCar::computeDState(const MCarState& s, DState* dst, const ActionTemplate* repr) {
+    dst->set(POS, round(Utils::transform(s.position, mcar_min_position, mcar_max_position, 0, repr->actionNumber(POS) -1)));
+    dst->set(VEL, round(Utils::transform(s.velocity, -mcar_max_velocity, mcar_max_velocity, 0, repr->actionNumber(VEL) -1)));
 }
 
 }

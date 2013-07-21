@@ -60,7 +60,7 @@ DAction::DAction ( const DAction& a )
 
 DAction::~DAction()
 {
-  delete[] values;
+    delete[] values;
 }
 
 int DAction::get ( const string& name ) const
@@ -87,6 +87,12 @@ void DAction::set ( const string& name, int value )
 unsigned int DAction::hash() const
 {
     return hashmem;
+}
+
+void DAction::copyValuesOf(const DAction& ac) {
+    const boost::unordered_map< string, int>* names  = ac.templ->getActionNames();
+    for(ActionTemplate::nameIterator it=names->cbegin(); it != names->cend(); ++it)
+        this->set(it->first, it->second);
 }
 
 void DAction::computehash()

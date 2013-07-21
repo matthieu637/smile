@@ -21,13 +21,17 @@ namespace sml{
 
 class ActionTemplate {
 public:
-    ActionTemplate();//empty constructor for serialization
+    typedef boost::unordered::unordered_map<string, int>::const_iterator nameIterator;
+//     ActionTemplate();//empty constructor for serialization
     
 ///
 ///\brief Constructeur
 ///\param names : la liste des noms pour chaque action 
 /// 	  sizes : le nombre des valeurs possibles pour chaque action   
     ActionTemplate(const std::list<string>& names, const std::list<int>& sizes);
+    
+    ActionTemplate(const ActionTemplate&, const ActionTemplate&);
+    ActionTemplate(const ActionTemplate&);
     
     ~ActionTemplate();
     
@@ -55,6 +59,11 @@ public:
 ///
 ///\brief Retourner le taille necéssaire pour toutes les actions
     unsigned int sizeNeeded() const;
+    
+    const boost::unordered_map< string, int>* getActionNames() const;
+    
+    void setSize(const string& s, int val);
+    
     /*
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version)

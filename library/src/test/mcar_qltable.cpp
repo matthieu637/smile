@@ -30,7 +30,14 @@ void MCarQLearn::mcar_qltable_learner() {
 void MCarQLearn::mcar_qltable_teacher(float cost) {
     srand(time(NULL));
 
-    TeacherMCar<FavorAdvice, MCarState>* teach = new TeacherMCar<FavorAdvice, MCarState>(new RLTable<MCarState>(simu::QL, new MCar(8, 12)), cost, simu::before);
+    MCar* leaner_env = new MCar(8, 12);
+    RLTable<MCarState>* leaner_agent = new RLTable<MCarState>(simu::QL, leaner_env);
+    
+    StateTemplate teacher_repr(*leaner_env->getStates());
+    teacher_repr.setSize(POS, 8);
+    teacher_repr.setSize(VEL, 12);
+    
+    TeacherMCar<FavorAdvice, MCarState>* teach = new TeacherMCar<FavorAdvice, MCarState>(leaner_agent, teacher_repr, cost, simu::after);
     RLTable<TeacherState> r(simu::QL_trace, teach);
     r.run();
     std::list<stats>* l = r.keepRun(10000);
