@@ -28,16 +28,18 @@ void MCarQLearn::mcar_qltable_learner() {
 
 
 void MCarQLearn::mcar_qltable_teacher(float cost) {
-    srand(time(NULL));
+//     srand(time(NULL));
+    srand(0);
 
     MCar* leaner_env = new MCar(8, 12);
     RLTable<MCarState>* leaner_agent = new RLTable<MCarState>(simu::QL, leaner_env);
+
     
     StateTemplate teacher_repr(*leaner_env->getStates());
     teacher_repr.setSize(POS, 8);
     teacher_repr.setSize(VEL, 12);
     
-    DTeacher<FavorAdvice, MCarState>* teach = new DTeacher<FavorAdvice, MCarState>(leaner_agent, teacher_repr, cost, simu::after);
+    DTeacher<CostlyAdvise, MCarState>* teach = new DTeacher<CostlyAdvise, MCarState>(leaner_agent, teacher_repr, cost, simu::after, sml::Max);
     RLTable<TeacherState<MCarState> > r(simu::QL_trace, teach);
     r.run();
     std::list<stats>* l = r.keepRun(10000);
@@ -45,6 +47,6 @@ void MCarQLearn::mcar_qltable_teacher(float cost) {
     bib::Logger::getInstance()->enableBuffer();
     for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
         LOG(it->nbStep);
-    LOG_DEBUG(l->back().min_step << " / " << teach->get_best_policy_teacher());
+//     LOG_DEBUG(l->back().min_step << " / " << teach->get_best_policy_teacher());
     bib::Logger::getInstance()->flushBuffer();
 }

@@ -4,13 +4,13 @@
 namespace sml {
 
 QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf) :
-    LearnStat(conf), Q(stmp, atmp), atmp(atmp)
+    LearnStat(conf), Q(stmp, atmp), P(stmp, atmp), atmp(atmp)
 {
     ds = new DState(s);
     da = new DAction(a);
 }
 
-QLearning::QLearning(const QLearning& q):LearnStat(q.conf), Q(q.Q), atmp(q.atmp){
+QLearning::QLearning(const QLearning& q):LearnStat(q.conf), Q(q.Q), P(q.P), atmp(q.atmp) {
     ds = new DState(*q.ds);
     da = new DAction(*q.da);
 }
@@ -26,15 +26,10 @@ DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon,
     DAction *ap = Q.argmax(s);
     Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(s, *ap) - Q(ds, da) );
 
-    //exploitation
-    DAction* a = ap ; //Q.argmax(s); // Choose a from s
+    //Choose a from s using policy derived from Q
+    DAction* a = decision(s, epsilon);
 
-    //exploration
-    if(sml::Utils::rand01() < epsilon ) {
-        delete a;
-        a = new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
-    }
-
+    delete ap;
     delete ds;
     delete da;
 
@@ -46,17 +41,48 @@ DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon,
 
 void QLearning::should_done(const DState& s, const DAction& a)
 {
-//     LOG_DEBUG("ok");
-    DAction* ba = Q.argmax(s);
-    Q(s,a) = Q(s,*ba);
-    delete ba;
+    switch(adviceStrat) {
+    case FixedNExploration:
+    case FixedNMax:
+        DAction* b = P.argmax(s);
+        if(P(s, *b) == 1 && !(*b == a) )
+            P(s, *b) = 0;
+        delete b;
+
+        P(s,a)=1;
+        break;
+    }
+
+    switch(adviceStrat) {
+    case FixedNMax:
+    case Max:
+        DAction* ba = Q.argmax(s);
+        Q(s,a) = Q(s,*ba) + 0.000001;
+        delete ba;
+    }
 }
 
 DAction* QLearning::decision(const DState& s, float epsilon) {
-    if(sml::Utils::rand01() < epsilon ) {
-        return new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
+    DAction* a = Q.argmax(s);
+
+    bool greedy = true;
+    if(adviceStrat == FixedNExploration || adviceStrat == FixedNMax) {
+        DAction* b = P.argmax(s);
+        if( P(s, *b) == 1 ) {
+            a = b;
+            greedy = false;
+        }
+        else
+            delete b;
     }
-    return Q.argmax(s);
+
+    //exploration
+    if(greedy && sml::Utils::rand01() < epsilon ) {
+        delete a;
+        a = new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
+    }
+
+    return a;
 }
 
 void QLearning::clear_history(const DState& s, const DAction& a)
@@ -68,18 +94,16 @@ void QLearning::clear_history(const DState& s, const DAction& a)
 }
 
 void QLearning::should_do(const DState& s, const DAction& a) {
-//     DAction *ap = Q.argmax(s);
-//     Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(s, *ap) - Q(ds, da) );
-    Q(s,a)= 10000;
+    should_done(s, a);
 
     clear_history(s, a);
 }
 
-Policy<DState>* QLearning::copyPolicy(){
+Policy<DState>* QLearning::copyPolicy() {
     return new QLearning(*this);
 }
 
-const QTable& QLearning::getPolicy(){
+const QTable& QLearning::getPolicy() {
     return Q;
 }
 
@@ -94,5 +118,6 @@ void QLearning::load(boost::archive::xml_iarchive* xml)
 }
 
 }
+
 
 

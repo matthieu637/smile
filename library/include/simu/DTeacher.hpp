@@ -22,12 +22,43 @@ enum AdviseStrategy {
 
 class FavorAdvice {
 protected:
-    double policy_reward(bool giveAdvise, float cost) const {
+    double policy_reward(bool giveAdvise, float cost, double reward) const {
         (void) cost;
+        (void) reward;
         if(giveAdvise)
             return 10;
         else
             return -10;
+    }
+};
+
+class CostlyAdvise {
+protected:
+    double policy_reward(bool giveAdvise, float cost, double reward) const {
+        (void) reward;
+        if(giveAdvise)
+            return -1;
+        else
+            return -1*cost;
+    }
+};
+
+class LearnerAdvise {
+protected:
+    double policy_reward(bool giveAdvise, float cost, double reward) const {
+        (void) cost;
+        (void) giveAdvise;
+        return reward;
+    }
+};
+
+class CostlyLearnerAdvise {//TODO: should only works with negative reward
+protected:
+    double policy_reward(bool giveAdvise, float cost, double reward) const {
+        if(giveAdvise)
+            return reward;
+        else
+            return reward*cost;
     }
 };
 
@@ -37,15 +68,16 @@ class DTeacher : public Environnement < TeacherState < EnvState > >, protected P
     using PolicyReward::policy_reward;
 
 public:
-    DTeacher(RLTable<EnvState>* learner, const StateTemplate& st, float advice_cost, AdviseStrategy astart):
+    DTeacher(RLTable<EnvState>* learner, const StateTemplate& st, float advice_cost, AdviseStrategy astart, StrategyEffectsAdvice sea):
         Environnement< TeacherState < EnvState > >(new StateTemplate( st, *learner->getEnv()->getActions()) , new ActionTemplate( {FDB}, {2}) ) ,
                    prob(learner->getEnv()),
                    learner(learner),
                    advice_cost(advice_cost),
-                   astart(astart)
+                   astart(astart),
+                   sea(sea)
     {
         // Compute the best policy of the learner for the teacher
-// 	RLTable<EnvState> m(simu::QL_trace, new MCar(8, 12)); TODO: compute best policy in teacher representation
+// 	RLTable<EnvState> m(simu::QL_trace, new MCar(8, 12)); TODO: compute best policy in teacher representation ??
         learner->run();
         std::list<stats>* hist = learner->keepRun(10000);
         best_policy = learner->get_best_policy()->copyPolicy();
@@ -56,7 +88,7 @@ public:
     }
 
     double reward() const {
-        return policy_reward(giveAdvise, advice_cost);
+        return policy_reward(giveAdvise, advice_cost, prob->reward());
     }
 
     DAction* getInitialAction() const {
@@ -95,8 +127,7 @@ protected:
 
             learner_next_action = learner->computeNextAction(prob->getDState(), prob->reward());
             break;
-// 	  case before:
-        default:
+        case before:
             if(giveAdvise) {
                 DAction* best_action = best_policy->decision(dstate_leaner);
                 learner->get_policy()->should_do(dstate_leaner, *best_action);
@@ -106,7 +137,8 @@ protected:
             else
                 prob->apply(*this->state->learner_action);
 
-            learner_next_action = learner->get_policy()->decision(prob->getDState());
+
+            learner_next_action = learner->computeNextAction(prob->getDState(), prob->reward());
             break;
         }
 
@@ -119,12 +151,13 @@ protected:
     }
 
     void computeDState(const TeacherState<EnvState>& s, DState* dst, const StateTemplate* repr) {
-	prob->computeDState(prob->getState(), dst, repr);
+        prob->computeDState(prob->getState(), dst, repr);
         dst->copyValuesOf(*s.learner_action);
     }
 
     void initState() {
         learner->reset();
+        learner->get_policy()->setAdviseStrat(sea);
         this->state->learner_state = prob->getState();
         this->state->learner_action = prob->getInitialAction();
     }
@@ -137,6 +170,7 @@ private:
     float advice_cost;
     int best_policy_teacher;
     AdviseStrategy astart;
+    StrategyEffectsAdvice sea;
 };
 
 

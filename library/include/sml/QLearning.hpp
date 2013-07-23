@@ -66,7 +66,7 @@ protected:
     void load(boost::archive::xml_iarchive* xml);
     
 private:
-    QTable Q;
+    QTable Q, P;
     const ActionTemplate* atmp;
     const DState* ds;
     const DAction* da;

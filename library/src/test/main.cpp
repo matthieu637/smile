@@ -42,7 +42,6 @@ int main(int argc, char* argv[])
 
     MCarQLearn m;
     if(argc > 1 ) {
-
         switch(hash_(argv[1])) {
         case "mcar_qltable_learner"_hash:
             m.mcar_qltable_learner();
@@ -51,13 +50,13 @@ int main(int argc, char* argv[])
             m.mcar_qltable_teacher(atof(argv[2]));
             break;
         case "mcar_qltable_teacher_annonce"_hash:
-            m.mcar_qltable_teacher_annonce(atof(argv[2]));
+//             m.mcar_qltable_teacher_annonce(atof(argv[2]));
             break;
         }
     }
     else {
 //         m.mcar_qltable_learner();
-        m.mcar_qltable_teacher(0.5);
+        m.mcar_qltable_teacher(1.5);
 //       m.mcar_qltable_teacher_annonce(0.5);
     }
 
