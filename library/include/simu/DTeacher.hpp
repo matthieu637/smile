@@ -36,7 +36,7 @@ class CostlyAdvise {
 protected:
     double policy_reward(bool giveAdvise, float cost, double reward) const {
         (void) reward;
-        if(giveAdvise)
+        if(!giveAdvise)
             return -1;
         else
             return -1*cost;
@@ -55,7 +55,7 @@ protected:
 class CostlyLearnerAdvise {//TODO: should only works with negative reward
 protected:
     double policy_reward(bool giveAdvise, float cost, double reward) const {
-        if(giveAdvise)
+        if(!giveAdvise)
             return reward;
         else
             return reward*cost;
@@ -80,10 +80,12 @@ public:
 // 	RLTable<EnvState> m(simu::QL_trace, new MCar(8, 12)); TODO: compute best policy in teacher representation ??
         learner->run();
         std::list<stats>* hist = learner->keepRun(10000);
-        best_policy = learner->get_best_policy()->copyPolicy();
+//         best_policy = learner->get_best_policy()->copyPolicy();
+	best_policy = learner->get_policy()->copyPolicy();
         this->init();
 
         best_policy_teacher = hist->back().min_step;
+// 	LOG_DEBUG(best_policy_teacher);
         delete hist;
     }
 
@@ -113,14 +115,14 @@ protected:
         giveAdvise = a;
 
 
-        DAction* learner_next_action;
+        DAction* learner_next_action = nullptr;
         DState dstate_leaner = prob->getDState();
         switch(astart) {
         case after:
             prob->apply(*this->state->learner_action);
 
             if(giveAdvise) {
-                DAction* best_action = best_policy->decision(dstate_leaner);
+                DAction* best_action = best_policy->decision(dstate_leaner, 0);
                 learner->get_policy()->should_done(dstate_leaner, *best_action);
                 delete best_action;
             }
@@ -129,7 +131,7 @@ protected:
             break;
         case before:
             if(giveAdvise) {
-                DAction* best_action = best_policy->decision(dstate_leaner);
+                DAction* best_action = best_policy->decision(dstate_leaner, 0);
                 learner->get_policy()->should_do(dstate_leaner, *best_action);
                 prob->apply(*best_action);
                 delete best_action;

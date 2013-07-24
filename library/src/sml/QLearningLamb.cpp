@@ -95,11 +95,13 @@ void QLearningLamb::clear_history(const DState& ds, const DAction& da)
 }
 
 void QLearningLamb::should_done(const DState& s, const DAction& a) {
-    
+    (void) s;
+    (void) a;
 }
 
 void QLearningLamb::should_do(const DState& s, const DAction& a) {
-
+    (void) s;
+    (void) a;
 }
 
 Policy<DState>* QLearningLamb::copyPolicy() {

@@ -41,6 +41,7 @@ DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon,
 
 void QLearning::should_done(const DState& s, const DAction& a)
 {
+    LOG_DEBUG("advice "<< s << " " << a);
     switch(adviceStrat) {
     case FixedNExploration:
     case FixedNMax:
@@ -82,6 +83,12 @@ DAction* QLearning::decision(const DState& s, float epsilon) {
         a = new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
     }
 
+//     LOG_DEBUG("dec " <<s << " " << *a);
+    
+    
+//     if(adviceStrat != None)
+//       LOG_DEBUG("dec "<< *a << " from " << s );
+//     LOG_DEBUG(adviceStrat);
     return a;
 }
 
@@ -118,6 +125,8 @@ void QLearning::load(boost::archive::xml_iarchive* xml)
 }
 
 }
+
+
 
 
 

@@ -19,7 +19,7 @@ struct MCarState {
     float position;
     float velocity;
 };
-  
+
 class MCar : public Environnement<MCarState> {
 
 #define POS "position"
@@ -33,8 +33,8 @@ class MCar : public Environnement<MCarState> {
 
 public:
     MCar(int nbPosStep, int nbVelStep);
-    
-    
+
+
     double reward() const;
     DAction* getInitialAction() const;
     bool goal() const;

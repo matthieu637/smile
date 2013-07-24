@@ -19,10 +19,10 @@
    bib::Logger::getInstance()->isBufferEnable() ? bib::Logger::getInstance()->registerBuffer() << stream : std::cout << stream << std::endl
 
 #define LOG_DEBUG(stream) \
-  bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << "DEBUG :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
+  bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << "#DEBUG :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
 
 #define LOG_DEBUGS(stream) \
-  bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << "DEBUG :" << __FILE__ << "."<< __LINE__ << " : " << stream
+  bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << "#DEBUG :" << __FILE__ << "."<< __LINE__ << " : " << stream
 
 #define LOG_DEBUGC(stream) \
   bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << stream
@@ -31,13 +31,13 @@
   bib::Logger::getInstance()->isEnabled(bib::Logger::DEBUGGING) && std::cout << std::endl
 
 #define LOG_INFO(stream) \
-  bib::Logger::getInstance()->isEnabled(bib::Logger::INFO) && std::cout << "INFO :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
+  bib::Logger::getInstance()->isEnabled(bib::Logger::INFO) && std::cout << "#INFO :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
 
 #define LOG_WARNING(stream) \
-  bib::Logger::getInstance()->isEnabled(bib::Logger::WARNING) && std::cout << "WARNING :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
+  bib::Logger::getInstance()->isEnabled(bib::Logger::WARNING) && std::cout << "#WARNING :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
 
 #define LOG_ERROR(stream) \
-  bib::Logger::getInstance()->isEnabled(bib::Logger::ERROR) && std::cout << "ERROR :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
+  bib::Logger::getInstance()->isEnabled(bib::Logger::ERROR) && std::cout << "#ERROR :" << __FILE__ << "."<< __LINE__ << " : " << stream << std::endl
 
 
 

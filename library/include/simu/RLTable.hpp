@@ -8,24 +8,29 @@
 #include <sml/Sarsa.hpp>
 #include "simu/Environnement.hpp"
 
-// Standard RL parameters:
-#define epsilon 0.05                    // probability of random action
-#define alpha 0.08                      // step size parameter
-#define lambda 0.9                     // trace-decay parameters
-#define gamma 1.                        // discount-rate parameters
-#define accumu false
-
 namespace simu {
 
+struct RLParam {
+    float epsilon;
+    float alpha;
+    float lambda;
+    float gamma;
+    bool accumu;
+};  
+  
 enum Algo {
     QL, QL_trace, Sarsa_, Sarsa_trace
 };
+
+static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., false};
+static const RLParam GridWorldParam= {0.001, 0.08, 0.9, 0.6, false};
+static const RLParam DefaultParam= {0.05, 0.08, 0.9, 0.6, false};
 
 template <typename EnvState>
 class RLTable : public RLSimulation<EnvState, DState, DiscretizeSelection>
 {
 public:
-    RLTable(Algo algo, Environnement<EnvState>* p) : RLSimulation<EnvState, DState, DiscretizeSelection>(p), type(algo) {}
+    RLTable(Algo algo, Environnement<EnvState>* p, RLParam rlp) : RLSimulation<EnvState, DState, DiscretizeSelection>(p), type(algo),rlp(rlp) {}
 
     Policy<DState>* createAgent(const DState& dst, const DAction& a) {
 
@@ -35,7 +40,7 @@ public:
         case QL_trace:
             return new QLearningLamb(this->prob->getStates(), this->prob->getActions(), dst, a);
         case Sarsa_:
-//             return new Sarsa(prob->getStates(), prob->getActions(), dst, a);
+            return new Sarsa(this->prob->getStates(), this->prob->getActions(), dst, a);
         case Sarsa_trace:
             break;
         }
@@ -47,10 +52,11 @@ public:
 
         switch(type) {
         case QL:
-            return ((QLearning*)this->agent)->learn(dst, reward, alpha, epsilon, gamma);
+            return ((QLearning*)this->agent)->learn(dst, reward, rlp.alpha, rlp.epsilon, rlp.gamma);
         case QL_trace:
-            return ((QLearningLamb*)this->agent)->learn(dst, reward, alpha, epsilon, gamma, lambda, accumu);
+            return ((QLearningLamb*)this->agent)->learn(dst, reward, rlp.alpha, rlp.epsilon, rlp.gamma, rlp.lambda, rlp.accumu);
         case Sarsa_:
+            return ((Sarsa*)this->agent)->learn(dst, reward, rlp.alpha, rlp.epsilon, rlp.gamma);
         case Sarsa_trace:
             break;
         }
@@ -59,6 +65,7 @@ public:
     }
 
     Algo type;
+    RLParam rlp;
 };
 
 }

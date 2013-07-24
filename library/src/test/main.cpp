@@ -1,4 +1,4 @@
-#include <test/mcar_qlearn.hpp>
+#include <test/DraftTest.hpp>
 #include "bib/Logger.hpp"
 #include "simu/DTeacher.hpp"
 
@@ -34,30 +34,29 @@ constexpr long long operator"" _hash( const char* str, size_t n ) {
 }
 
 
-// using namespace test;
-
-
 int main(int argc, char* argv[])
 {
 
-    MCarQLearn m;
+    DraftTest m;
     if(argc > 1 ) {
         switch(hash_(argv[1])) {
-        case "mcar_qltable_learner"_hash:
-            m.mcar_qltable_learner();
+        case "FGQ1"_hash:
+            m.FGQ1();
+            break;
+        case "FMQ1"_hash:
+            m.FMQ1();
             break;
         case "mcar_qltable_teacher"_hash:
             m.mcar_qltable_teacher(atof(argv[2]));
             break;
-        case "mcar_qltable_teacher_annonce"_hash:
-//             m.mcar_qltable_teacher_annonce(atof(argv[2]));
-            break;
         }
     }
     else {
-//         m.mcar_qltable_learner();
-        m.mcar_qltable_teacher(1.5);
-//       m.mcar_qltable_teacher_annonce(0.5);
+//         m.FGQ1();
+//         m.FMQ1();
+      
+        m.TGQ1Q2(3);
+//         m.mcar_qltable_teacher(2);
     }
 
 }

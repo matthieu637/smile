@@ -54,7 +54,7 @@ public:
     std::list<stats>* keepRun(int additional_step) {
         std::list<stats>* stats_history = new std::list<stats>;
 
-	additional_step--;
+        additional_step--;
         prob->init();
         agent->clear_history(getState(prob), *fac);
         stats s = local_run();
@@ -69,8 +69,8 @@ public:
             prob->init();
             agent->clear_history(getState(prob), *fac);
             stats s = local_run();
-            
-            if(s.nbStep < min_step) {
+
+            if(s.nbStep <= min_step) {
                 min_step = s.nbStep;
                 delete best_policy;
                 best_policy = agent->copyPolicy();
@@ -120,6 +120,8 @@ protected:
             total_reward += prob->reward();
 
             ac = this->computeNextAction(getState(prob), prob->reward());
+
+// 	    LOG_DEBUG(*ac << " " << getState(prob));
         }
         while(!prob->goal() && step < (int)prob->maxStep());
 
