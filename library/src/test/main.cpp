@@ -148,7 +148,8 @@ int main(int argc, char* argv[])
                     m.T_run_simple<GridWorldLSState, LearnerAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost);
                 } else if(argv[1][6]== 'M') {
                     m.T_run_simple<GridWorldLSState, CostlyLearnerAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost);
-                } else handled = false;
+                }
+                else handled = false;
             }
             else handled = false;
         }
@@ -159,8 +160,8 @@ int main(int argc, char* argv[])
         handled = false;
 
 
-    if(!handled) {
+    if(!handled)
+        LOG_ERROR("Cannot handle your test");
 
-    }
-
+    return 0;
 }

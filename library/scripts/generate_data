@@ -23,6 +23,9 @@ if [ ! -e $EXEC ] ; then
 	exit 1
 fi
 
+# 1 : TEST
+# 2 : FUSION (1 -> yes)
+# 3 : NB TEST
 function launch_test(){
 
 job_pool_init $CPU 0
@@ -50,9 +53,18 @@ fi
 
 }
 
+nbrTest=5
 
 #graphA1
-launch_test "mcar_qltable_learner" 1 3000
+launch_test "TMQ1Q1AMTB" 1 $nbrTest
+launch_test "TMQ1Q1AOTB" 1 $nbrTest
+launch_test "TMQ1Q1ANTB" 1 $nbrTest
+launch_test "TMQ1Q1AITB" 1 $nbrTest
+
+launch_test "TMQ1Q1AMTA" 1 $nbrTest
+launch_test "TMQ1Q1AOTA" 1 $nbrTest
+launch_test "TMQ1Q1ANTA" 1 $nbrTest
+launch_test "TMQ1Q1AITA" 1 $nbrTest
 
 
 # k=".001"
