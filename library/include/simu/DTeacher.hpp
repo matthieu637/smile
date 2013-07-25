@@ -77,11 +77,10 @@ public:
                    sea(sea)
     {
         // Compute the best policy of the learner for the teacher
-// 	RLTable<EnvState> m(simu::QL_trace, new MCar(8, 12)); TODO: compute best policy in teacher representation ??
         learner->run();
         std::list<stats>* hist = learner->keepRun(10000);
-//         best_policy = learner->get_best_policy()->copyPolicy();
-	best_policy = learner->get_policy()->copyPolicy();
+        best_policy = learner->get_best_policy()->copyPolicy();
+// 	best_policy = learner->get_policy()->copyPolicy();
         this->init();
 
         best_policy_teacher = hist->back().min_step;
@@ -114,7 +113,6 @@ protected:
         int a = ac[FDB];
         giveAdvise = a;
 
-
         DAction* learner_next_action = nullptr;
         DState dstate_leaner = prob->getDState();
         switch(astart) {
@@ -145,7 +143,7 @@ protected:
         }
 
 
-// 	LOG_DEBUG(prob->getDState() << " " << *learner_action << " " << giveAdvise);
+// 	LOG_DEBUG(prob->getDState() << " " << *learner_next_action << " " << giveAdvise);
 
         EnvState car = prob->getState();
         this->state->learner_state = car;

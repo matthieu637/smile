@@ -1,6 +1,7 @@
 #include <test/DraftTest.hpp>
 #include "bib/Logger.hpp"
 #include "simu/DTeacher.hpp"
+#include <simu/GridWorld.hpp>
 
 // FNV-1a constants
 static constexpr unsigned long long basis = 14695981039346656037ULL;
@@ -33,33 +34,133 @@ constexpr long long operator"" _hash( const char* str, size_t n ) {
     return hash_( str );
 }
 
+Algo parseAlgo(char*c, int start) {
+    if(c[start]=='Q' && c[start+1]=='1') {
+        return simu::QL;
+    } else if(c[start]=='Q' && c[start+1]=='2') {
+        return simu::QL;
+    } else if(c[start]=='Q' && c[start+1]=='3') {
+
+    } else if(c[start]=='S' && c[start+1]=='1') {
+        return simu::Sarsa_;
+    } else if(c[start]=='S' && c[start+1]=='2') {
+        return simu::Sarsa_trace;
+    } else if(c[start]=='S' && c[start+1]=='3') {
+
+    }
+    return simu::QL;
+}
+
+AdviseStrategy parseAdviseStrat(char*c, int start) {
+    if(c[start]=='B') {
+        return AdviseStrategy::before;
+    } else if(c[start]=='A') {
+        return AdviseStrategy::after;
+    }
+    return AdviseStrategy::after;
+}
+
+StrategyEffectsAdvice parseStrategyEffectsAdvice(char* c, int start) {
+    if(c[start]=='O') {
+        return StrategyEffectsAdvice::FixedNExploration;
+    } else if(c[start]=='M') {
+        return StrategyEffectsAdvice::Max;
+    } else if(c[start]=='I') {
+        return StrategyEffectsAdvice::FixedNMax;
+    } else if(c[start]=='N') {
+        return StrategyEffectsAdvice::None;
+    }
+    return StrategyEffectsAdvice::None;
+}
 
 int main(int argc, char* argv[])
 {
-
     DraftTest m;
+
+    bool handled = true;
     if(argc > 1 ) {
-        switch(hash_(argv[1])) {
-        case "FGQ1"_hash:
-            m.FGQ1();
-            break;
-        case "FMQ1"_hash:
-            m.FMQ1();
-            break;
-        case "mcar_qltable_teacher"_hash:
-            m.mcar_qltable_teacher(atof(argv[2]));
-            break;
+        float cost = 5;
+
+        if(argc > 2)
+            cost = atof(argv[2]);
+
+        Environnement<GridWorldState>* grid = new GridWorld();
+        Environnement<GridWorldLSState>* gridls = new GridWorldLS();
+        Environnement<MCarState>* car = new MCar(8, 12);
+
+        Algo learnAlgo = QL, teachAlgo = QL;
+        StrategyEffectsAdvice sea = None;
+        bool same_state_rpr = true;
+        AdviseStrategy as = after;
+
+        if(argv[1][0] == 'F') {
+            learnAlgo = parseAlgo(argv[1], 2);
+        } else if(argv[1][0] == 'T') {
+            learnAlgo = parseAlgo(argv[1], 2);
+            teachAlgo = parseAlgo(argv[1], 4);
+            sea = parseStrategyEffectsAdvice(argv[1], 7);
+            same_state_rpr = argv[1][8] == 'T';
+            as = parseAdviseStrat(argv[1], 9);
         }
+        else handled = false;
+
+        if(argv[1][0] == 'F') {
+            if (argv[1][1] == 'M') {
+                m.F_run_simple<MCarState>(learnAlgo, car, MCarParam);
+            } else if(argv[1][1] == 'G') {
+                m.F_run_simple<GridWorldState>(learnAlgo, grid, GridWorldParam);
+            } else if(argv[1][1] == 'L') {
+                m.F_run_simple<GridWorldLSState>(learnAlgo, gridls, GridWorldParam);
+            }
+            else handled = false;
+        }
+        else if(argv[1][0] == 'T') {
+            if (argv[1][1] == 'M') {
+                if(argv[1][6]== 'A') {
+                    m.T_run_simple<MCarState, FavorAdvice>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost);
+                } else if(argv[1][6]== 'C') {
+                    m.T_run_simple<MCarState, CostlyAdvise>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost);
+                } else if(argv[1][6]== 'W') {
+                    m.T_run_simple<MCarState, LearnerAdvise>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost);
+                } else if(argv[1][6]== 'M') {
+                    m.T_run_simple<MCarState, CostlyLearnerAdvise>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost);
+                }
+                else handled = false;
+            }
+            else if(argv[1][1] == 'G') {
+                if(argv[1][6]== 'A') {
+                    m.T_run_simple<GridWorldState, FavorAdvice>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost);
+                } else if(argv[1][6]== 'C') {
+                    m.T_run_simple<GridWorldState, CostlyAdvise>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost);
+                } else if(argv[1][6]== 'W') {
+                    m.T_run_simple<GridWorldState, LearnerAdvise>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost);
+                } else if(argv[1][6]== 'M') {
+                    m.T_run_simple<GridWorldState, CostlyLearnerAdvise>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost);
+                }
+                else handled = false;
+            }
+            else if(argv[1][1] == 'L') {
+                if (argv[1][6]== 'A') {
+                    m.T_run_simple<GridWorldLSState, FavorAdvice>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost);
+                } else if(argv[1][6]== 'C') {
+                    m.T_run_simple<GridWorldLSState, CostlyAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost);
+                } else if(argv[1][6]== 'W') {
+                    m.T_run_simple<GridWorldLSState, LearnerAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost);
+                } else if(argv[1][6]== 'M') {
+                    m.T_run_simple<GridWorldLSState, CostlyLearnerAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost);
+                } else handled = false;
+            }
+            else handled = false;
+        }
+        else
+            handled = false;
     }
-    else {
-//         m.FGQ1();
-//         m.FMQ1();
-      
-        m.TGQ1Q2(3);
-//         m.mcar_qltable_teacher(2);
+    else
+        handled = false;
+
+
+    if(!handled) {
+
     }
 
 }
-
-
-

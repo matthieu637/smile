@@ -16,14 +16,15 @@ struct RLParam {
     float lambda;
     float gamma;
     bool accumu;
-};  
-  
+};
+
 enum Algo {
     QL, QL_trace, Sarsa_, Sarsa_trace
 };
 
 static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., false};
-static const RLParam GridWorldParam= {0.001, 0.08, 0.9, 0.6, false};
+static const RLParam GridWorldLSParam= {0.001, 0.08, 0.9, 0.6, false};
+static const RLParam GridWorldParam= {0.05, 0.08, 0.9, 0.6, false};
 static const RLParam DefaultParam= {0.05, 0.08, 0.9, 0.6, false};
 
 template <typename EnvState>

@@ -1,5 +1,5 @@
-#ifndef GRIDWORLDFULL_H
-#define GRIDWORLDFULL_H
+#ifndef WUMPUS_H
+#define WUMPUS_H
 
 #include "simu/Environnement.hpp"
 
@@ -7,47 +7,44 @@ namespace simu {
 
 #define XPOS "XPOS"
 #define YPOS "YPOS"
-#define XG "XGOAL"
-#define YG "YGOAL"
-  
+#define PAS "passed"
+
 #define MOV "move"
 
 #define XMAX 10
 #define YMAX 10
+#define PMAX 2
 
-struct GridWorldState {
+struct GridWorldLSState {
     int x;
     int y;
-    int xgoal;
-    int ygoal;
+    int p;
 };
 
-class GridWorld : public Environnement<GridWorldState>
+class GridWorldLS : public Environnement<GridWorldLSState>
 {
 public:
-    GridWorld();
+    GridWorldLS();
 
 public:
     DAction* getInitialAction() const;
     double reward() const;
     bool goal() const;
     unsigned int maxStep() const;
-    void computeDState(const GridWorldState& s, DState* dst, const StateTemplate* repr);
+    void computeDState(const GridWorldLSState& s, DState* dst, const StateTemplate* repr);
 protected:
     void applyOn(const DAction& ac);
     void initState();
 
     bool accessible(int x, int y) const;
 
-public:
-// private:
+private:
     static const int REWARD[XMAX][YMAX];
-    static const int NBGOALS = 5;
-    static const int XGOALS [NBGOALS];
-    static const int YGOALS [NBGOALS];
+    static const int GOALS = 6;
 
     int world[XMAX][YMAX];
-    int currentGoal;
+    int passed[XMAX][YMAX];
+    int keepGoals;
     int last_reward;
 };
 

@@ -1,4 +1,4 @@
-#include "simu/GridWorld.hpp"
+#include "simu/GridWorldLS.hpp"
 #include "bib/Logger.hpp"
 
 namespace simu {
@@ -7,41 +7,40 @@ namespace simu {
 //0 means wall
 //-10 malus
 //10/50 goals
-const int GridWorld::REWARD[XMAX][YMAX]= {
-    { -1, -1, -1, -1, -1,  0,  -1, -1, -1, 50},
-    { -1, -1, -1,  0, 10,  0,  -1, -1, -1, 0  },
-    {  0,  0, -1,  0,  0, 10,  -1, -1,  0, -10 },
+const int GridWorldLS::REWARD[XMAX][YMAX]= {
+    { -1, -1, -1, 10, -1,  0,  -1, -1, -1, -10},
+    { -1, -1, -1,  0, -1,  0,  -1, -1, -1, 0  },
+    {  0,  0, -1,  0,  0, 10,  -1, -1,  0, 10 },
     { 10,  0, -1,  0, -1,  0,   0, -1, -1, -1 },
     { -1,  0, -1, -1, -1,  0, -20,  0,  0, -1 },
-    { -1,  0, -1, -1, -1,  0,  -1,  0, -1, -1 },
+    { -1,  0, -1, -1, -1,  0,  -1,  0, -1, 50 },
     { -1,  0, 10, -1, -1,  0,  -1,  0, -1, 0  },
     { -1, -1, -1, -1, -1,  0,  -1,  0, -1, 0  },
     { -1,  0, -1,  0,  0,  0,  -1,  0, -1, 0  },
     {-20,  0, -1, -1, -1, -1,  -1, -1, -1, 0  }
 };
 
-const int GridWorld::XGOALS[NBGOALS] = {3, 1, 2, 6, 0};
-const int GridWorld::YGOALS[NBGOALS] = {0, 4, 4, 2, 9};
-
-GridWorld::GridWorld() : Environnement< GridWorldState >(new StateTemplate( {XPOS, YPOS, XG, YG}, {XMAX, YMAX, XMAX, YMAX}), new ActionTemplate( {MOV}, {4}))
+GridWorldLS::GridWorldLS() : Environnement< GridWorldLSState >(new StateTemplate( {XPOS, YPOS, PAS}, {XMAX, YMAX, PMAX}), new ActionTemplate( {MOV}, {4}))
 {
     init();
 }
 
-void GridWorld::initState() {
-    currentGoal = 0;
+void GridWorldLS::initState() {
+    keepGoals = GOALS;
     for(int i=0; i<XMAX; i++)
-        for(int j=0; j<YMAX; j++)
+        for(int j=0; j<YMAX; j++) {
             world[i][j]=REWARD[i][j];
+            passed[i][j]= 0;
+        }
 
     state->x = 0;
     state->y = 0;
-    state->xgoal = XGOALS[currentGoal];
-    state->ygoal = YGOALS[currentGoal];
+    state->p = 0;
+    passed[0][0] = 1;
     last_reward = -1;
 }
 
-void GridWorld::applyOn(const DAction& ac)
+void GridWorldLS::applyOn(const DAction& ac)
 {
     // if we are on a goal, we eat it
     if(last_reward > 0) {
@@ -68,45 +67,44 @@ void GridWorld::applyOn(const DAction& ac)
         break;
     }
     
-    if(reward() > 0) {
-        currentGoal++;
-        if(currentGoal < NBGOALS) {
-            state->xgoal = XGOALS[currentGoal];
-            state->ygoal = YGOALS[currentGoal];
-        }
-    }
+    state->p = passed[state->x][state->y];
+    passed[state->x][state->y]++;
+
+    if(reward() > 0)
+        keepGoals--;
+    
     last_reward = reward();
 }
 
-bool GridWorld::accessible(int x, int y) const {
+bool GridWorldLS::accessible(int x, int y) const {
     if(x < 0 || x >= XMAX || y < 0 || y >= YMAX)
         return false;
 
     return REWARD[x][y] != 0;
 }
 
-double GridWorld::reward() const {
+double GridWorldLS::reward() const {
     return world[state->x][state->y];
 }
 
-DAction* GridWorld::getInitialAction() const {
+DAction* GridWorldLS::getInitialAction() const {
     return new DAction(getActions(), 0);
 }
 
-bool GridWorld::goal() const {
-    return currentGoal >= NBGOALS /*|| currentGoal == NBGOALS -1 && state->x == 0 && state->y == 9*/;
+bool GridWorldLS::goal() const {
+    return keepGoals <= 0;
 }
 
-unsigned int GridWorld::maxStep() const {
+unsigned int GridWorldLS::maxStep() const {
     return 5000;
 }
 
-void GridWorld::computeDState(const GridWorldState& s, DState* dst, const ActionTemplate* repr) {
+void GridWorldLS::computeDState(const GridWorldLSState& s, DState* dst, const ActionTemplate* repr) {
     (void) repr;
     dst->set(XPOS, s.x);
     dst->set(YPOS, s.y);
-    dst->set(XG, s.xgoal);
-    dst->set(YG, s.ygoal);
+    dst->set(PAS, s.p >= PMAX ? PMAX - 1 : s.p);
+//     LOG_DEBUG(*dst);
 }
 
 }
