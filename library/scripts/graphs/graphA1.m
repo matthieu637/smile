@@ -1,38 +1,28 @@
 clear all
 close all
 
+X = load('../../data/TMQ1Q1AMTA');
+Y = load('../../data/TMQ1Q1AOTA');
+Z = load('../../data/TMQ1Q1ANTA');
+U = load('../../data/TMQ1Q1AITA');
 
+X = mean(X);
+Y = mean(Y);
+Z = mean(Z);
+U = mean(U);
 
-X = mean( load( '../../data/mcar_qltable_learner' ) );
-
-q=0.001:0.001:0.040
-
-ii=1
-for i=q
-   [tok, rem] = strtok(num2str(i), '.');
-   if(length(rem) == 3) 
-      rem = cstrcat(rem, '0');
-   endif
-   tmp = mean( load( cstrcat('../../data/mcar_qltable_teacher_', rem) ) ); 
-   Y(ii)=tmp(1);
-   tmp2 = mean( load( cstrcat('../../data/mcar_qltable_teacher_annonce_', rem) ) ); 
-   Z(ii)=tmp2(1);
-   ii=ii+1;
-end
+inter=1:15:length(X);
 
 h = figure
 
-x=1:ii-1
+plot(inter, X(inter), '-'); hold on;
+plot(inter, Y(inter), 'r-'); hold on;
+plot(inter, Z(inter), 'g-'); hold on;
+plot(inter, U(inter), 'm-');
 
-
-plot(q, ones(1, length(x))*X , '-'); hold on;
-plot(q, Y, 'r-'); hold on;
-plot(q, Z, 'g-');
-
-legend('no advise', 'advise after', 'advise before');
-xlabel('cout');
-ylabel('temps moyen d apprentissage');
-title('Evolution du temps d apprentissage par rapport au cout ');
+legend('Max', 'Override', 'None', 'Max+Override');
+xlabel('step of teacher');
+ylabel('step to reach the goal for the learner');
+title('How the advice affects the learner');
 
 print(h, '../../data/graphs/graphA1.png')
-
