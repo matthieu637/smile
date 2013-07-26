@@ -5,6 +5,7 @@
 #include "simu/MCar.hpp"
 #include <sml/Q.hpp>
 #include "simu/RLTable.hpp"
+#include "GridWorldLS.hpp"
 
 #define FDB "feedbacks"
 
@@ -84,7 +85,8 @@ public:
         this->init();
 
         best_policy_teacher = hist->back().min_step;
-// 	LOG_DEBUG(best_policy_teacher);
+	LOG_DEBUG(best_policy_teacher << " after " << hist->back().index_min << " runs");
+// 	LOG_DEBUG(hist->back().nbStep);
         delete hist;
     }
 
@@ -114,23 +116,25 @@ protected:
         giveAdvise = a;
 
         DAction* learner_next_action = nullptr;
-        DState dstate_leaner = prob->getDState();
+        DState dstate_learner = prob->getDState();
+	
         switch(astart) {
         case after:
             prob->apply(*this->state->learner_action);
-
-            if(giveAdvise) {
-                DAction* best_action = best_policy->decision(dstate_leaner, 0);
-                learner->get_policy()->should_done(dstate_leaner, *best_action);
+            if(giveAdvise && sea != None) {
+                DAction* best_action = best_policy->decision(dstate_learner, 0);
+                learner->get_policy()->should_done(dstate_learner, *best_action);
                 delete best_action;
             }
-
+            
             learner_next_action = learner->computeNextAction(prob->getDState(), prob->reward());
+	    
+// 	    LOG_DEBUG("state : " << dstate_learner << " action : " << *this->state->learner_action << " advice : " << *best_policy->decision(dstate_learner, 0) << " have advice " << giveAdvise );
             break;
         case before:
-            if(giveAdvise) {
-                DAction* best_action = best_policy->decision(dstate_leaner, 0);
-                learner->get_policy()->should_do(dstate_leaner, *best_action);
+            if(giveAdvise && sea != None) {
+                DAction* best_action = best_policy->decision(dstate_learner, 0);
+                learner->get_policy()->should_do(dstate_learner, *best_action);
                 prob->apply(*best_action);
                 delete best_action;
             }
@@ -143,23 +147,28 @@ protected:
         }
 
 
-// 	LOG_DEBUG(prob->getDState() << " " << *learner_next_action << " " << giveAdvise);
+// 	LOG_DEBUG(prob->getDState() << " " << *learner_next_action << " " << giveAdvise << " " << *(this->state->learner_action));
 
         EnvState car = prob->getState();
         this->state->learner_state = car;
-        this->state->learner_action = learner_next_action;
+ 	delete this->state->learner_action;
+        this->state->learner_action = new DAction(*learner_next_action);
     }
 
     void computeDState(const TeacherState<EnvState>& s, DState* dst, const StateTemplate* repr) {
+// 	const GridWorldLSState ss = ((const GridWorldLSState&)prob->getState());
+// 	LOG_DEBUG("begin with : " << *dst << " copy first {" << ss.x << "," << ss.y << "," << ss.p << "} and then " << *s.learner_action);	
         prob->computeDState(prob->getState(), dst, repr);
+// 	LOG_DEBUG(*dst);
         dst->copyValuesOf(*s.learner_action);
+// 	LOG_DEBUG(*dst);
     }
 
     void initState() {
         learner->reset();
         learner->get_policy()->setAdviseStrat(sea);
         this->state->learner_state = prob->getState();
-        this->state->learner_action = prob->getInitialAction();
+        this->state->learner_action = new DAction(*prob->getInitialAction());
     }
 
 private:

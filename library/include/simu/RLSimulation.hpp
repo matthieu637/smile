@@ -22,6 +22,7 @@ struct stats {
     int nbStep;
     double total_reward;
     int min_step;
+    int index_min;
 };
 
 template<typename EnvState, typename PolicyState, typename StateType>
@@ -38,7 +39,7 @@ public:
 
     virtual ~RLSimulation() {
         delete fac;
-        delete prob;
+//         delete prob;
         delete agent;
         delete best_policy;
     }
@@ -46,7 +47,7 @@ public:
     stats run() {
         agent = this->createAgent(getState(prob), *fac);
 
-        stats s = local_run();
+        stats s = local_run(0);
         best_policy = agent->copyPolicy();
         return s;
     }//best_policy not cleared
@@ -57,8 +58,10 @@ public:
         additional_step--;
         prob->init();
         agent->clear_history(getState(prob), *fac);
-        stats s = local_run();
+        stats s = local_run(0);
         int min_step = s.min_step;
+	int index_min = 0;
+	int index = 1;
         stats_history->push_back(s);
 
         delete best_policy;
@@ -68,16 +71,19 @@ public:
             additional_step--;
             prob->init();
             agent->clear_history(getState(prob), *fac);
-            stats s = local_run();
+            stats s = local_run(index);
 
             if(s.nbStep <= min_step) {
                 min_step = s.nbStep;
+		index_min = index;
                 delete best_policy;
                 best_policy = agent->copyPolicy();
             }
             s.min_step = min_step;
+	    s.index_min = index_min;
 //             LOG_INFO(s.nbStep << " " << s.total_reward << " " << s.min_step << " " << additional_step);
             stats_history->push_back( s);
+	    index++;
         }
         while(additional_step > 0);
 
@@ -109,7 +115,7 @@ public:
 
 
 protected:
-    virtual stats local_run() {
+    virtual stats local_run(int index) {
         DAction* ac = fac;
         int step = 0;
         double total_reward = 0;
@@ -121,7 +127,8 @@ protected:
 
             ac = this->computeNextAction(getState(prob), prob->reward());
 
-// 	    LOG_DEBUG(*ac << " " << getState(prob));
+// 	    if(index==8142)
+//  	    LOG_DEBUG(*ac << " " << getState(prob));
         }
         while(!prob->goal() && step < (int)prob->maxStep());
 
@@ -129,7 +136,7 @@ protected:
 // 	LOG(step);
 // 	LOG(total_reward);
 
-        return {step, total_reward, step};
+        return {step, total_reward, step, index};
     }
 
 protected:

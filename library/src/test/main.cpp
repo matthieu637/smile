@@ -80,9 +80,12 @@ int main(int argc, char* argv[])
     bool handled = true;
     if(argc > 1 ) {
         float cost = 5;
+        int numberRun = 1000;
 
         if(argc > 2)
             cost = atof(argv[2]);
+        if(argc > 3)
+            numberRun = atoi(argv[3]);
 
         Environnement<GridWorldState>* grid = new GridWorld();
         Environnement<GridWorldLSState>* gridls = new GridWorldLS();
@@ -106,48 +109,48 @@ int main(int argc, char* argv[])
 
         if(argv[1][0] == 'F') {
             if (argv[1][1] == 'M') {
-                m.F_run_simple<MCarState>(learnAlgo, car, MCarParam);
+                m.F_run_simple<MCarState>(learnAlgo, car, MCarParam, numberRun);
             } else if(argv[1][1] == 'G') {
-                m.F_run_simple<GridWorldState>(learnAlgo, grid, GridWorldParam);
+                m.F_run_simple<GridWorldState>(learnAlgo, grid, GridWorldParam, numberRun);
             } else if(argv[1][1] == 'L') {
-                m.F_run_simple<GridWorldLSState>(learnAlgo, gridls, GridWorldParam);
+                m.F_run_simple<GridWorldLSState>(learnAlgo, gridls, GridWorldParam, numberRun);
             }
             else handled = false;
         }
         else if(argv[1][0] == 'T') {
             if (argv[1][1] == 'M') {
                 if(argv[1][6]== 'A') {
-                    m.T_run_simple<MCarState, FavorAdvice>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<MCarState, FavorAdvice>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 } else if(argv[1][6]== 'C') {
-                    m.T_run_simple<MCarState, CostlyAdvise>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<MCarState, CostlyAdvise>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 } else if(argv[1][6]== 'W') {
-                    m.T_run_simple<MCarState, LearnerAdvise>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<MCarState, LearnerAdvise>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 } else if(argv[1][6]== 'M') {
-                    m.T_run_simple<MCarState, CostlyLearnerAdvise>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<MCarState, CostlyLearnerAdvise>(learnAlgo, teachAlgo, car, MCarParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 }
                 else handled = false;
             }
             else if(argv[1][1] == 'G') {
                 if(argv[1][6]== 'A') {
-                    m.T_run_simple<GridWorldState, FavorAdvice>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<GridWorldState, FavorAdvice>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 } else if(argv[1][6]== 'C') {
-                    m.T_run_simple<GridWorldState, CostlyAdvise>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<GridWorldState, CostlyAdvise>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 } else if(argv[1][6]== 'W') {
-                    m.T_run_simple<GridWorldState, LearnerAdvise>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<GridWorldState, LearnerAdvise>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 } else if(argv[1][6]== 'M') {
-                    m.T_run_simple<GridWorldState, CostlyLearnerAdvise>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<GridWorldState, CostlyLearnerAdvise>(learnAlgo, teachAlgo, grid, GridWorldParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 }
                 else handled = false;
             }
             else if(argv[1][1] == 'L') {
                 if (argv[1][6]== 'A') {
-                    m.T_run_simple<GridWorldLSState, FavorAdvice>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<GridWorldLSState, FavorAdvice>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 } else if(argv[1][6]== 'C') {
-                    m.T_run_simple<GridWorldLSState, CostlyAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<GridWorldLSState, CostlyAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 } else if(argv[1][6]== 'W') {
-                    m.T_run_simple<GridWorldLSState, LearnerAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<GridWorldLSState, LearnerAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 } else if(argv[1][6]== 'M') {
-                    m.T_run_simple<GridWorldLSState, CostlyLearnerAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost);
+                    m.T_run_simple<GridWorldLSState, CostlyLearnerAdvise>(learnAlgo, teachAlgo, gridls, GridWorldLSParam, DefaultParam, same_state_rpr, as, sea, cost, numberRun);
                 }
                 else handled = false;
             }
@@ -160,8 +163,28 @@ int main(int argc, char* argv[])
         handled = false;
 
 
-    if(!handled)
+    if(!handled) {
         LOG_ERROR("Cannot handle your test");
+	
+// 	ActionTemplate* at = new ActionTemplate({"move"}, {4});
+// 	GridWorldLS* gg = new GridWorldLS;
+// 	LOG(gg->getDState() << " " << gg->reward());
+// 	gg->apply(DAction(at, 1));
+// 	LOG(gg->getDState() << " " << gg->reward());
+// 	gg->apply(DAction(at, 1));
+// 	LOG(gg->getDState() << " " << gg->reward());
+// 	gg->apply(DAction(at, 2));
+// 	LOG(gg->getDState() << " " << gg->reward());
+// 	gg->apply(DAction(at, 1));
+// 	LOG(gg->getDState() << " " << gg->reward());
+// 	gg->apply(DAction(at, 2));
+// 	LOG(gg->getDState() << " " << gg->reward());
+// 	gg->apply(DAction(at, 2));
+// 	LOG(gg->getDState() << " " << gg->reward());
+	
+//         m.T_run_simple<GridWorldLSState, FavorAdvice>(simu::Sarsa_, simu::QL, new GridWorldLS(), GridWorldLSParam, DefaultParam, true, after, sml::Max, 5, 1000);
+// 	m.F_run_simple<GridWorldLSState>(simu::QL, new GridWorldLS, GridWorldLSParam, 10000);
+    }
 
     return 0;
 }

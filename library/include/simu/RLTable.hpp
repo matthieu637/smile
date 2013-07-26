@@ -23,7 +23,7 @@ enum Algo {
 };
 
 static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., false};
-static const RLParam GridWorldLSParam= {0.001, 0.08, 0.9, 0.6, false};
+static const RLParam GridWorldLSParam= {0.05, 0.08, 0.9, 0.6, false};
 static const RLParam GridWorldParam= {0.05, 0.08, 0.9, 0.6, false};
 static const RLParam DefaultParam= {0.05, 0.08, 0.9, 0.6, false};
 

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd graphs
+find . -name '*.m' | while read file
+do 
+	echo "generate $file ..."
+	octave $file >& /dev/null
+done
+
+

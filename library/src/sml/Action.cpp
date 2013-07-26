@@ -90,9 +90,13 @@ unsigned int DAction::hash() const
 }
 
 void DAction::copyValuesOf(const DAction& ac) {
+//     LOG_DEBUG(*this << " copying " << ac);
     const boost::unordered_map< string, int>* names  = ac.templ->getActionNames();
-    for(ActionTemplate::nameIterator it=names->cbegin(); it != names->cend(); ++it)
-        this->set(it->first, it->second);
+    for(ActionTemplate::nameIterator it=names->cbegin(); it != names->cend(); ++it){
+// 	LOG_DEBUG(it->first << " " << ac[it->first]);
+        this->set(it->first, ac[it->first]);
+    }
+//     LOG_DEBUG(*this);
 }
 
 void DAction::computehash()

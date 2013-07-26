@@ -10,12 +10,16 @@ ActionTemplate::ActionTemplate(const sml::ActionTemplate& a, const sml::ActionTe
         actionNames[it->first] = it->second;
     }
     for(boost::unordered_map< string, int>::const_iterator it= b.actionNames.cbegin(); it != b.actionNames.cend(); ++it) {
-        actionNames[it->first] = it->second;
+        actionNames[it->first] = it->second + a.actionNames.size();
     }
     for(std::list<int>::const_iterator it = b.sizes.cbegin(); it != b.sizes.cend(); ++it) {
         sizes.push_back(*it);
     }
 
+//     bib::Logger::PRINT_ELEMENTS<list<int>>(sizes);
+//     for(boost::unordered_map< string, int>::const_iterator it= actionNames.cbegin(); it != actionNames.cend(); ++it) {
+// 	LOG_DEBUG(it->first << " " << it->second);
+//     }
 }
 
 ActionTemplate::ActionTemplate(const sml::ActionTemplate& a): actionNames(a.actionNames.size()), sizes(a.sizes) {

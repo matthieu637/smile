@@ -9,18 +9,18 @@ namespace simu {
 //10/50 goals
 const int GridWorldLS::REWARD[XMAX][YMAX]= {
     { -1, -1, -1, 10, -1,  0,  -1, -1, -1, -10},
-    { -1, -1, -1,  0, -1,  0,  -1, -1, -1, 0  },
-    {  0,  0, -1,  0,  0, 10,  -1, -1,  0, 10 },
-    { 10,  0, -1,  0, -1,  0,   0, -1, -1, -1 },
-    { -1,  0, -1, -1, -1,  0, -20,  0,  0, -1 },
-    { -1,  0, -1, -1, -1,  0,  -1,  0, -1, 50 },
-    { -1,  0, 10, -1, -1,  0,  -1,  0, -1, 0  },
-    { -1, -1, -1, -1, -1,  0,  -1,  0, -1, 0  },
+    { -1, -1, -1,  0, -1,  0,  -1, -1, -1, -1 },
+    {  0,  0, -1,  0, -1, 10,  -1, -1,  0, 10 },
+    {-10,  0, -1,  0, -1,  0,  -1,  0, -1, -1 },
+    { 10,  0, -1, -1, -1,  0, -20,  0,  0, -1 },
+    { -1,  0, -1, -1, -1,  0,  -1,  0, -1, 10 },
+    { -1,  0, 50,  0, -1,  0,  -1,  0, -1, 0  },
+    { -1, -1, -1,  0, -1,  0,  -1,  0, -1, 0  },
     { -1,  0, -1,  0,  0,  0,  -1,  0, -1, 0  },
-    {-20,  0, -1, -1, -1, -1,  -1, -1, -1, 0  }
+    { -1, -1, -1, -1, -1, -1,  -1, -1, -1, 0  }
 };
 
-GridWorldLS::GridWorldLS() : Environnement< GridWorldLSState >(new StateTemplate( {XPOS, YPOS, PAS}, {XMAX, YMAX, PMAX}), new ActionTemplate( {MOV}, {4}))
+GridWorldLS::GridWorldLS() : Environnement< GridWorldLSState >(new StateTemplate( {XPOS, YPOS}, {XMAX, YMAX}), new ActionTemplate( {MOV}, {4}))
 {
     init();
 }
@@ -84,7 +84,7 @@ bool GridWorldLS::accessible(int x, int y) const {
 }
 
 double GridWorldLS::reward() const {
-    return world[state->x][state->y];
+    return world[state->x][state->y] - state->p;
 }
 
 DAction* GridWorldLS::getInitialAction() const {
@@ -101,9 +101,10 @@ unsigned int GridWorldLS::maxStep() const {
 
 void GridWorldLS::computeDState(const GridWorldLSState& s, DState* dst, const ActionTemplate* repr) {
     (void) repr;
+//     LOG_DEBUG(s.x << " " << s.y << " " << s.p);
     dst->set(XPOS, s.x);
     dst->set(YPOS, s.y);
-    dst->set(PAS, s.p >= PMAX ? PMAX - 1 : s.p);
+//     dst->set(PAS, s.p >= PMAX ? PMAX - 1 : s.p);
 //     LOG_DEBUG(*dst);
 }
 

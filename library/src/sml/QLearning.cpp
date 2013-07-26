@@ -22,13 +22,14 @@ QLearning::~QLearning() {
 
 DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon, float discount)
 {
-//     LOG_DEBUG(s << " " << *ds);
     DAction *ap = Q.argmax(s);
     Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(s, *ap) - Q(ds, da) );
 
     //Choose a from s using policy derived from Q
     DAction* a = decision(s, epsilon);
 
+//     LOG_DEBUG(s << " " << *ds << *da << *a);
+    
     delete ap;
     delete ds;
     delete da;

@@ -16,12 +16,12 @@ class DraftTest
 public:
 
     template<typename EnvState>
-    void F_run_simple(Algo a, Environnement<EnvState>* env, RLParam p) {
+    void F_run_simple(Algo a, Environnement<EnvState>* env, RLParam p, int numberRun) {
         Utils::srand_mili();
 
         simu::RLTable<EnvState> m(a, env, p);
         int step = m.run().nbStep;
-        std::list<stats>* l = m.keepRun(1000);
+        std::list<stats>* l = m.keepRun(numberRun);
         LOG_DEBUG(l->back().min_step);
         LOG_DEBUG(step);
 
@@ -32,28 +32,31 @@ public:
     }
 
     template<typename EnvState, typename PolicyReward>
-    void T_run_simple(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* leaner_env, RLParam paramLearn,
-                      RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost) {
+    void T_run_simple(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
+                      RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
         Utils::srand_mili();
 
-        RLTable<EnvState>* leaner_agent = new RLTable<EnvState>(algoLearn, leaner_env, paramLearn);
+        RLTable<EnvState>* learner_agent = new RLTable<EnvState>(algoLearn, learner_env, paramLearn);
 
 
-        StateTemplate teacher_repr(*leaner_env->getStates());
+        StateTemplate teacher_repr(*learner_env->getStates());
         if(!same_rpr) {
             teacher_repr.setSize(POS, 16);
             teacher_repr.setSize(VEL, 24);
         }
 
-        DTeacher<PolicyReward, EnvState>* teach = new DTeacher<PolicyReward, EnvState>(leaner_agent, teacher_repr, cost, as, sea);
+        DTeacher<PolicyReward, EnvState>* teach = new DTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
         RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);
         r.run();
-        std::list<stats>* l = r.keepRun(1000);
+        std::list<stats>* l = r.keepRun(numberRun);
 
         bib::Logger::getInstance()->enableBuffer();
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
             LOG(it->nbStep);
         bib::Logger::getInstance()->flushBuffer();
+	
+	delete teach;
+	delete learner_agent;
     }
 };
 

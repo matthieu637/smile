@@ -13,7 +13,6 @@ namespace simu {
 
 #define XMAX 10
 #define YMAX 10
-#define PMAX 2
 
 struct GridWorldLSState {
     int x;

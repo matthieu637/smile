@@ -15,14 +15,14 @@ inter=1:15:length(X);
 
 h = figure
 
-plot(inter, X(inter), '-'); hold on;
-plot(inter, Y(inter), 'r-'); hold on;
-plot(inter, Z(inter), 'g-'); hold on;
-plot(inter, U(inter), 'm-');
+plot(inter, X(inter), '-', "linewidth", 2); hold on;
+plot(inter, Y(inter), 'r-', "linewidth", 2); hold on;
+plot(inter, Z(inter), 'g-', "linewidth", 2); hold on;
+plot(inter, U(inter), 'm-', "linewidth", 2);
 
 legend('Max', 'Override', 'None', 'Max+Override');
 xlabel('step of teacher');
-ylabel('step to reach the goal for the learner');
+ylabel('step to reach the goal for the learner at the first episod');
 title('How the advice affects the learner');
 
-print(h, '../../data/graphs/graphA1.png')
+print(h, '../../data/graphs/graphA_MA.png')
