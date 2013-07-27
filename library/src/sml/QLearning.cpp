@@ -3,14 +3,14 @@
 
 namespace sml {
 
-QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf) :
-    LearnStat(conf), Q(stmp, atmp), P(stmp, atmp), atmp(atmp)
+QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, RLParam param, const LearnConfig& conf) :
+    LearnStat(conf), Q(stmp, atmp), P(stmp, atmp), atmp(atmp), DPolicy(param)
 {
     ds = new DState(s);
     da = new DAction(a);
 }
 
-QLearning::QLearning(const QLearning& q):LearnStat(q.conf), Q(q.Q), P(q.P), atmp(q.atmp) {
+QLearning::QLearning(const QLearning& q):LearnStat(q.conf), Q(q.Q), P(q.P), atmp(q.atmp), DPolicy(q.param) {
     ds = new DState(*q.ds);
     da = new DAction(*q.da);
 }
@@ -20,13 +20,13 @@ QLearning::~QLearning() {
     delete da;
 }
 
-DAction* QLearning::learn(const DState& s, double r, float lrate, float epsilon, float discount)
+DAction* QLearning::learn(const DState& s, double r)
 {
     DAction *ap = Q.argmax(s);
-    Q(ds,da) = Q(ds,da) + lrate*(r+discount*Q(s, *ap) - Q(ds, da) );
+    Q(ds,da) = Q(ds,da) + param.alpha*(r+param.gamma*Q(s, *ap) - Q(ds, da) );
 
     //Choose a from s using policy derived from Q
-    DAction* a = decision(s, epsilon);
+    DAction* a = decision(s, param.epsilon);
 
 //     LOG_DEBUG(s << " " << *ds << *da << *a);
     
@@ -101,7 +101,7 @@ void QLearning::clear_history(const DState& s, const DAction& a)
     da = new DAction(a);
 }
 
-void QLearning::should_do(const DState& s, const DAction& a) {
+void QLearning::should_do(const DState& s, const DAction& a, double reward) {
     should_done(s, a);
 
     clear_history(s, a);

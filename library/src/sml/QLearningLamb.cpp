@@ -104,9 +104,9 @@ void QLearningLamb::should_do(const DState& s, const DAction& a) {
     (void) a;
 }
 
-Policy<DState>* QLearningLamb::copyPolicy() {
-    return new QLearningLamb(*this);
-}
+// Policy<DState>* QLearningLamb::copyPolicy() {
+//     return new QLearningLamb(*this);
+// }
 
 DAction* QLearningLamb::decision (const DState& s, float epsilon)
 {

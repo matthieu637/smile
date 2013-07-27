@@ -28,7 +28,7 @@ public:
 };
 
 
-class QLearningLamb : public sml::LearnStat, public DPolicy
+class QLearningLamb : public sml::LearnStat/*, public DPolicy*/
 {
 
 public:

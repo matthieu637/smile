@@ -6,20 +6,14 @@
 #include <sml/QLearning.hpp>
 #include <sml/QLearningLamb.hpp>
 #include <sml/Sarsa.hpp>
+#include <sml/QLearnGradient.hpp>
+#include "sml/Feature.hpp"
 #include "simu/Environnement.hpp"
 
 namespace simu {
 
-struct RLParam {
-    float epsilon;
-    float alpha;
-    float lambda;
-    float gamma;
-    bool accumu;
-};
-
 enum Algo {
-    QL, QL_trace, Sarsa_, Sarsa_trace
+    QL, QL_trace, QL_gen, Sarsa_, Sarsa_trace, Sarsa_gen
 };
 
 static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., false};
@@ -37,29 +31,15 @@ public:
 
         switch(type) {
         case QL:
-            return new QLearning(this->prob->getStates(), this->prob->getActions(), dst, a);
+            return new QLearning(this->prob->getStates(), this->prob->getActions(), dst, a, rlp);
         case QL_trace:
-            return new QLearningLamb(this->prob->getStates(), this->prob->getActions(), dst, a);
+//             return new QLearningLamb(this->prob->getStates(), this->prob->getActions(), dst, a);
         case Sarsa_:
-            return new Sarsa(this->prob->getStates(), this->prob->getActions(), dst, a);
+//             return new Sarsa(this->prob->getStates(), this->prob->getActions(), dst, a);
         case Sarsa_trace:
             break;
-        }
-
-        return nullptr;
-    }
-
-    DAction* computeNextAction(const DState& dst, double reward) {
-
-        switch(type) {
-        case QL:
-            return ((QLearning*)this->agent)->learn(dst, reward, rlp.alpha, rlp.epsilon, rlp.gamma);
-        case QL_trace:
-            return ((QLearningLamb*)this->agent)->learn(dst, reward, rlp.alpha, rlp.epsilon, rlp.gamma, rlp.lambda, rlp.accumu);
-        case Sarsa_:
-            return ((Sarsa*)this->agent)->learn(dst, reward, rlp.alpha, rlp.epsilon, rlp.gamma);
-        case Sarsa_trace:
-            break;
+        default:
+            LOG_ERROR("wrong param");
         }
 
         return nullptr;
@@ -68,6 +48,33 @@ public:
     Algo type;
     RLParam rlp;
 };
+
+template<typename EnvState>
+class RLGradient : public RLSimulation<EnvState, EnvState, ContinuousSelection>
+{
+public:
+    RLGradient(Algo algo, Environnement<EnvState>* p, RLParam rlp, featuredList<EnvState>* features, int nbFeature) : 
+    RLSimulation<EnvState, DState, DiscretizeSelection>(p), type(algo),rlp(rlp), features(features), nbFeature(nbFeature) {}
+
+    Policy<DState>* createAgent(const DState& dst, const DAction& a) {
+
+        switch(type) {
+        case QL_gen:
+            return new QLearnGradient<EnvState>(features, nbFeature, this->prob->getActions(), a, rlp);
+        default:
+            LOG_ERROR("wrong param");
+            return nullptr;
+        }
+
+        return nullptr;
+    }
+
+    Algo type;
+    RLParam rlp;
+    featuredList<EnvState>* features;
+    int nbFeature;
+};
+
 
 }
 

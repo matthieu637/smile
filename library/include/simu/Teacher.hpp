@@ -135,7 +135,7 @@ protected:
         case before:
             if(giveAdvise && sea != None) {
                 DAction* best_action = best_policy->decision(state_learner, 0);
-                learner->get_policy()->should_do(state_learner, *best_action);
+//                 learner->get_policy()->should_do(state_learner, *best_action);
                 prob->apply(*best_action);
                 delete best_action;
             }

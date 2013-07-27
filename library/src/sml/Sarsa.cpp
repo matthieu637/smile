@@ -38,55 +38,55 @@ DAction* Sarsa::learn(const DState& s, double r, float lrate, float epsilon, flo
 
 void Sarsa::should_done(const DState& s, const DAction& a)
 {
-//     LOG_DEBUG(s << " " << a);
-    switch(adviceStrat) {
-    case FixedNExploration:
-    case FixedNMax:
-        DAction* b = P.argmax(s);
-        if(P(s, *b) == 1 && !(*b == a) )
-            P(s, *b) = 0;
-        delete b;
-
-        P(s,a)=1;
-        break;
-    }
-
-    switch(adviceStrat) {
-    case FixedNMax:
-    case Max:
-        DAction* ba = Q.argmax(s);
-        Q(s,a) = Q(s,*ba) + 0.000001;
-        delete ba;
-    }
+// //     LOG_DEBUG(s << " " << a);
+//     switch(adviceStrat) {
+//     case FixedNExploration:
+//     case FixedNMax:
+//         DAction* b = P.argmax(s);
+//         if(P(s, *b) == 1 && !(*b == a) )
+//             P(s, *b) = 0;
+//         delete b;
+// 
+//         P(s,a)=1;
+//         break;
+//     }
+// 
+//     switch(adviceStrat) {
+//     case FixedNMax:
+//     case Max:
+//         DAction* ba = Q.argmax(s);
+//         Q(s,a) = Q(s,*ba) + 0.000001;
+//         delete ba;
+//     }
 }
 
 DAction* Sarsa::decision(const DState& s, float epsilon) {
-    DAction* a = Q.argmax(s);
-
-    bool greedy = true;
-    if(adviceStrat == FixedNExploration || adviceStrat == FixedNMax) {
-        DAction* b = P.argmax(s);
-        if( P(s, *b) == 1 ) {
-            a = b;
-            greedy = false;
-        }
-        else
-            delete b;
-    }
-
-    //exploration
-    if(greedy && sml::Utils::rand01() < epsilon ) {
-        delete a;
-        a = new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
-    }
-
-//     LOG_DEBUG("dec " <<s << " " << *a);
-    
-    
-//     if(adviceStrat != None)
-//       LOG_DEBUG("dec "<< *a << " from " << s );
-//     LOG_DEBUG(adviceStrat);
-    return a;
+//     DAction* a = Q.argmax(s);
+// 
+//     bool greedy = true;
+//     if(adviceStrat == FixedNExploration || adviceStrat == FixedNMax) {
+//         DAction* b = P.argmax(s);
+//         if( P(s, *b) == 1 ) {
+//             a = b;
+//             greedy = false;
+//         }
+//         else
+//             delete b;
+//     }
+// 
+//     //exploration
+//     if(greedy && sml::Utils::rand01() < epsilon ) {
+//         delete a;
+//         a = new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
+//     }
+// 
+// //     LOG_DEBUG("dec " <<s << " " << *a);
+//     
+//     
+// //     if(adviceStrat != None)
+// //       LOG_DEBUG("dec "<< *a << " from " << s );
+// //     LOG_DEBUG(adviceStrat);
+//     return a;
 }
 
 void Sarsa::clear_history(const DState& s, const DAction& a)
@@ -103,9 +103,9 @@ void Sarsa::should_do(const DState& s, const DAction& a) {
     clear_history(s, a);
 }
 
-Policy<DState>* Sarsa::copyPolicy() {
-    return new Sarsa(*this);
-}
+// Policy<DState>* Sarsa::copyPolicy() {
+//     return new Sarsa(*this);
+// }
 
 const QTable& Sarsa::getPolicy() {
     return Q;

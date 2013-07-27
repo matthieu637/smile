@@ -24,7 +24,7 @@ public:
 ///       s : l'état
 ///       a : l'action
 ///       conf : la configuration d'apprentissage
-    QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf={false,0,0});
+    QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, RLParam param, const LearnConfig& conf={false,0,0});
     
     QLearning(const QLearning& q);
     
@@ -37,7 +37,7 @@ public:
 ///       lrate : le taux d'apprentissage
 ///	  epsilon : politique "epsilon-greedy"
 ///	  discount : importance du prochain état de la récompense 
-    DAction* learn(const DState& s, double r, float lrate, float epsilon, float discount);
+    DAction* learn(const DState& s, double r);
     
 ///
 ///\brief Retourner l'action à faire selon l'algorithme QLearning sans apprentissage 
@@ -48,7 +48,7 @@ public:
     void clear_history(const DState& ds, const DAction& da);
     
     void should_done(const DState& s, const DAction& a);
-    void should_do(const DState& s, const DAction& a);
+    void should_do(const DState& s, const DAction& a, double reward);
     const QTable& getPolicy();
     Policy<DState>* copyPolicy();
     

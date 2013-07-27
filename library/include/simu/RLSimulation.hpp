@@ -68,8 +68,8 @@ public:
         agent->clear_history(getState(prob), *fac);
         stats s = local_run(0);
         int min_step = s.min_step;
-	int index_min = 0;
-	int index = 1;
+        int index_min = 0;
+        int index = 1;
         stats_history->push_back(s);
 
         delete best_policy;
@@ -83,15 +83,15 @@ public:
 
             if(s.nbStep <= min_step) {
                 min_step = s.nbStep;
-		index_min = index;
+                index_min = index;
                 delete best_policy;
                 best_policy = agent->copyPolicy();
             }
             s.min_step = min_step;
-	    s.index_min = index_min;
+            s.index_min = index_min;
 //             LOG_INFO(s.nbStep << " " << s.total_reward << " " << s.min_step << " " << additional_step);
             stats_history->push_back( s);
-	    index++;
+            index++;
         }
         while(additional_step > 0);
 
@@ -119,7 +119,10 @@ public:
     }
 
     virtual Policy<PolicyState>* createAgent(const PolicyState& s, const DAction& a) = 0;
-    virtual DAction* computeNextAction(const PolicyState& s, double reward) = 0;
+
+    DAction* computeNextAction(const PolicyState& s, double reward) {
+        return agent->learn(s, reward);
+    }
 
 
 protected:

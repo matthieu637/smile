@@ -12,7 +12,7 @@
 
 namespace sml {
 
-class Sarsa : public LearnStat, public DPolicy
+class Sarsa : public LearnStat/*, public DPolicy*/
 {
 public:
 ///

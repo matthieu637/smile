@@ -26,15 +26,15 @@ public:
 
 ///
 ///\brief Constructeur pour créer une couche complexe (RBF, log, ...)
-///\param f : une fonction 
-/// 	  params : paramètre pour la fonction 
+///\param f : une fonction
+/// 	  params : paramètre pour la fonction
     Feature(featuring f, const std::vector<double> &params, type t=custom):
         f(f), params(params), t(t) {}
 
 ///
 ///\brief Constructeur pour créer une couche regulière : un tiling en dimension quelconque
-///\param featuresl : liste des fonctions pour chaque dimension 
-/// 	  params : paramètre pour la fonction         
+///\param featuresl : liste des fonctions pour chaque dimension
+/// 	  params : paramètre pour la fonction
     Feature(const vector<featuring1D>& featuresl, const std::vector<double> &params):
         featuresl(featuresl), params(params), t(_ND), var(featuresl.size()), max(featuresl.size()), total(featuresl.size()), width(featuresl.size()), size(1)
     {
@@ -51,7 +51,7 @@ public:
     }
 
 ///
-///\brief Retourner le taille total de dimensions  
+///\brief Retourner le taille total de dimensions
     int getSize() {
         return size;
     }
@@ -74,7 +74,7 @@ public:
 ///
 ///\brief Déterminer l'indice activé pour l'état et l'action
 ///\param st : l'état donné
-/// 	  at : l'action donnée    
+/// 	  at : l'action donnée
     int caseND(const S& st, const DAction& ac) {
 
         for(int index=0; index < featuresl.size(); index++) {
@@ -141,6 +141,12 @@ private:
 
     int size;
 };
+
+template<typename State>
+using featuredList = std::list< Feature<State> > ;
+
+template<typename State>
+using fLiterator = typename std::list< Feature<State> >::iterator ;
 
 }
 
