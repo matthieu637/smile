@@ -1,6 +1,6 @@
 #include <test/DraftTest.hpp>
 #include "bib/Logger.hpp"
-#include "simu/DTeacher.hpp"
+#include "simu/Teacher.hpp"
 #include <simu/GridWorld.hpp>
 
 // FNV-1a constants
@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
 // 	gg->apply(DAction(at, 2));
 // 	LOG(gg->getDState() << " " << gg->reward());
 	
-//         m.T_run_simple<GridWorldLSState, FavorAdvice>(simu::Sarsa_, simu::QL, new GridWorldLS(), GridWorldLSParam, DefaultParam, true, after, sml::Max, 5, 1000);
+        m.T_run_simple<GridWorldLSState, FavorAdvice>(simu::Sarsa_, simu::QL, new GridWorldLS(), GridWorldLSParam, DefaultParam, true, after, sml::Max, 5, 1000);
 // 	m.F_run_simple<GridWorldLSState>(simu::QL, new GridWorldLS, GridWorldLSParam, 10000);
     }
 

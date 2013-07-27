@@ -4,7 +4,7 @@
 #include "simu/Environnement.hpp"
 #include "simu/MCar.hpp"
 #include <sml/Q.hpp>
-#include "simu/RLTable.hpp"
+#include "simu/RLSimulation.hpp"
 #include "GridWorldLS.hpp"
 
 #define FDB "feedbacks"
@@ -63,13 +63,14 @@ protected:
     }
 };
 
-template<typename PolicyReward, typename EnvState>
-class DTeacher : public Environnement < TeacherState < EnvState > >, protected PolicyReward {
+template<typename PolicyReward, typename EnvState, typename PolicyState, typename StateType>
+class Teacher : public Environnement < TeacherState < EnvState > >, protected PolicyReward, private StateType {
 
     using PolicyReward::policy_reward;
+    using StateType::getState;
 
 public:
-    DTeacher(RLTable<EnvState>* learner, const StateTemplate& st, float advice_cost, AdviseStrategy astart, StrategyEffectsAdvice sea):
+    Teacher(RLSimulation<EnvState, PolicyState, StateType>* learner, const StateTemplate& st, float advice_cost, AdviseStrategy astart, StrategyEffectsAdvice sea):
         Environnement< TeacherState < EnvState > >(new StateTemplate( st, *learner->getEnv()->getActions()) , new ActionTemplate( {FDB}, {2}) ) ,
                    prob(learner->getEnv()),
                    learner(learner),
@@ -116,25 +117,25 @@ protected:
         giveAdvise = a;
 
         DAction* learner_next_action = nullptr;
-        DState dstate_learner = prob->getDState();
+        PolicyState state_learner = getState(prob);
 	
         switch(astart) {
         case after:
             prob->apply(*this->state->learner_action);
             if(giveAdvise && sea != None) {
-                DAction* best_action = best_policy->decision(dstate_learner, 0);
-                learner->get_policy()->should_done(dstate_learner, *best_action);
+                DAction* best_action = best_policy->decision(state_learner, 0);
+                learner->get_policy()->should_done(state_learner, *best_action);
                 delete best_action;
             }
             
-            learner_next_action = learner->computeNextAction(prob->getDState(), prob->reward());
+            learner_next_action = learner->computeNextAction(getState(prob), prob->reward());
 	    
-// 	    LOG_DEBUG("state : " << dstate_learner << " action : " << *this->state->learner_action << " advice : " << *best_policy->decision(dstate_learner, 0) << " have advice " << giveAdvise );
+// 	    LOG_DEBUG("state : " << state_learner << " action : " << *this->state->learner_action << " advice : " << *best_policy->decision(state_learner, 0) << " have advice " << giveAdvise );
             break;
         case before:
             if(giveAdvise && sea != None) {
-                DAction* best_action = best_policy->decision(dstate_learner, 0);
-                learner->get_policy()->should_do(dstate_learner, *best_action);
+                DAction* best_action = best_policy->decision(state_learner, 0);
+                learner->get_policy()->should_do(state_learner, *best_action);
                 prob->apply(*best_action);
                 delete best_action;
             }
@@ -142,7 +143,7 @@ protected:
                 prob->apply(*this->state->learner_action);
 
 
-            learner_next_action = learner->computeNextAction(prob->getDState(), prob->reward());
+            learner_next_action = learner->computeNextAction(getState(prob), prob->reward());
             break;
         }
 
@@ -173,14 +174,21 @@ protected:
 
 private:
     Environnement<EnvState>* prob;
-    RLTable<EnvState>* learner;
-    Policy<DState>* best_policy;
+    RLSimulation<EnvState, PolicyState, StateType>* learner;
+    Policy<PolicyState>* best_policy;
     bool giveAdvise;
     float advice_cost;
     int best_policy_teacher;
     AdviseStrategy astart;
     StrategyEffectsAdvice sea;
 };
+
+
+template<typename PolicyReward, typename EnvState>
+using DTeacher = Teacher<PolicyReward, EnvState, DState, DiscretizeSelection>;
+
+template<typename PolicyReward, typename EnvState>
+using CTeacher = Teacher<PolicyReward, EnvState, EnvState, ContinuousSelection>;
 
 
 }

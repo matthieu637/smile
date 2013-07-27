@@ -9,12 +9,20 @@ namespace simu {
 
 
 class DiscretizeSelection {
-
 protected:
     template<typename EnvState>
     const DState& getState(Environnement<EnvState>* env)
     {
         return env->getDState();
+    }
+};
+
+class ContinuousSelection {
+protected:
+    template<typename EnvState>
+    const EnvState& getState(Environnement<EnvState>* env)
+    {
+        return env->getState();
     }
 };
 

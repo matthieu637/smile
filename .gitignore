@@ -51,3 +51,6 @@ doc/
 library/data
 
 octave-core
+
+#too big
+*.pdf

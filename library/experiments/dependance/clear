@@ -1,0 +1,24 @@
+#!/bin/bash
+
+function rmb(){
+
+svn del --force *.toc
+svn del --force *.log
+svn del --force *.bbl
+svn del --force *.blg
+svn del --force *.out
+svn del --force *~
+svn del --force *.aux
+svn del --force *.gz
+svn del --force *.backup
+
+}
+
+cd ..
+
+ls | while read file
+do
+	cd $file
+	rmb
+	cd ..
+done

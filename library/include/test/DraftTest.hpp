@@ -3,7 +3,7 @@
 
 #include "bib/Logger.hpp"
 #include <simu/RLTable.hpp>
-#include <simu/DTeacher.hpp>
+#include <simu/Teacher.hpp>
 #include <simu/GridWorldLS.hpp>
 #include <simu/GridWorld.hpp>
 #include <sml/Utils.hpp>
