@@ -55,38 +55,42 @@ fi
 
 nbrTest=100
 
+
+launch_test "FMQ3" 1 $nbrTest
+launch_test "FMQ1" 1 $nbrTest
+
 #graph partie 1
 # # launch_test "TMQ1Q1AMTB" 1 $nbrTest
 # # launch_test "TMQ1Q1AOTB" 1 $nbrTest
 # # launch_test "TMQ1Q1ANTB" 1 $nbrTest
 # # launch_test "TMQ1Q1AITB" 1 $nbrTest
 
-launch_test "TMQ1Q1AMTA" 1 $nbrTest
-launch_test "TMQ1Q1AOTA" 1 $nbrTest
-launch_test "TMQ1Q1ANTA" 1 $nbrTest
-launch_test "TMQ1Q1AITA" 1 $nbrTest
-
-
-# # launch_test "TGQ1Q1AMTB" 1 $nbrTest
-# # launch_test "TGQ1Q1AOTB" 1 $nbrTest
-# # launch_test "TGQ1Q1ANTB" 1 $nbrTest
-# # launch_test "TGQ1Q1AITB" 1 $nbrTest
-
-launch_test "TGQ1Q1AMTA" 1 $nbrTest
-launch_test "TGQ1Q1AOTA" 1 $nbrTest
-launch_test "TGQ1Q1ANTA" 1 $nbrTest
-launch_test "TGQ1Q1AITA" 1 $nbrTest
-
-
-# # launch_test "TLQ1Q1AMTB" 1 $nbrTest
-# # launch_test "TLQ1Q1AOTB" 1 $nbrTest
-# # launch_test "TLQ1Q1ANTB" 1 $nbrTest
-# # launch_test "TLQ1Q1AITB" 1 $nbrTest
-
-launch_test "TLQ1Q1AMTA" 1 $nbrTest
-launch_test "TLQ1Q1AOTA" 1 $nbrTest
-launch_test "TLQ1Q1ANTA" 1 $nbrTest
-launch_test "TLQ1Q1AITA" 1 $nbrTest
+# launch_test "TMQ1Q1AMTA" 1 $nbrTest
+# launch_test "TMQ1Q1AOTA" 1 $nbrTest
+# launch_test "TMQ1Q1ANTA" 1 $nbrTest
+# launch_test "TMQ1Q1AITA" 1 $nbrTest
+# 
+# 
+# # # launch_test "TGQ1Q1AMTB" 1 $nbrTest
+# # # launch_test "TGQ1Q1AOTB" 1 $nbrTest
+# # # launch_test "TGQ1Q1ANTB" 1 $nbrTest
+# # # launch_test "TGQ1Q1AITB" 1 $nbrTest
+# 
+# launch_test "TGQ1Q1AMTA" 1 $nbrTest
+# launch_test "TGQ1Q1AOTA" 1 $nbrTest
+# launch_test "TGQ1Q1ANTA" 1 $nbrTest
+# launch_test "TGQ1Q1AITA" 1 $nbrTest
+# 
+# 
+# # # launch_test "TLQ1Q1AMTB" 1 $nbrTest
+# # # launch_test "TLQ1Q1AOTB" 1 $nbrTest
+# # # launch_test "TLQ1Q1ANTB" 1 $nbrTest
+# # # launch_test "TLQ1Q1AITB" 1 $nbrTest
+# 
+# launch_test "TLQ1Q1AMTA" 1 $nbrTest
+# launch_test "TLQ1Q1AOTA" 1 $nbrTest
+# launch_test "TLQ1Q1ANTA" 1 $nbrTest
+# launch_test "TLQ1Q1AITA" 1 $nbrTest
 
 
 # k=".001"

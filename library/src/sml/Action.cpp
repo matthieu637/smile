@@ -5,10 +5,6 @@
 namespace sml
 {
 
-DAction::DAction()
-{
-}
-
 DAction::DAction ( const ActionTemplate* temp, const std::list< int>& vals )
 {
     assert ( ( int ) vals.size() == temp->actionNumber() );
@@ -40,8 +36,13 @@ DAction::DAction ( const ActionTemplate* temp, int value )
         for ( ; it != templ->sizesActions()->end(); ++it ) //compute multiplier
             multiplier *= *it;
 
+// 	LOG_DEBUG(multiplier << " " << value << " " << (int) ( value / multiplier ));
+	
         values[i] = ( int ) ( value / multiplier );
         value -= values[i]*multiplier;
+	
+	if(temp->sizeNeeded()==3)
+// 	LOG_DEBUG(values[i] << " " << value << " " << this->get("motor"));
 
         for ( int j=0; j < ( templ->actionNumber() -1 ) - ( i + 1 ); j++ ) //refill
             it--;

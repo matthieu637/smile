@@ -14,7 +14,7 @@ MCar::MCar(int nbPosStep, int nbVelStep) : Environnement< MCarState >(new StateT
 }
 
 void MCar::initState() {
-//     state->position = -0.5;
+// // //     state->position = -0.5;
     state->position = 0.0;
     state->velocity = 0.0;
 }

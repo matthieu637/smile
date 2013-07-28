@@ -33,8 +33,15 @@ struct stats {
     int index_min;
 };
 
+class Simulation{
+public:
+  virtual ~Simulation(){}
+  virtual stats run() = 0;
+  virtual std::list<stats>* keepRun(int additional_step) = 0;
+};
+
 template<typename EnvState, typename PolicyState, typename StateType>
-class RLSimulation : private StateType
+class RLSimulation : private StateType, public Simulation
 {
     using StateType::getState;
 

@@ -26,9 +26,6 @@ public:
   
 //friend class boost::serialization::access;
   
-///
-///\brief Constructeur vide 
-    DAction();
     
 ///
 ///\brief Constructeur

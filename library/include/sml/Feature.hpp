@@ -78,6 +78,7 @@ public:
     int caseND(const S& st, const DAction& ac) {
 
         for(int index=0; index < featuresl.size(); index++) {
+// 	    LOG_DEBUG(featuresl[index](st, ac) << " " << floor( featuresl[index](st, ac) / width[index]) << " " <<  max[index] << " " << width[index] << " " << index);
             var[index] = floor( featuresl[index](st, ac) / width[index]);
             if(var[index] < 0 || var[index] >= max[index])
                 return -1;

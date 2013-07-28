@@ -4,4 +4,3 @@ using namespace simu;
 
 // void DraftTest::FGQ1() {
 // }
-

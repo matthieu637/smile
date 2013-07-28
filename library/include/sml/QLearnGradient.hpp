@@ -14,6 +14,7 @@
 #include "sml/Utils.hpp"
 #include "LearnStat.hpp"
 #include "Policy.hpp"
+#include <simu/MCar.hpp>
 
 namespace sml {
 
@@ -45,15 +46,17 @@ public:
         for(unsigned int i=0; i<nbFeature; i++)
             teta[i]=-1./5.+ 2.*sml::Utils::rand01()/5.;//TODO:kinda important
 
-        for(unsigned int i=0; i < atmp->sizeNeeded() ; i++)
-            actions[i] = DAction(atmpl, i);
+        for(unsigned int i=0; i < atmp->sizeNeeded() ; i++){
+            actions[i] = new DAction(atmpl, i);
+// 	    LOG_DEBUG(actions[i]->get("motor") << " " << atmpl->indexFor("motor") << " " << atmpl->actionNumber());
+	}
 
         lastAction = new DAction(initial);
     }
 
-    QLearnGradient(const QLearnGradient& q) : LearnStat(q.conf), nbFeature(q.nbFeature),
+    QLearnGradient(const QLearnGradient& q) : LearnStat(q.conf), Policy<State>(q.param), nbFeature(q.nbFeature),
         teta(q.teta), e(q.e), Qa(q.Qa), actions(q.actions), features(q.features), atmpl(q.atmpl),
-        history(q.history), Policy<State>(q.param)
+        history(q.history)
     {
         lastAction = new DAction(*q.lastAction);
     }
@@ -101,6 +104,7 @@ public:
 
         //begin
         if( sml::Utils::rand01() < this->param.epsilon) {
+	    delete ap;
             a = new DAction(atmpl, rand() % atmpl->sizeNeeded());
             for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
                 e[*it] = 0L;
@@ -132,7 +136,7 @@ public:
         return a;
     }
 
-    void clear_history(const State& s, const DAction& a) {
+    void clear_history(const State&, const DAction& a) {
         delete lastAction;
         lastAction = new DAction(a);
 
@@ -141,11 +145,11 @@ public:
         history.clear();
     }
 
-    void should_done(const State& s, const DAction& a) {
+    void should_done(const State&, const DAction&) {
 
     }
 
-    void should_do(const State& s, const DAction& a, double reward) {
+    void should_do(const State&, const DAction&, double) {
 
     }
 
@@ -184,18 +188,23 @@ private:
 ///\param state : l'état présent
     void computeQa(const State& state) {
 
-        for(vector<DAction>::iterator ai = actions.begin(); ai != actions.end() ; ++ai) { // each actions
+//         simu::MCarState mcs = (const simu::MCarState&) state;
+//         mcs.position = 0;
+//         mcs.velocity = 0;
+
+//         LOG_DEBUG(mcs.position<< " " << mcs.velocity);
+        for(vector<DAction*>::iterator ai = actions.begin(); ai != actions.end() ; ++ai) { // each actions
             double _Qa = 0.;
 
-            list<int>* actived = extractFeatures(state, *ai);
-
-//   	    bib::Logger::PRINT_ELEMENTS<list<int>>(*actived);
+            list<int>* actived = extractFeatures(state, **ai);
+// 	    LOG_DEBUG((*ai)->get("motor"));
+//             bib::Logger::PRINT_ELEMENTS<list<int>>(*actived);
 
             for(list<int>::iterator it=actived->begin(); it != actived->end(); ++it)
                 _Qa += teta[*it];
 
 // 	    LOG_DEBUG("old :" << Qa(*ai) << " new :" << _Qa);
-            Qa(*ai) = _Qa;
+            Qa(**ai) = _Qa;
             delete actived;
         }
     }
@@ -233,7 +242,7 @@ private:
 
     DAction* lastAction;
 
-    std::vector<DAction> actions;
+    std::vector<DAction*> actions;
 
     featuredList<State>* features;
     const ActionTemplate* atmpl;

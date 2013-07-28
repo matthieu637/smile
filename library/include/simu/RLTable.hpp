@@ -37,7 +37,6 @@ public:
         case Sarsa_:
 //             return new Sarsa(this->prob->getStates(), this->prob->getActions(), dst, a);
         case Sarsa_trace:
-            break;
         default:
             LOG_ERROR("wrong param");
         }
@@ -54,16 +53,15 @@ class RLGradient : public RLSimulation<EnvState, EnvState, ContinuousSelection>
 {
 public:
     RLGradient(Algo algo, Environnement<EnvState>* p, RLParam rlp, featuredList<EnvState>* features, int nbFeature) : 
-    RLSimulation<EnvState, DState, DiscretizeSelection>(p), type(algo),rlp(rlp), features(features), nbFeature(nbFeature) {}
+    RLSimulation<EnvState, EnvState, ContinuousSelection>(p), type(algo),rlp(rlp), features(features), nbFeature(nbFeature) {}
 
-    Policy<DState>* createAgent(const DState& dst, const DAction& a) {
+    Policy<EnvState>* createAgent(const EnvState&, const DAction& a) {
 
         switch(type) {
         case QL_gen:
             return new QLearnGradient<EnvState>(features, nbFeature, this->prob->getActions(), a, rlp);
         default:
             LOG_ERROR("wrong param");
-            return nullptr;
         }
 
         return nullptr;
