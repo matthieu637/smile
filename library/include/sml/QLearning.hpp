@@ -42,7 +42,7 @@ public:
 ///
 ///\brief Retourner l'action à faire selon l'algorithme QLearning sans apprentissage 
 ///\param s : le nouvel état
-    DAction* decision(const DState& s, float epsilon=0.L);
+    DAction* decision(const DState& s, bool greedy);
     
     
     void clear_history(const DState& ds, const DAction& da);

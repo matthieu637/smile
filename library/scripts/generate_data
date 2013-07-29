@@ -53,11 +53,11 @@ fi
 
 }
 
-nbrTest=100
+nbrTest=10
 
 
-launch_test "FMQ3" 1 $nbrTest
-launch_test "FMQ1" 1 $nbrTest
+launch_test "FMQ3" 1 10
+launch_test "TMQ3Q1ANTB" 1 1
 
 #graph partie 1
 # # launch_test "TMQ1Q1AMTB" 1 $nbrTest

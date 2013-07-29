@@ -30,6 +30,8 @@ public:
 
 };
 
+#define M 16
+
 template<>
 class Functor1D<MCarState>
 {
@@ -38,20 +40,20 @@ public:
     double callPosition(const MCarState& st, const DAction& ac)
     {
         (void) ac;
-        return sml::Utils::transform(st.position, -1.2, 0.6, 0., 1.8) + i*((1.8/8)/10);
+        return sml::Utils::transform(st.position, -1.2, 0.6, 0., 1.8) + i*((1.8/8)/M);
     }
 
     double callVelocity(const MCarState& st, const DAction& ac)
     {
         (void) ac;
 //     LOG_DEBUG(st.velocity << " " << sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14));
-        return sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14) + i*((0.14/8)/10) ;
+        return sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14) + i*((0.14/8)/M) ;
     }
 
     double callAction(const MCarState& st, const DAction& ac)
     {
         (void) st;
-        return ((double)ac["motor"]) + i*((3/3)/10);
+        return ((double)ac["motor"]) + i*((3/3)/M);
     }
     int i;
 };
@@ -65,7 +67,7 @@ public:
     featuredList<EnvState>* getMCarFeatures() {
 
         featuredList<EnvState> *features = new featuredList<EnvState>();
-        for(int i=0; i<10; i++) {
+        for(int i=0; i<M; i++) {
 
             typename Feature<EnvState>::featuring1D fonctor1 = boost::bind(&Functor1D<EnvState>::callPosition, new Functor1D<EnvState>(i), _1, _2);
             typename Feature<EnvState>::featuring1D fonctor2 = boost::bind(&Functor1D<EnvState>::callVelocity, new Functor1D<EnvState>(i), _1, _2);

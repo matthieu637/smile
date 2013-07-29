@@ -4,6 +4,7 @@
 #include "simu/Environnement.hpp"
 #include "simu/MCar.hpp"
 #include <sml/Q.hpp>
+#include <sml/QLearnGradient.hpp>
 #include "simu/RLSimulation.hpp"
 #include "GridWorldLS.hpp"
 
@@ -100,7 +101,7 @@ public:
     }
 
     bool goal() const {
-        return prob->goal();
+        return learner_reached_goal > 100;
     }
 
     unsigned int maxStep() const {
@@ -109,6 +110,10 @@ public:
 
     int get_best_policy_teacher() const {
         return best_policy_teacher;
+    }
+    
+    int get_given_advice() const{
+	return nbAdvice;
     }
 
 protected:
@@ -123,9 +128,10 @@ protected:
         case after:
             prob->apply(*this->state->learner_action);
             if(giveAdvise && sea != None) {
-                DAction* best_action = best_policy->decision(state_learner, 0);
+                DAction* best_action = best_policy->decision(state_learner, false);
                 learner->get_policy()->should_done(state_learner, *best_action);
                 delete best_action;
+		nbAdvice++;
             }
             
             learner_next_action = learner->computeNextAction(getState(prob), prob->reward());
@@ -134,19 +140,33 @@ protected:
             break;
         case before:
             if(giveAdvise && sea != None) {
-                DAction* best_action = best_policy->decision(state_learner, 0);
+                DAction* best_action = best_policy->decision(state_learner, false);
                 prob->apply(*best_action);
 		
 		learner->get_policy()->should_do(state_learner, *best_action, prob->reward());
                 delete best_action;
+		nbAdvice++;
             }
-            else
-                prob->apply(*this->state->learner_action);
+            else {
+		DAction* la = learner->computeNextAction(state_learner, prob->reward());
+                prob->apply(*la);
+	    }
 
-
-            learner_next_action = learner->computeNextAction(getState(prob), prob->reward());
+	    Policy<PolicyState>* cp =  learner->get_policy()->copyPolicy();
+	    learner_next_action = cp->learn(getState(prob), prob->reward());
+	    delete cp;
+//             learner_next_action = learner->computeNextAction(getState(prob), prob->reward());
+	    
+// 	    learner_next_action = learner->get_policy()->decision(getState(prob), true);
             break;
         }
+        
+        //TODO: clear history of my own algo
+        if(prob->goal()){
+	    prob->init();
+	    learner_reached_goal++;
+	    learner_next_action = prob->getInitialAction();
+	}
 
 
 // 	LOG_DEBUG(prob->getDState() << " " << *learner_next_action << " " << giveAdvise << " " << *(this->state->learner_action));
@@ -169,6 +189,8 @@ protected:
     void initState() {
         learner->reset();
         learner->get_policy()->setAdviseStrat(sea);
+	nbAdvice = 0;
+	learner_reached_goal = 0;
         this->state->learner_state = prob->getState();
         this->state->learner_action = new DAction(*prob->getInitialAction());
     }
@@ -180,6 +202,8 @@ private:
     bool giveAdvise;
     float advice_cost;
     int best_policy_teacher;
+    int nbAdvice;
+    int learner_reached_goal;
     AdviseStrategy astart;
     StrategyEffectsAdvice sea;
 };

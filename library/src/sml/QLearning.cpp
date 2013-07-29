@@ -64,22 +64,22 @@ void QLearning::should_done(const DState& s, const DAction& a)
     }
 }
 
-DAction* QLearning::decision(const DState& s, float epsilon) {
+DAction* QLearning::decision(const DState& s, bool greedy) {
     DAction* a = Q.argmax(s);
 
-    bool greedy = true;
+    bool may_greedy = greedy;
     if(adviceStrat == FixedNExploration || adviceStrat == FixedNMax) {
         DAction* b = P.argmax(s);
         if( P(s, *b) == 1 ) {
             a = b;
-            greedy = false;
+            may_greedy = false;
         }
         else
             delete b;
     }
 
     //exploration
-    if(greedy && sml::Utils::rand01() < epsilon ) {
+    if(may_greedy && sml::Utils::rand01() < param.epsilon ) {
         delete a;
         a = new DAction(atmp, {rand() % (int)atmp->sizeNeeded()});
     }

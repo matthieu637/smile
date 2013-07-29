@@ -46,10 +46,10 @@ public:
         for(unsigned int i=0; i<nbFeature; i++)
             teta[i]=-1./5.+ 2.*sml::Utils::rand01()/5.;//TODO:kinda important
 
-        for(unsigned int i=0; i < atmp->sizeNeeded() ; i++){
+        for(unsigned int i=0; i < atmp->sizeNeeded() ; i++) {
             actions[i] = new DAction(atmpl, i);
 // 	    LOG_DEBUG(actions[i]->get("motor") << " " << atmpl->indexFor("motor") << " " << atmpl->actionNumber());
-	}
+        }
 
         lastAction = new DAction(initial);
     }
@@ -64,9 +64,11 @@ public:
 ///
 ///\brief Retourner l'action à faire selon l'algorithme sans apprentissage
 ///\param state : l'état présent
-    DAction* decision(const State& state, float epsilon=0.L) {
-        if(sml::Utils::rand01() < epsilon )
+    DAction* decision(const State& state, bool greedy) {
+        if(greedy && sml::Utils::rand01() < this->param.epsilon ){
+// 	    LOG_DEBUG("got greeding");
             return new DAction(atmpl, {rand() % (int)atmpl->sizeNeeded()});
+	}
 
         computeQa(state);
         return Qa.argmax();
@@ -95,40 +97,15 @@ public:
         DAction* ap = Qa.argmax();
         delta = delta + this->param.gamma * Qa(*ap);
 
-// 	LOG_DEBUG("history size:" << history.size());
 // 	teta = teta + lrate * delta * e;
         for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
             int index = *it;
             teta[index] = teta[index] + this->param.alpha * delta * e[index];
         }
 
-        //begin
-        if( sml::Utils::rand01() < this->param.epsilon) {
-	    delete ap;
-            a = new DAction(atmpl, rand() % atmpl->sizeNeeded());
-            for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
-                e[*it] = 0L;
-            history.clear();
-        } else {
-//             a = Qa.argmax();
-            a = ap;
-            for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
-                unsigned int index = *it;
-                e[index] = this->param.lambda * this->param.gamma * e[index];
-// 		LOG_DEBUG(e(*it));
-            }
-        }
 
-        list<int>* activeIndex = extractFeatures(state, *a);
-        for(list<int>::iterator it = activeIndex->begin(); it != activeIndex->end() ; ++it) {
-            int index = *it;
-            if(this->param.accumu)
-                e[index] += 1.;
-            else
-                e[index] = 1.;
-            history.insert(index);
-        }
-        delete activeIndex;
+        delete ap;
+        a = decision_learn(state);
 
         //take action a, observe reward, and next state
         delete lastAction;
@@ -149,8 +126,32 @@ public:
 
     }
 
-    void should_do(const State&, const DAction&, double) {
+    void should_do(const State& s, const DAction& ba, double r) {
+        DAction* a;
+        a = lastAction;
 
+        float delta = r - Qa(*a);
+
+        // For all a in A(s')
+        computeQa(s);
+
+
+        DAction* ap = Qa.argmax();
+        delta = delta + this->param.gamma * Qa(*ap);
+
+// 	teta = teta + lrate * delta * e;
+        for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
+            int index = *it;
+            teta[index] = teta[index] + this->param.alpha * delta * e[index];
+        }
+
+
+        delete ap;
+        a = decision_learn(s, true, new DAction(ba));;
+
+        //take action a, observe reward, and next state
+        delete lastAction;
+        lastAction = a;
     }
 
     Policy<State>* copyPolicy() {
@@ -182,6 +183,41 @@ public:
 
 
 private:
+
+    DAction* decision_learn(const State& state, bool lucky=false, DAction* lucky_ac=nullptr) {
+        DAction* a;
+        computeQa(state);
+
+        //begin
+        if( !lucky && sml::Utils::rand01() < this->param.epsilon) {
+// 	    LOG_DEBUG("got greeding");
+            a = new DAction(atmpl, rand() % atmpl->sizeNeeded());
+            for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
+                e[*it] = 0L;
+            history.clear();
+        } else {
+            if(!lucky)
+                a = Qa.argmax();
+            else a = lucky_ac;
+            for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
+                unsigned int index = *it;
+                e[index] = this->param.lambda * this->param.gamma * e[index];
+            }
+        }
+
+        list<int>* activeIndex = extractFeatures(state, *a);
+        for(list<int>::iterator it = activeIndex->begin(); it != activeIndex->end() ; ++it) {
+            int index = *it;
+            if(this->param.accumu)
+                e[index] += 1.;
+            else
+                e[index] = 1.;
+            history.insert(index);
+        }
+        delete activeIndex;
+
+        return a;
+    }
 
 ///
 ///\brief Calculer la somme de feature pour chaque action disponible
