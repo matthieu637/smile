@@ -73,7 +73,7 @@ public:
 
 
             Feature<EnvState> f( {fonctor1, fonctor2, fonctor3}, { 8, 1.8, 8, 0.14, 3, 3});
-	    features->push_back(f);
+            features->push_back(f);
         }
 
         return features;
@@ -84,7 +84,7 @@ public:
         Utils::srand_mili();
 
         Simulation* s;
-	featuredList<EnvState> *features;
+        featuredList<EnvState> *features;
 
         if(a == simu::QL_gen || a == simu::Sarsa_gen ) {
             unsigned int nbFeature = 0;
@@ -106,15 +106,24 @@ public:
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
             LOG(it->nbStep);
         bib::Logger::getInstance()->flushBuffer();
-	
-	delete s;
-	delete l;
-	delete features;
+
+        delete s;
+        delete l;
+        delete features;
     }
 
     template<typename EnvState, typename PolicyReward>
     void T_run_simple(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
                       RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
+      if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
+	T_run_simple_continuous<EnvState, PolicyReward>(algoLearn, algoTeach, learner_env, paramLearn, paramTeach, same_rpr, as, sea, cost, numberRun);
+      else
+        T_run_simple_discretize<EnvState, PolicyReward>(algoLearn, algoTeach, learner_env, paramLearn, paramTeach, same_rpr, as, sea, cost, numberRun);
+    }
+
+    template<typename EnvState, typename PolicyReward>
+    void T_run_simple_discretize(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
+                                 RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
         Utils::srand_mili();
 
         RLTable<EnvState>* learner_agent = new RLTable<EnvState>(algoLearn, learner_env, paramLearn);
@@ -138,6 +147,41 @@ public:
 
         delete teach;
         delete learner_agent;
+    }
+
+    template<typename EnvState, typename PolicyReward>
+    void T_run_simple_continuous(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
+                                 RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
+        Utils::srand_mili();
+
+
+        unsigned int nbFeature = 0;
+        featuredList<EnvState> * features = getMCarFeatures<EnvState>();
+        for(fLiterator<EnvState> flist = features->begin() ; flist != features->end(); ++flist) {
+            nbFeature += flist->getSize();
+        }
+        RLGradient<EnvState>* learner_agent = new RLGradient<EnvState>(algoLearn, learner_env, paramLearn, features, nbFeature);
+
+
+        StateTemplate teacher_repr(*learner_env->getStates());
+        if(!same_rpr) {
+            teacher_repr.setSize(POS, 16);
+            teacher_repr.setSize(VEL, 24);
+        }
+
+        CTeacher<PolicyReward, EnvState>* teach = new CTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
+        RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);
+        r.run();
+        std::list<stats>* l = r.keepRun(numberRun);
+
+        bib::Logger::getInstance()->enableBuffer();
+        for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
+            LOG(it->nbStep);
+        bib::Logger::getInstance()->flushBuffer();
+
+        delete teach;
+        delete learner_agent;
+	delete features;
     }
 };
 
