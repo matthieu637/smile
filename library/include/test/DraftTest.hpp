@@ -6,6 +6,7 @@
 #include <simu/Teacher.hpp>
 #include <simu/GridWorldLS.hpp>
 #include <simu/GridWorld.hpp>
+#include <simu/Teacher.hpp>
 #include <sml/Utils.hpp>
 #include <boost/bind.hpp>
 
@@ -118,13 +119,19 @@ public:
     void T_run_simple(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
                       RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
       if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
-	T_run_simple_continuous<EnvState, PolicyReward>(algoLearn, algoTeach, learner_env, paramLearn, paramTeach, same_rpr, as, sea, cost, numberRun);
+	T_run_simple_DD<EnvState, PolicyReward>(algoLearn, algoTeach, learner_env, paramLearn, paramTeach, same_rpr, as, sea, cost, numberRun);
       else
-        T_run_simple_discretize<EnvState, PolicyReward>(algoLearn, algoTeach, learner_env, paramLearn, paramTeach, same_rpr, as, sea, cost, numberRun);
+        T_run_simple_CD<EnvState, PolicyReward>(algoLearn, algoTeach, learner_env, paramLearn, paramTeach, same_rpr, as, sea, cost, numberRun);
     }
+    
+/*    
+    template<typename TeacherPolicyState>
+    ATeacher<TeacherPolicyState> createTeacher(Algo algoLearn, Algo algoTeach, RLSimulation<EnvState, PolicyState, StateType>){
+      
+    }*/
 
     template<typename EnvState, typename PolicyReward>
-    void T_run_simple_discretize(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
+    void T_run_simple_DD(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
                                  RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
         Utils::srand_mili();
 
@@ -137,7 +144,7 @@ public:
             teacher_repr.setSize(VEL, 24);
         }
 
-        DTeacher<PolicyReward, EnvState>* teach = new DTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
+        DDTeacher<PolicyReward, EnvState>* teach = new DDTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
         RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);
         r.run();
         std::list<stats>* l = r.keepRun(numberRun);
@@ -152,7 +159,7 @@ public:
     }
 
     template<typename EnvState, typename PolicyReward>
-    void T_run_simple_continuous(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
+    void T_run_simple_CD(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
                                  RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
         Utils::srand_mili();
 
@@ -171,8 +178,11 @@ public:
             teacher_repr.setSize(VEL, 24);
         }
 
-        CTeacher<PolicyReward, EnvState>* teach = new CTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
-        RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);
+        CDTeacher<PolicyReward, EnvState>* teach = new CDTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
+        RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);	
+	Policy<DState> *rezareza = r.get_policy();
+  	teach->setTeacherPolicy(rezareza);
+	
         r.run();
 	
 	bib::Logger::getInstance()->enableBuffer();

@@ -60,7 +60,7 @@ nbrTest=10
 #launch_test "FMQ3" 1 10
 
 
-launch_test "TMQ3Q1ANTB 5 1" 1 200
+launch_test "TMQ3Q1ANTB 5 1" 1 2000
 
 #graph partie 1
 # # launch_test "TMQ1Q1AMTB" 1 $nbrTest

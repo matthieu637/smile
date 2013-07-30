@@ -64,18 +64,44 @@ protected:
     }
 };
 
-struct Tstats{
-  double lreward;
-  int lstep;
-  int lepisod;
+
+class DiscretizeTSelection {
+protected:
+    template<typename EnvState>
+    const DState& getTState(Environnement<EnvState>* env)
+    {
+        return env->getDState();
+    }
+};
+
+class ContinuousTSelection {
+protected:
+    template<typename EnvState>
+    const EnvState& getTState(Environnement<EnvState>* env)
+    {
+        return env->getState();
+    }
+};
+
+struct Tstats {
+    double lreward;
+    int lstep;
+    int lepisod;
+};
+
+template<typename TeacherPolicyState>
+class ATeacher
+{
+  virtual void setTeacherPolicy(Policy<TeacherPolicyState>* tpol) = 0;
 };
 
 
-template<typename PolicyReward, typename EnvState, typename PolicyState, typename StateType>
-class Teacher : public Environnement < TeacherState < EnvState > >, protected PolicyReward, private StateType {
+template<typename PolicyReward, typename EnvState, typename PolicyState, typename StateType, typename TeacherPolicyState, typename TeacherStateType>
+class Teacher : public Environnement < TeacherState < EnvState > >, protected PolicyReward, private StateType, private TeacherStateType, public ATeacher<TeacherPolicyState> {
 
     using PolicyReward::policy_reward;
     using StateType::getState;
+    using TeacherStateType::getTState;
 
 public:
     Teacher(RLSimulation<EnvState, PolicyState, StateType>* learner, const StateTemplate& st, float advice_cost, AdviseStrategy astart, StrategyEffectsAdvice sea):
@@ -94,9 +120,13 @@ public:
         this->init();
 
         best_policy_teacher = hist->back().min_step;
-	LOG_DEBUG(best_policy_teacher << " after " << hist->back().index_min << " runs");
+        LOG_DEBUG(best_policy_teacher << " after " << hist->back().index_min << " runs");
 // 	LOG_DEBUG(hist->back().nbStep);
         delete hist;
+    }
+
+    void setTeacherPolicy(Policy<TeacherPolicyState>* tpol) {
+        this->tpolicy = tpol;
     }
 
     double reward() const {
@@ -118,26 +148,26 @@ public:
     int get_best_policy_teacher() const {
         return best_policy_teacher;
     }
-    
-    int get_given_advice() const{
-	return nbAdvice;
+
+    int get_given_advice() const {
+        return nbAdvice;
     }
-    
-    const list<Tstats>& get_learner_stats() const{
-	return run_stats;
+
+    const list<Tstats>& get_learner_stats() const {
+        return run_stats;
     }
 
 protected:
     virtual void applyOn(const DAction& ac) {
         int a = ac[FDB];
         giveAdvise = a;
-	
-	lstep ++;
-	lreward += prob->reward();
+
+        lstep ++;
+        lreward += prob->reward();
 
         DAction* learner_next_action = nullptr;
         PolicyState state_learner = getState(prob);
-	
+
         switch(astart) {
         case after:
             prob->apply(*this->state->learner_action);
@@ -145,58 +175,62 @@ protected:
                 DAction* best_action = best_policy->decision(state_learner, false);
                 learner->get_policy()->should_done(state_learner, *best_action);
                 delete best_action;
-		nbAdvice++;
+                nbAdvice++;
             }
-            
+
             learner_next_action = learner->computeNextAction(getState(prob), prob->reward());
-	    
+
 // 	    LOG_DEBUG("state : " << state_learner << " action : " << *this->state->learner_action << " advice : " << *best_policy->decision(state_learner, 0) << " have advice " << giveAdvise );
             break;
         case before:
             if(giveAdvise && sea != None) {
                 DAction* best_action = best_policy->decision(state_learner, false);
                 prob->apply(*best_action);
-		
-		learner->get_policy()->should_do(state_learner, *best_action, prob->reward());
+
+                learner->get_policy()->should_do(state_learner, *best_action, prob->reward());
                 delete best_action;
-		nbAdvice++;
+                nbAdvice++;
             }
             else {
-		DAction* la = learner->computeNextAction(state_learner, prob->reward());
+                DAction* la = learner->computeNextAction(state_learner, prob->reward());
                 prob->apply(*la);
-	    }
+            }
 
-	    Policy<PolicyState>* cp =  learner->get_policy()->copyPolicy();
-	    learner_next_action = cp->learn(getState(prob), prob->reward());
-	    delete cp;
+            Policy<PolicyState>* cp =  learner->get_policy()->copyPolicy();
+            learner_next_action = cp->learn(getState(prob), prob->reward());
+            delete cp;
             break;
         }
-        
+
         //TODO: should clear_history of my own algo
-        if(prob->goal() || prob->maxStep() < lstep){
-	    run_stats.push_back({lreward, lstep, learner_reached_goal});
-	  
-	    prob->init();
-	    learner->get_policy()->clear_history(getState(prob), *prob->getInitialAction());
-	    
-	    learner_reached_goal++;
-	    learner_next_action = prob->getInitialAction();
-	    
-	    lstep = 0;
-	    lreward = 0;
-	}
+        if(prob->goal() || prob->maxStep() < lstep) {
+            run_stats.push_back( {lreward, lstep, learner_reached_goal});
+
+            prob->init();
+            learner->get_policy()->clear_history(getState(prob), *prob->getInitialAction());
+
+            this->state->learner_state = prob->getState();
+            this->state->learner_action = new DAction(*prob->getInitialAction());
+            tpolicy->clear_history(getTState(this), *getInitialAction());
+
+            learner_reached_goal++;
+            learner_next_action = prob->getInitialAction();
+
+            lstep = 0;
+            lreward = 0;
+        }
 
 // 	LOG_DEBUG(prob->getDState() << " " << *learner_next_action << " " << giveAdvise << " " << *(this->state->learner_action));
 
         EnvState car = prob->getState();
         this->state->learner_state = car;
- 	delete this->state->learner_action;
+        delete this->state->learner_action;
         this->state->learner_action = new DAction(*learner_next_action);
     }
 
     void computeDState(const TeacherState<EnvState>& s, DState* dst, const StateTemplate* repr) {
 // 	const GridWorldLSState ss = ((const GridWorldLSState&)prob->getState());
-// 	LOG_DEBUG("begin with : " << *dst << " copy first {" << ss.x << "," << ss.y << "," << ss.p << "} and then " << *s.learner_action);	
+// 	LOG_DEBUG("begin with : " << *dst << " copy first {" << ss.x << "," << ss.y << "," << ss.p << "} and then " << *s.learner_action);
         prob->computeDState(prob->getState(), dst, repr);
 // 	LOG_DEBUG(*dst);
         dst->copyValuesOf(*s.learner_action);
@@ -206,19 +240,21 @@ protected:
     void initState() {
         learner->reset();
         learner->get_policy()->setAdviseStrat(sea);
-	nbAdvice = 0;
-	learner_reached_goal = 0;
+        nbAdvice = 0;
+        learner_reached_goal = 0;
         this->state->learner_state = prob->getState();
         this->state->learner_action = new DAction(*prob->getInitialAction());
-	lstep = 0;
-	lreward = 0;
-	run_stats.clear();
+        lstep = 0;
+        lreward = 0;
+        run_stats.clear();
     }
 
 private:
     Environnement<EnvState>* prob;
     RLSimulation<EnvState, PolicyState, StateType>* learner;
     Policy<PolicyState>* best_policy;
+
+    Policy<TeacherPolicyState>* tpolicy;
     bool giveAdvise;
     float advice_cost;
     int best_policy_teacher;
@@ -233,10 +269,16 @@ private:
 
 
 template<typename PolicyReward, typename EnvState>
-using DTeacher = Teacher<PolicyReward, EnvState, DState, DiscretizeSelection>;
+using DDTeacher = Teacher<PolicyReward, EnvState, DState, DiscretizeSelection, DState, DiscretizeTSelection>;
 
 template<typename PolicyReward, typename EnvState>
-using CTeacher = Teacher<PolicyReward, EnvState, EnvState, ContinuousSelection>;
+using CDTeacher = Teacher<PolicyReward, EnvState, EnvState, ContinuousSelection, DState, DiscretizeTSelection>;
+
+template<typename PolicyReward, typename EnvState, typename TeacherPolicyState>
+using DCTeacher = Teacher<PolicyReward, EnvState, DState, DiscretizeSelection, TeacherPolicyState, ContinuousTSelection>;
+
+template<typename PolicyReward, typename EnvState, typename TeacherPolicyState>
+using CCTeacher = Teacher<PolicyReward, EnvState, EnvState, DiscretizeSelection, TeacherPolicyState, ContinuousTSelection>;
 
 
 }

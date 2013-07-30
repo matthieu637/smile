@@ -26,6 +26,7 @@ protected:
     }
 };
 
+
 struct stats {
     int nbStep;
     double total_reward;
