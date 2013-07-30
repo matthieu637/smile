@@ -118,21 +118,32 @@ public:
     template<typename EnvState, typename PolicyReward>
     void T_run_simple(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
                       RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
-      if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
-	T_run_simple_DD<EnvState, PolicyReward>(algoLearn, algoTeach, learner_env, paramLearn, paramTeach, same_rpr, as, sea, cost, numberRun);
-      else
-        T_run_simple_CD<EnvState, PolicyReward>(algoLearn, algoTeach, learner_env, paramLearn, paramTeach, same_rpr, as, sea, cost, numberRun);
+        if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
+            T_run_simple_DD<EnvState, PolicyReward>(algoLearn, algoTeach, learner_env, paramLearn, paramTeach, same_rpr, as, sea, cost, numberRun);
+        else
+            T_run_simple_CD<EnvState, PolicyReward>(algoLearn, algoTeach, learner_env, paramLearn, paramTeach, same_rpr, as, sea, cost, numberRun);
     }
-    
-/*    
-    template<typename TeacherPolicyState>
-    ATeacher<TeacherPolicyState> createTeacher(Algo algoLearn, Algo algoTeach, RLSimulation<EnvState, PolicyState, StateType>){
-      
-    }*/
+
+
+    template<typename EnvState, typename PolicyState, typename StateType, typename PolicyReward, typename TeacherPolicyState>
+    ATeacher<TeacherPolicyState> createTeacher(Algo algoLearn, Algo algoTeach, RLSimulation<EnvState, PolicyState, StateType>* learner,
+            const StateTemplate& teacher_repr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost) {
+        if(algoTeach == simu::QL_gen || algoTeach == simu::Sarsa_gen ) {
+            if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
+                return new CCTeacher<PolicyReward, EnvState, TeacherState<EnvState>>(learner, teacher_repr, cost, as, sea);
+            else
+                return new DCTeacher<PolicyReward, EnvState, TeacherState<EnvState>>(learner, teacher_repr, cost, as, sea);
+        } else {
+            if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
+                return new CDTeacher<PolicyReward, EnvState>(learner, teacher_repr, cost, as, sea);
+            else
+                return new DDTeacher<PolicyReward, EnvState>(learner, teacher_repr, cost, as, sea);
+        }
+    }
 
     template<typename EnvState, typename PolicyReward>
     void T_run_simple_DD(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
-                                 RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
+                         RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
         Utils::srand_mili();
 
         RLTable<EnvState>* learner_agent = new RLTable<EnvState>(algoLearn, learner_env, paramLearn);
@@ -160,7 +171,7 @@ public:
 
     template<typename EnvState, typename PolicyReward>
     void T_run_simple_CD(Algo algoLearn, Algo algoTeach, Environnement<EnvState>* learner_env, RLParam paramLearn,
-                                 RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
+                         RLParam paramTeach, bool same_rpr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun) {
         Utils::srand_mili();
 
 
@@ -179,32 +190,32 @@ public:
         }
 
         CDTeacher<PolicyReward, EnvState>* teach = new CDTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
-        RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);	
-	Policy<DState> *rezareza = r.get_policy();
-  	teach->setTeacherPolicy(rezareza);
-	
-        r.run();
-	
-	bib::Logger::getInstance()->enableBuffer();
-        
+        RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);
+        Policy<DState> *rezareza = r.get_policy();
+        teach->setTeacherPolicy(rezareza);
 
-	std::list<stats>* l = r.keepRun(numberRun);
-	bib::Logger::getInstance()->setIgnoredBuffer(true);
+        r.run();
+
+        bib::Logger::getInstance()->enableBuffer();
+
+
+        std::list<stats>* l = r.keepRun(numberRun);
+        bib::Logger::getInstance()->setIgnoredBuffer(true);
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
             LOG(it->nbStep);
         bib::Logger::getInstance()->flushBuffer();
-	
-	
-	bib::Logger::getInstance()->setIgnoredBuffer(false);
-	const list<Tstats>& s = teach->get_learner_stats();
-	for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
-	    LOG(it->lreward);
-	bib::Logger::getInstance()->flushBuffer();  
-	
+
+
+        bib::Logger::getInstance()->setIgnoredBuffer(false);
+        const list<Tstats>& s = teach->get_learner_stats();
+        for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
+            LOG(it->lreward);
+        bib::Logger::getInstance()->flushBuffer();
+
 
         delete teach;
         delete learner_agent;
-	delete features;
+        delete features;
     }
 };
 
