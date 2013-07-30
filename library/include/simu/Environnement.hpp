@@ -2,6 +2,7 @@
 #define ENVIRONNEMENT_H
 
 #include "sml/Action.hpp"
+#include "bib/Logger.hpp"
 
 namespace simu {
 
@@ -42,6 +43,7 @@ public:
     void init(){
 	initState();
 	computeDState(*state, dstate, stempl);
+// 	LOG_DEBUG("reset");
     }
 
     const State& getState() const {

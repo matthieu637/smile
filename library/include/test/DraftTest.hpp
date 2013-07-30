@@ -174,12 +174,23 @@ public:
         CTeacher<PolicyReward, EnvState>* teach = new CTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
         RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);
         r.run();
-        std::list<stats>* l = r.keepRun(numberRun);
+	
+	bib::Logger::getInstance()->enableBuffer();
+        
 
-        bib::Logger::getInstance()->enableBuffer();
+	std::list<stats>* l = r.keepRun(numberRun);
+	bib::Logger::getInstance()->setIgnoredBuffer(true);
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
             LOG(it->nbStep);
         bib::Logger::getInstance()->flushBuffer();
+	
+	
+	bib::Logger::getInstance()->setIgnoredBuffer(false);
+	const list<Tstats>& s = teach->get_learner_stats();
+	for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
+	    LOG(it->lreward);
+	bib::Logger::getInstance()->flushBuffer();  
+	
 
         delete teach;
         delete learner_agent;
