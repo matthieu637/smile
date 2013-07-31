@@ -37,11 +37,12 @@ protected:
 class CostlyAdvise {
 protected:
     double policy_reward(bool giveAdvise, float cost, double reward) const {
+	float based = -1.;
         (void) reward;
         if(!giveAdvise)
-            return -1;
+            return based;
         else
-            return -1*cost;
+            return based*cost;
     }
 };
 
@@ -87,6 +88,7 @@ struct Tstats {
     double lreward;
     int lstep;
     int lepisod;
+    double treward;
 };
 
 template<typename TeacherPolicyState>
@@ -113,6 +115,7 @@ public:
                    sea(sea)
     {
         // Compute the best policy of the learner for the teacher
+	learner->init();
         learner->run();
         std::list<stats>* hist = learner->keepRun(5000);
         best_policy = learner->get_best_policy()->copyPolicy();
@@ -142,7 +145,7 @@ public:
     }
 
     unsigned int maxStep() const {
-        return 5000*100;
+        return 500*100;
     }
 
     int get_best_policy_teacher() const {
@@ -164,6 +167,7 @@ protected:
 
         lstep ++;
         lreward += prob->reward();
+	treward += reward();
 
         DAction* learner_next_action = nullptr;
         PolicyState state_learner = getState(prob);
@@ -183,13 +187,14 @@ protected:
 // 	    LOG_DEBUG("state : " << state_learner << " action : " << *this->state->learner_action << " advice : " << *best_policy->decision(state_learner, 0) << " have advice " << giveAdvise );
             break;
         case before:
-            if(giveAdvise && sea != None) {
+            if(giveAdvise && sea != None && advice_limit_per_ep > 0) {
                 DAction* best_action = best_policy->decision(state_learner, false);
                 prob->apply(*best_action);
 
                 learner->get_policy()->should_do(state_learner, *best_action, prob->reward());
                 delete best_action;
                 nbAdvice++;
+		advice_limit_per_ep--;
             }
             else {
                 DAction* la = learner->computeNextAction(state_learner, prob->reward());
@@ -204,7 +209,7 @@ protected:
 
         //TODO: should clear_history of my own algo
         if(prob->goal() || prob->maxStep() < lstep) {
-            run_stats.push_back( {lreward, lstep, learner_reached_goal});
+            run_stats.push_back( {lreward, lstep, learner_reached_goal, treward});
 
             prob->init();
             learner->get_policy()->clear_history(getState(prob), *prob->getInitialAction());
@@ -218,6 +223,8 @@ protected:
 
             lstep = 0;
             lreward = 0;
+	    treward = 0;
+	    advice_limit_per_ep = 100;
         }
 
 // 	LOG_DEBUG(prob->getDState() << " " << *learner_next_action << " " << giveAdvise << " " << *(this->state->learner_action));
@@ -246,6 +253,8 @@ protected:
         this->state->learner_action = new DAction(*prob->getInitialAction());
         lstep = 0;
         lreward = 0;
+	treward = 0;
+	advice_limit_per_ep = 100;
         run_stats.clear();
     }
 
@@ -260,7 +269,9 @@ private:
     int best_policy_teacher;
     int nbAdvice;
     int lstep;
+    int advice_limit_per_ep;
     double lreward;
+    double treward;
     int learner_reached_goal;
     list<Tstats> run_stats;
     AdviseStrategy astart;
@@ -278,7 +289,7 @@ template<typename PolicyReward, typename EnvState, typename TeacherPolicyState>
 using DCTeacher = Teacher<PolicyReward, EnvState, DState, DiscretizeSelection, TeacherPolicyState, ContinuousTSelection>;
 
 template<typename PolicyReward, typename EnvState, typename TeacherPolicyState>
-using CCTeacher = Teacher<PolicyReward, EnvState, EnvState, DiscretizeSelection, TeacherPolicyState, ContinuousTSelection>;
+using CCTeacher = Teacher<PolicyReward, EnvState, EnvState, ContinuousSelection, TeacherPolicyState, ContinuousTSelection>;
 
 
 }

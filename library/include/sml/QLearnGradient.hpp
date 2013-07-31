@@ -44,7 +44,8 @@ public:
         features(features), atmpl(atmp), history()
     {
         for(unsigned int i=0; i<nbFeature; i++)
-            teta[i]=-1./5.+ 2.*sml::Utils::rand01()/5.;//TODO:kinda important
+//             teta[i]=-1./5.+ 2.*sml::Utils::rand01()/5.;//TODO:kinda important
+	  teta[i] =  -1 ;
 
         for(unsigned int i=0; i < atmp->sizeNeeded() ; i++) {
             actions[i] = new DAction(atmpl, i);

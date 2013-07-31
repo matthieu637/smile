@@ -2,6 +2,7 @@
 #include <sys/time.h>
 // #include <stdlib.h>
 #include <random>
+#include <algorithm>
 
 namespace sml {
 
@@ -37,5 +38,17 @@ time_t Utils::srand_mili(bool zero) {
 	return t1.tv_usec * t1.tv_sec; 
     }
 }
+
+
+float* Utils::genNrand(int N, float max){
+    float* tab = new float[N];
+    tab[0] = 0.;
+    for(int i=1;i<N;i++)
+      tab[i] = rand01() * max;
+    
+    std::sort(tab, tab + N, std::less<float>());
+    return tab;
+}
+
 
 }

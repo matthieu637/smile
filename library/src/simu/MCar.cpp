@@ -15,7 +15,6 @@ MCar::MCar(int nbPosStep, int nbVelStep) : Environnement< MCarState >(new StateT
 
 void MCar::initState() {
     state->position = -0.5;
-//     state->position = 0.0;
     state->velocity = 0.0;
 }
 
@@ -40,9 +39,9 @@ void MCar::applyOn(const DAction& ac)
 }
 
 double MCar::reward() const {
-    if(!goal())
+//     if(!goal())
         return -1.;
-    return 0;
+//     return 0;
 }
 
 DAction* MCar::getInitialAction() const {
@@ -54,7 +53,7 @@ bool MCar::goal() const {
 }
 
 unsigned int MCar::maxStep() const {
-    return 5000;
+    return 500;
 }
 
 void MCar::computeDState(const MCarState& s, DState* dst, const ActionTemplate* repr) {

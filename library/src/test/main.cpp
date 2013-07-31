@@ -182,9 +182,9 @@ int main(int argc, char* argv[])
 // 	gg->apply(DAction(at, 2));
 // 	LOG(gg->getDState() << " " << gg->reward());
 
-// 	m.F_run_simple<MCarState>(simu::QL_gen, new MCar(1,1), MCarParam, 1000);
-	m.T_run_simple<MCarState, CostlyAdvise>(simu::QL_gen, simu::QL, new MCar(8,8), MCarParam, DefaultParam, true, simu::before, None, 5, 1);
-	
+// 	m.F_run_simple<MCarState>(simu::QL_gen, new MCar(8,8), MCarParam, 100);
+// 	m.T_run_simple<MCarState, CostlyAdvise>(simu::QL_gen, simu::QL, new MCar(8,8), MCarParam, DefaultParam, true, simu::before, None, 5, 1);
+	m.runme();
 
 	
 // 	m.F_run_simple<MCarState>(simu::QL, new MCar(8,8), MCarParam, 1000);

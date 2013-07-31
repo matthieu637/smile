@@ -34,11 +34,12 @@ struct stats {
     int index_min;
 };
 
-class Simulation{
+class Simulation {
 public:
-  virtual ~Simulation(){}
-  virtual stats run() = 0;
-  virtual std::list<stats>* keepRun(int additional_step) = 0;
+    virtual ~Simulation() {}
+    virtual void init() = 0;
+    virtual stats run() = 0;
+    virtual std::list<stats>* keepRun(int additional_step) = 0;
 };
 
 template<typename EnvState, typename PolicyState, typename StateType>
@@ -60,9 +61,11 @@ public:
         delete best_policy;
     }
 
-    stats run() {
+    void init() {
         agent = this->createAgent(getState(prob), *fac);
+    }
 
+    stats run() {
         stats s = local_run(0);
         best_policy = agent->copyPolicy();
         return s;

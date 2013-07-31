@@ -32,6 +32,8 @@ public :
     static double transform(double x, double a, double b, double c, double d);
 
     static time_t srand_mili(bool zero=false);
+    
+    static float* genNrand(int N, float max);
 
 };
 
