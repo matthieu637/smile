@@ -67,8 +67,8 @@ public:
         }
         std::cout << std::endl;
         buff.clear();
-	
-	clearIgnoredBuffer();
+
+        clearIgnoredBuffer();
     }
 
     void clearIgnoredBuffer() {
@@ -119,8 +119,16 @@ public:
         LOG_DEBUGE();
     }
 
+    ~Logger() {
+        clearIgnoredBuffer();
+        for(std::list<std::stringstream*>::iterator it = buff.begin(); it != buff.end(); ++it)
+            delete *it;
+        buff.clear();
+    }
+
 protected:
     Logger():level(DEBUGGING) {}
+
 
 private :
     LogLevel level;

@@ -15,7 +15,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS} ${CPPUNIT_
 file ( GLOB_RECURSE sources src/bib/*.cpp include/bib/*.hpp src/sml/*.cpp include/sml/*.hpp )
 file ( GLOB_RECURSE sources_test src/test/*.cpp src/simu/*.cpp include/test/*.hpp include/simu/*.hpp)
 
-set(CMAKE_CXX_FLAGS "-g -O2 -DDEBUG -Wall -Wextra -std=c++11 -fPIC -Wno-switch")
+set(CMAKE_CXX_FLAGS "-g -DDEBUG -Wall -Wextra -std=c++11 -fPIC -Wno-switch") #-O2
 set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/lib")
 
 set(TYPE_LIB STATIC CACHE STRING "(STATIC or SHARED)")

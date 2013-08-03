@@ -55,7 +55,7 @@ fi
 
 nbrTest=10
 
-launch_test "NIMP2" 1 3
+launch_test "NIMO2" 1 3
 
 #launch_test "FMQ3" 1 12
 

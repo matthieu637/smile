@@ -25,7 +25,7 @@ GridWorldLS::GridWorldLS() : Environnement< GridWorldLSState >(new StateTemplate
     init();
 }
 
-void GridWorldLS::initState() {
+void GridWorldLS::initState(bool) {
     keepGoals = GOALS;
     for(int i=0; i<XMAX; i++)
         for(int j=0; j<YMAX; j++) {

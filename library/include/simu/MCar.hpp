@@ -42,7 +42,7 @@ public:
 protected:
     void applyOn(const DAction& ac);
     void computeDState(const MCarState& s, DState* dst, const StateTemplate* repr);
-    void initState();
+    void initState(bool random=false);
 };
 
 }

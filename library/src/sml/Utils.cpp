@@ -10,6 +10,13 @@ float Utils::rand01() {
     return (float)rand()/(float)RAND_MAX;
 }
 
+float Utils::randin(float a, float b) {
+    float random = ((float) rand()) / (float) RAND_MAX;
+    float diff = b - a;
+    float r = random * diff;
+    return a + r;
+}
+
 double Utils::abs(double x) {
     if(x > 0)
         return x;

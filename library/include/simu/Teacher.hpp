@@ -10,6 +10,9 @@
 
 #define FDB "feedbacks"
 
+#define LEARNER_STEP 100
+#define MAX_NUMBER_ADVICE 100
+
 namespace simu {
 
 template<typename EnvState>
@@ -37,7 +40,7 @@ protected:
 class CostlyAdvise {
 protected:
     double policy_reward(bool giveAdvise, float cost, double reward) const {
-	float based = -1.;
+        float based = -1.;
         (void) reward;
         if(!giveAdvise)
             return based;
@@ -94,7 +97,7 @@ struct Tstats {
 template<typename TeacherPolicyState>
 class ATeacher
 {
-  virtual void setTeacherPolicy(Policy<TeacherPolicyState>* tpol) = 0;
+    virtual void setTeacherPolicy(Policy<TeacherPolicyState>* tpol) = 0;
 };
 
 
@@ -115,17 +118,26 @@ public:
                    sea(sea)
     {
         // Compute the best policy of the learner for the teacher
-	learner->init();
         learner->run();
-        std::list<stats>* hist = learner->keepRun(5000);
-        best_policy = learner->get_best_policy()->copyPolicy();
-// 	best_policy = learner->get_policy()->copyPolicy();
-        this->init();
 
-        best_policy_teacher = hist->back().min_step;
-        LOG_DEBUG(best_policy_teacher << " after " << hist->back().index_min << " runs");
-// 	LOG_DEBUG(hist->back().nbStep);
+        std::list<stats>* hist = learner->keepRun(8000, true);
         delete hist;
+        hist = learner->keepRun(2000, false);
+        best_policy = learner->get_best_policy()->copyPolicy();
+//         best_policy = learner->get_policy()->copyPolicy();
+        best_policy_teacher = hist->back().min_step;
+	
+        LOG_DEBUG(best_policy_teacher << " after " << hist->back().index_min << " runs");
+
+        delete hist;
+
+        alreadyInit=false;
+        this->init();
+    }
+
+    ~Teacher() {
+        delete best_policy;
+        delete this->state->learner_action;
     }
 
     void setTeacherPolicy(Policy<TeacherPolicyState>* tpol) {
@@ -133,7 +145,25 @@ public:
     }
 
     double reward() const {
-        return policy_reward(giveAdvise, advice_cost, prob->reward());
+//         return policy_reward(giveAdvise, advice_cost, prob->reward());
+        if(goal())
+            return 0;
+
+        float based = -1.;
+        if(!giveAdvise) {
+//             DAction* best_action = this->best_policy->decision(getState(this->prob), false);
+//             bool eg = (*best_action == *this->state->learner_action);
+//             delete best_action;
+            if(tookBestAction)
+                return 0.;
+            return based;
+        }
+        else {
+// 	  if(advice_limit_per_ep > 0)
+            return based*advice_cost;
+// 	  else
+// 	    return based*-10;
+        }
     }
 
     DAction* getInitialAction() const {
@@ -141,11 +171,11 @@ public:
     }
 
     bool goal() const {
-        return learner_reached_goal > 101;
+        return learner_reached_goal > (LEARNER_STEP-1);
     }
 
     unsigned int maxStep() const {
-        return 500*100;
+        return 500*LEARNER_STEP;
     }
 
     int get_best_policy_teacher() const {
@@ -167,7 +197,7 @@ protected:
 
         lstep ++;
         lreward += prob->reward();
-	treward += reward();
+        treward += reward();
 
         DAction* learner_next_action = nullptr;
         PolicyState state_learner = getState(prob);
@@ -194,45 +224,56 @@ protected:
                 learner->get_policy()->should_do(state_learner, *best_action, prob->reward());
                 delete best_action;
                 nbAdvice++;
-		advice_limit_per_ep--;
+                advice_limit_per_ep--;
             }
             else {
+                DAction* best_action = best_policy->decision(state_learner, false);
                 DAction* la = learner->computeNextAction(state_learner, prob->reward());
+                tookBestAction = (*best_action == *la);
+                delete best_action;
+
                 prob->apply(*la);
             }
 
             Policy<PolicyState>* cp =  learner->get_policy()->copyPolicy();
-            learner_next_action = cp->learn(getState(prob), prob->reward());
+            learner_next_action = new DAction(*cp->learn(getState(prob), prob->reward()));
             delete cp;
             break;
         }
 
-        //TODO: should clear_history of my own algo
+        //TODO: should clear_history of my own algo | try without
         if(prob->goal() || prob->maxStep() < lstep) {
             run_stats.push_back( {lreward, lstep, learner_reached_goal, treward});
 
             prob->init();
-            learner->get_policy()->clear_history(getState(prob), *prob->getInitialAction());
+            DAction* ac = prob->getInitialAction();
+            learner->get_policy()->clear_history(getState(prob), *ac);
 
-            this->state->learner_state = prob->getState();
-            this->state->learner_action = new DAction(*prob->getInitialAction());
-            tpolicy->clear_history(getTState(this), *getInitialAction());
+            DAction* ia = getInitialAction();
+            tpolicy->clear_history(getTState(this), *ia);
+            delete ia;
 
             learner_reached_goal++;
-            learner_next_action = prob->getInitialAction();
+            if(astart == before)
+                delete learner_next_action;
+            learner_next_action = new DAction(*ac);
+            delete ac;
 
             lstep = 0;
             lreward = 0;
-	    treward = 0;
-	    advice_limit_per_ep = 100;
+            treward = 0;
+            advice_limit_per_ep = MAX_NUMBER_ADVICE;
         }
 
 // 	LOG_DEBUG(prob->getDState() << " " << *learner_next_action << " " << giveAdvise << " " << *(this->state->learner_action));
 
         EnvState car = prob->getState();
         this->state->learner_state = car;
+
         delete this->state->learner_action;
-        this->state->learner_action = new DAction(*learner_next_action);
+        if(astart == before)
+            this->state->learner_action = learner_next_action;
+        else this->state->learner_action = new DAction(*learner_next_action);
     }
 
     void computeDState(const TeacherState<EnvState>& s, DState* dst, const StateTemplate* repr) {
@@ -244,18 +285,27 @@ protected:
 // 	LOG_DEBUG(*dst);
     }
 
-    void initState() {
+    void initState(bool random=false) {
+        (void)random;
+
         learner->reset();
         learner->get_policy()->setAdviseStrat(sea);
         nbAdvice = 0;
         learner_reached_goal = 0;
         this->state->learner_state = prob->getState();
-        this->state->learner_action = new DAction(*prob->getInitialAction());
+
+	
+        if(alreadyInit)
+            delete this->state->learner_action;
+        this->state->learner_action = prob->getInitialAction();
         lstep = 0;
         lreward = 0;
-	treward = 0;
-	advice_limit_per_ep = 100;
+        treward = 0;
+        advice_limit_per_ep = MAX_NUMBER_ADVICE;
+        tookBestAction = false;
         run_stats.clear();
+
+        alreadyInit=true;
     }
 
 private:
@@ -265,6 +315,8 @@ private:
 
     Policy<TeacherPolicyState>* tpolicy;
     bool giveAdvise;
+    bool tookBestAction;
+
     float advice_cost;
     int best_policy_teacher;
     int nbAdvice;
@@ -273,6 +325,7 @@ private:
     double lreward;
     double treward;
     int learner_reached_goal;
+    bool alreadyInit;
     list<Tstats> run_stats;
     AdviseStrategy astart;
     StrategyEffectsAdvice sea;

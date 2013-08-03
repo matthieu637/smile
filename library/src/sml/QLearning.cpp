@@ -4,13 +4,13 @@
 namespace sml {
 
 QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, RLParam param, const LearnConfig& conf) :
-    LearnStat(conf), Q(stmp, atmp), P(stmp, atmp), atmp(atmp), DPolicy(param)
+    LearnStat(conf), DPolicy(param), Q(stmp, atmp), P(stmp, atmp), atmp(atmp)
 {
     ds = new DState(s);
     da = new DAction(a);
 }
 
-QLearning::QLearning(const QLearning& q):LearnStat(q.conf), Q(q.Q), P(q.P), atmp(q.atmp), DPolicy(q.param) {
+QLearning::QLearning(const QLearning& q):LearnStat(q.conf), DPolicy(q.param), Q(q.Q), P(q.P), atmp(q.atmp) {
     ds = new DState(*q.ds);
     da = new DAction(*q.da);
 }
@@ -102,6 +102,7 @@ void QLearning::clear_history(const DState& s, const DAction& a)
 }
 
 void QLearning::should_do(const DState& s, const DAction& a, double reward) {
+    (void) reward;
     should_done(s, a);
 
     clear_history(s, a);

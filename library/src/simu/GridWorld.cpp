@@ -28,7 +28,7 @@ GridWorld::GridWorld() : Environnement< GridWorldState >(new StateTemplate( {XPO
     init();
 }
 
-void GridWorld::initState() {
+void GridWorld::initState(bool) {
     currentGoal = 0;
     for(int i=0; i<XMAX; i++)
         for(int j=0; j<YMAX; j++)

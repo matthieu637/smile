@@ -13,9 +13,14 @@ MCar::MCar(int nbPosStep, int nbVelStep) : Environnement< MCarState >(new StateT
     init();
 }
 
-void MCar::initState() {
+void MCar::initState(bool random) {
+  if(!random){
     state->position = -0.5;
     state->velocity = 0.0;
+  } else {
+    state->position = sml::Utils::randin(mcar_min_position, mcar_max_position);
+    state->velocity = sml::Utils::randin(-mcar_max_velocity, mcar_max_velocity);
+  }
 }
 
 void MCar::applyOn(const DAction& ac)

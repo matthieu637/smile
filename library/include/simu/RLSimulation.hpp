@@ -11,7 +11,7 @@ namespace simu {
 class DiscretizeSelection {
 protected:
     template<typename EnvState>
-    const DState& getState(Environnement<EnvState>* env)
+    const DState& getState(Environnement<EnvState>* env) const
     {
         return env->getDState();
     }
@@ -20,7 +20,7 @@ protected:
 class ContinuousSelection {
 protected:
     template<typename EnvState>
-    const EnvState& getState(Environnement<EnvState>* env)
+    const EnvState& getState(Environnement<EnvState>* env) const
     {
         return env->getState();
     }
@@ -38,8 +38,8 @@ class Simulation {
 public:
     virtual ~Simulation() {}
     virtual void init() = 0;
-    virtual stats run() = 0;
-    virtual std::list<stats>* keepRun(int additional_step) = 0;
+    virtual stats run(bool random=false) = 0;
+    virtual std::list<stats>* keepRun(int additional_step, bool random_init=false) = 0;
 };
 
 template<typename EnvState, typename PolicyState, typename StateType>
@@ -49,33 +49,39 @@ class RLSimulation : private StateType, public Simulation
 
 public:
 
-
-    RLSimulation(Environnement<EnvState>* prob):prob(prob) {
+    RLSimulation(Environnement<EnvState>* prob):prob(prob),agentSet(false),bestPolicySet(false) {
         fac = prob->getInitialAction();
     }
 
     virtual ~RLSimulation() {
         delete fac;
-//         delete prob;
-        delete agent;
-        delete best_policy;
+        if(agentSet)
+            delete agent;
+        if(bestPolicySet)
+            delete best_policy;
     }
 
     void init() {
         agent = this->createAgent(getState(prob), *fac);
+        agentSet = true;
     }
 
-    stats run() {
+    stats run(bool random=false) {
+        assert(agentSet);
+
+        prob->init(random);
         stats s = local_run(0);
         best_policy = agent->copyPolicy();
+        bestPolicySet = true;
         return s;
-    }//best_policy not cleared
+    }
 
-    std::list<stats>* keepRun(int additional_step) {
+    std::list<stats>* keepRun(int additional_step, bool random_init=false) {
+        assert(agentSet);
         std::list<stats>* stats_history = new std::list<stats>;
 
         additional_step--;
-        prob->init();
+        prob->init(random_init);
         agent->clear_history(getState(prob), *fac);
         stats s = local_run(0);
         int min_step = s.min_step;
@@ -83,12 +89,13 @@ public:
         int index = 1;
         stats_history->push_back(s);
 
-        delete best_policy;
+        if(bestPolicySet)
+            delete best_policy;
         best_policy = agent->copyPolicy();
 
         do {
             additional_step--;
-            prob->init();
+            prob->init(random_init);
             agent->clear_history(getState(prob), *fac);
             stats s = local_run(index);
 
@@ -123,10 +130,13 @@ public:
 
     void reset() {
         prob->init();
-        delete agent;
-        agent = this->createAgent(getState(prob), *fac);
-        delete best_policy;
-        best_policy = agent->copyPolicy();
+	if(agentSet)
+	  delete agent;
+        init();
+	
+	if(bestPolicySet)
+	  delete best_policy;
+        bestPolicySet = false;
     }
 
     virtual Policy<PolicyState>* createAgent(const PolicyState& s, const DAction& a) = 0;
@@ -149,14 +159,11 @@ protected:
 
             ac = this->computeNextAction(getState(prob), prob->reward());
 
-// 	    if(index==8142)
 //  	    LOG_DEBUG(*ac << " " << getState(prob));
         }
         while(!prob->goal() && step < (int)prob->maxStep());
 
 //      LOG(step<< " " << total_reward);
-// 	LOG(step);
-// 	LOG(total_reward);
 
         return {step, total_reward, step, index};
     }
@@ -166,6 +173,7 @@ protected:
     DAction* fac;
     Policy<PolicyState>* agent;
     Policy<PolicyState>* best_policy;
+    bool agentSet, bestPolicySet;
 };
 
 }

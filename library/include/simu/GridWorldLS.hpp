@@ -33,7 +33,7 @@ public:
     void computeDState(const GridWorldLSState& s, DState* dst, const StateTemplate* repr);
 protected:
     void applyOn(const DAction& ac);
-    void initState();
+    void initState(bool random=false);
 
     bool accessible(int x, int y) const;
 

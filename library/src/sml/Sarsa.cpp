@@ -36,7 +36,7 @@ DAction* Sarsa::learn(const DState& s, double r, float lrate, float epsilon, flo
     return a;
 }
 
-void Sarsa::should_done(const DState& s, const DAction& a)
+void Sarsa::should_done(const DState&, const DAction&)
 {
 // //     LOG_DEBUG(s << " " << a);
 //     switch(adviceStrat) {
@@ -60,7 +60,7 @@ void Sarsa::should_done(const DState& s, const DAction& a)
 //     }
 }
 
-DAction* Sarsa::decision(const DState& s, float epsilon) {
+DAction* Sarsa::decision(const DState&, float) {
 //     DAction* a = Q.argmax(s);
 // 
 //     bool greedy = true;
@@ -87,6 +87,7 @@ DAction* Sarsa::decision(const DState& s, float epsilon) {
 // //       LOG_DEBUG("dec "<< *a << " from " << s );
 // //     LOG_DEBUG(adviceStrat);
 //     return a;
+  return nullptr;
 }
 
 void Sarsa::clear_history(const DState& s, const DAction& a)

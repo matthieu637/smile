@@ -30,14 +30,16 @@ public:
         assert(_singleton != nullptr);
         return _singleton;
     }
+    
+    static void endInstance() {
+	delete _singleton;
+    }
 ///
 ///\brief Constructeur privée/protected pour empécher l'instanciation n'importe où
 ///
 protected:
     Singleton() {}
-    ~Singleton() {
-	delete _singleton;
-    }
+    virtual ~Singleton() {}
 
 private:
     static T* _singleton;
@@ -49,3 +51,4 @@ T *Singleton<T>::_singleton = new T;
 }
 
 #endif
+

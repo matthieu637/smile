@@ -11,6 +11,7 @@
 namespace sml {
 
 QTable::QTable(const StateTemplate* stmp, const ActionTemplate* atmp):stmpl(stmp), atmpl(atmp) {
+    shouldDeleteStmpl = false;
     map = new hashmap(stmpl->sizeNeeded() * atmpl->sizeNeeded());
 //     LOG_DEBUG("sized " << stmpl->sizeNeeded() * atmpl->sizeNeeded() <<  " " << map->size() );
 
@@ -22,6 +23,7 @@ QTable::QTable(const StateTemplate* stmp, const ActionTemplate* atmp):stmpl(stmp
 }
 
 QTable::QTable(const ActionTemplate* atmp):atmpl(atmp) {
+    shouldDeleteStmpl = true;
     stmpl = new StateTemplate( {""}, {1}); // for file saving
     map = new hashmap(atmpl->sizeNeeded());
 //     LOG_DEBUG("call here");
@@ -31,10 +33,13 @@ QTable::QTable(const ActionTemplate* atmp):atmpl(atmp) {
 }
 
 QTable::QTable(const QTable& q):stmpl(q.stmpl), atmpl(q.atmpl) {
+    shouldDeleteStmpl = false;
     map = new hashmap(*q.map);
 }
 
 QTable::~QTable() {
+    if(shouldDeleteStmpl)
+      delete stmpl;
     delete map;
 }
 

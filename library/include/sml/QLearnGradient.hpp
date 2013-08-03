@@ -45,7 +45,7 @@ public:
     {
         for(unsigned int i=0; i<nbFeature; i++)
 //             teta[i]=-1./5.+ 2.*sml::Utils::rand01()/5.;//TODO:kinda important
-	  teta[i] =  -1 ;
+            teta[i] =  -1 ;
 
         for(unsigned int i=0; i < atmp->sizeNeeded() ; i++) {
             actions[i] = new DAction(atmpl, i);
@@ -56,20 +56,28 @@ public:
     }
 
     QLearnGradient(const QLearnGradient& q) : LearnStat(q.conf), Policy<State>(q.param), nbFeature(q.nbFeature),
-        teta(q.teta), e(q.e), Qa(q.Qa), actions(q.actions), features(q.features), atmpl(q.atmpl),
+        teta(q.teta), e(q.e), Qa(q.Qa), actions(q.atmpl->sizeNeeded()), features(q.features), atmpl(q.atmpl),
         history(q.history)
     {
+        for(unsigned int i=0; i < atmpl->sizeNeeded() ; i++)
+            actions[i] = new DAction(atmpl, i);
         lastAction = new DAction(*q.lastAction);
+    }
+
+    ~QLearnGradient() {
+        for(vector<DAction*>::iterator ai = actions.begin(); ai != actions.end() ; ++ai)
+            delete *ai;
+        delete lastAction;
     }
 
 ///
 ///\brief Retourner l'action à faire selon l'algorithme sans apprentissage
 ///\param state : l'état présent
     DAction* decision(const State& state, bool greedy) {
-        if(greedy && sml::Utils::rand01() < this->param.epsilon ){
+        if(greedy && sml::Utils::rand01() < this->param.epsilon ) {
 // 	    LOG_DEBUG("got greeding");
             return new DAction(atmpl, {rand() % (int)atmpl->sizeNeeded()});
-	}
+        }
 
         computeQa(state);
         return Qa.argmax();
@@ -186,12 +194,11 @@ public:
 private:
 
     DAction* decision_learn(const State& state, bool lucky=false, DAction* lucky_ac=nullptr) {
-        DAction* a;
+        DAction* a = nullptr;
         computeQa(state);
 
         //begin
         if( !lucky && sml::Utils::rand01() < this->param.epsilon) {
-// 	    LOG_DEBUG("got greeding");
             a = new DAction(atmpl, rand() % atmpl->sizeNeeded());
             for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
                 e[*it] = 0L;
@@ -199,7 +206,8 @@ private:
         } else {
             if(!lucky)
                 a = Qa.argmax();
-            else a = lucky_ac;
+            else
+                a = lucky_ac;
             for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
                 unsigned int index = *it;
                 e[index] = this->param.lambda * this->param.gamma * e[index];
@@ -224,10 +232,6 @@ private:
 ///\brief Calculer la somme de feature pour chaque action disponible
 ///\param state : l'état présent
     void computeQa(const State& state) {
-
-//         simu::MCarState mcs = (const simu::MCarState&) state;
-//         mcs.position = 0;
-//         mcs.velocity = 0;
 
 //         LOG_DEBUG(mcs.position<< " " << mcs.velocity);
         for(vector<DAction*>::iterator ai = actions.begin(); ai != actions.end() ; ++ai) { // each actions
@@ -256,9 +260,9 @@ private:
 
         int layer = 0;
         for(fLiterator<State> flist = features->begin() ; flist != features->end(); ++flist) { // each tiling
-            Feature<State> f = *flist;
-            int size = f.getSize();
-            int active = f.calc(state, ac);
+            Feature<State> *f = *flist;
+            int size = f->getSize();
+            int active = f->calc(state, ac);
 // 	    LOG_DEBUG(active);
             if(active != -1)
                 actived->push_back(layer + active);

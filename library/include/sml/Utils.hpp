@@ -19,6 +19,7 @@ public :
 ///\brief Retourner 0 ou 1
     static float rand01();
     
+    static float randin(float a, float b);
 ///
 ///\brief Retourner la valeur absolue de "x"
 ///\param x : une valeur

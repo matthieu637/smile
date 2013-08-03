@@ -94,6 +94,7 @@ public:
     void print(bool perState=true) const;
 
 private:
+    bool shouldDeleteStmpl;
     hashmap *map = nullptr;
     //TODO: could be slightly improve argmax performance by using multiset and hashmap together
     

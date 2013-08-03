@@ -19,7 +19,7 @@ public:
     virtual void computeDState(const State& s, DState* dst, const StateTemplate* repr) = 0;
 protected:
     virtual void applyOn(const DAction& ac) = 0;
-    virtual void initState() = 0;
+    virtual void initState(bool random=false) = 0;
 
     
 public:
@@ -40,8 +40,8 @@ public:
 	computeDState(*state, dstate, stempl);
     }
     
-    void init(){
-	initState();
+    void init(bool random=false){
+	initState(random);
 	computeDState(*state, dstate, stempl);
 // 	LOG_DEBUG("reset");
     }

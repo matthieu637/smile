@@ -29,25 +29,28 @@ public:
 ///\param f : une fonction
 /// 	  params : paramètre pour la fonction
     Feature(featuring f, const std::vector<double> &params, type t=custom):
-        f(f), params(params), t(t) {}
+        f(f), params(params), t(t) {
+        LOG_ERROR("not implemented");
+    }
 
 ///
 ///\brief Constructeur pour créer une couche regulière : un tiling en dimension quelconque
 ///\param featuresl : liste des fonctions pour chaque dimension
 /// 	  params : paramètre pour la fonction
     Feature(const vector<featuring1D>& featuresl, const std::vector<double> &params):
-        featuresl(featuresl), params(params), t(_ND), var(featuresl.size()), max(featuresl.size()), total(featuresl.size()), width(featuresl.size()), size(1)
+        featuresl(featuresl), params(params), t(_ND), maxi(featuresl.size()), total(featuresl.size()), width(featuresl.size()), size(1)
     {
         assert(params.size()==featuresl.size()*2);
 
         int index = 0;
         for(int i=0; i< params.size(); i+=2) {
-            max[index] = params[i];
+            maxi[index] = params[i];
             total[index] = params[i+1];
-            width[index] = total[index]/max[index];
-            size *= max[index];
+            width[index] = total[index]/maxi[index];
+            size *= maxi[index];
             index++;
         }
+
     }
 
 ///
@@ -76,11 +79,12 @@ public:
 ///\param st : l'état donné
 /// 	  at : l'action donnée
     int caseND(const S& st, const DAction& ac) {
+        vector<int> var(featuresl.size());
 
         for(int index=0; index < featuresl.size(); index++) {
-// 	    LOG_DEBUG(featuresl[index](st, ac) << " " << floor( featuresl[index](st, ac) / width[index]) << " " <<  max[index] << " " << width[index] << " " << index);
-            var[index] = floor( featuresl[index](st, ac) / width[index]);
-            if(var[index] < 0 || var[index] >= max[index])
+// 	    LOG_DEBUG(featuresl[index](st, ac) << " " << (int) floor( featuresl[index](st, ac) / width[index]) << " " <<  maxi[index] << " " << width[index] << " " << index);
+            var[index] = (int) floor( featuresl[index](st, ac) / width[index]);
+            if(var[index] < 0 || var[index] >= maxi[index])
                 return -1;
         }
 
@@ -89,7 +93,7 @@ public:
 
             int factor = var[i];
             for(int j= i - 1; j >= 0; j--) {
-                factor *= max[j];
+                factor *= maxi[j];
             }
             calc += factor ;
         }
@@ -98,13 +102,13 @@ public:
 
     /*
         int case4D(const S& st, const DAction& ac) {
-            int xmax = params[0];
+            int xmaxi = params[0];
             double xtotal = params[1];
-            int ymax = params[2];
+            int ymaxi = params[2];
             double ytotal = params[3];
-            int zmax = params[4];
+            int zmaxi = params[4];
             double ztotal = params[5];
-            int umax = params[6];
+            int umaxi = params[6];
             double utotal = params[7];
 
             double x = f1d(st, ac);
@@ -112,20 +116,20 @@ public:
             double z = f1d3(st, ac);
             double u = f1d4(st, ac);
 
-            double xwidth = xtotal/xmax;
-            double ywidth = ytotal/ymax;
-            double zwidth = ztotal/zmax;
-            double uwidth = utotal/umax;
+            double xwidth = xtotal/xmaxi;
+            double ywidth = ytotal/ymaxi;
+            double zwidth = ztotal/zmaxi;
+            double uwidth = utotal/umaxi;
 
             int X = floor(x/xwidth);
             int Y = floor(y/ywidth);
             int Z = floor(z/zwidth);
             int U = floor(u/uwidth);
 
-            if(X < 0 || X >= xmax || Y < 0 || Y >= ymax || Z < 0 || Z >= zmax || U < 0 || U >= umax)
+            if(X < 0 || X >= xmaxi || Y < 0 || Y >= ymaxi || Z < 0 || Z >= zmaxi || U < 0 || U >= umaxi)
                 return -1;
 
-            return U*zmax*ymax*xmax + Z*ymax*xmax + Y*xmax + X;
+            return U*zmaxi*ymaxi*xmaxi + Z*ymaxi*xmaxi + Y*xmaxi + X;
         }*/
 
 private:
@@ -135,8 +139,8 @@ private:
     vector<double> params;
     type t;
 
-    vector<int> var;
-    vector<int> max;
+//     vector<int> var;
+    vector<int> maxi;
     vector<double> total;
     vector<double> width;
 
@@ -144,11 +148,12 @@ private:
 };
 
 template<typename State>
-using featuredList = std::list< Feature<State> > ;
+using featuredList = std::list< Feature<State>* > ;
 
 template<typename State>
-using fLiterator = typename std::list< Feature<State> >::iterator ;
+using fLiterator = typename std::list< Feature<State>* >::iterator ;
 
 }
 
 #endif // FEATURE_HPP
+
