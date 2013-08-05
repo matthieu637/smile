@@ -32,6 +32,12 @@ public:
     double callAction2(const EnvState&, const DAction&) {
         return 0;
     }
+    double callEpisod(const EnvState&, const DAction&) {
+        return 0;
+    }
+    double callGivenFdb(const EnvState&, const DAction&) {
+        return 0;
+    }
 
 };
 
@@ -103,6 +109,19 @@ public:
         (void) st;
         return ((double)ac["feedbacks"]) /*+ i*((2/2)/M)*/;
     }
+    
+    double callEpisod(const TeacherState<MCarState>& st, const DAction& ac)
+    {
+        (void) ac;
+        return st.episod;
+    }
+    
+    double callGivenFdb(const TeacherState<MCarState>& st, const DAction& ac)
+    {
+        (void) ac;
+        return st.givenFdb;
+    }
+    
     int i;
 };
 
@@ -154,9 +173,11 @@ public:
             typename Feature<EnvState>::featuring1D fonctor2 = boost::bind(&Functor1D<EnvState>::callVelocity, inst_call, _1, _2);
             typename Feature<EnvState>::featuring1D fonctor3 = boost::bind(&Functor1D<EnvState>::callAction, inst_call, _1, _2);
             typename Feature<EnvState>::featuring1D fonctor4 = boost::bind(&Functor1D<EnvState>::callAction2, inst_call, _1, _2);
+	    typename Feature<EnvState>::featuring1D fonctor5 = boost::bind(&Functor1D<EnvState>::callEpisod, inst_call, _1, _2);
+	    typename Feature<EnvState>::featuring1D fonctor6 = boost::bind(&Functor1D<EnvState>::callGivenFdb, inst_call, _1, _2);
 
 
-            Feature<EnvState>* f = new Feature<EnvState>( {fonctor1, fonctor2, fonctor3, fonctor4}, { K, 1.8, K, 0.14, 3, 3, 2, 2});
+            Feature<EnvState>* f = new Feature<EnvState>( {fonctor1, fonctor2, fonctor3, fonctor4, fonctor5/*, fonctor6*/}, { K, 1.8, K, 0.14, 3, 3, 2, 2, 25, 100/*, 25, 100*/});
             features->push_back(f);
             instances->push_back(inst_call);
         }
@@ -305,6 +326,7 @@ public:
     void runme() {
         Environnement<MCarState> *learner_env = new MCar(8, 8);
         Utils::srand_mili();
+// 	Utils::srand_mili(true);
 
         unsigned int nbFeature = 0;
         featureData<MCarState> features = getMCarFeatures<MCarState>();
@@ -321,7 +343,7 @@ public:
         RLSimulation<MCarState, MCarState, ContinuousSelection>* learner_agent = new RLGradient<MCarState>(simu::QL_gen, learner_env, MCarParam, features.func, nbFeature);
         learner_agent->init();
 
-        CCTeacher<CostlyAdvise, MCarState, TeacherState<MCarState>>* teach = new CCTeacher<CostlyAdvise, MCarState, TeacherState<MCarState>>(learner_agent, *learner_env->getStates(), 51, before, Max);
+        CCTeacher<CostlyAdvise, MCarState, TeacherState<MCarState>>* teach = new CCTeacher<CostlyAdvise, MCarState, TeacherState<MCarState>>(learner_agent, *learner_env->getStates(), 1.5, before, Max);
         // 	CCTeacher<FavorAdvice, MCarState, TeacherState<MCarState>>* teach = new CCTeacher<FavorAdvice, MCarState, TeacherState<MCarState>>(learner_agent, *learner_env->getStates(), 1.5, before, Max);
         //         RLTable<TeacherState<MCarState> > r(QL_gen, teach, DefaultParam);
 
@@ -335,7 +357,7 @@ public:
 
         // 	LOG_DEBUG(teach->get_best_policy_teacher());
 
-        std::list<stats>* l = r.keepRun(200);
+        std::list<stats>* l = r.keepRun(400);
 
         LOG("#1");
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
@@ -348,17 +370,26 @@ public:
             LOG(it->treward);
         bib::Logger::getInstance()->flushBuffer();
 
-
+	LOG("#3");
         for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
             LOG(it->lreward);
         bib::Logger::getInstance()->flushBuffer();
+	
+	LOG("#4");
+	for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
+            LOG(it->nbAdvice);
+        bib::Logger::getInstance()->flushBuffer();
+	
+	LOG("#5");
+	for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
+            LOG(it->ratio_ad_ch);
+        bib::Logger::getInstance()->flushBuffer();
 
-	delete l;
-
-        LOG("#3");
+        LOG("#6");
         LOG(teach->get_given_advice());
         bib::Logger::getInstance()->flushBuffer();
 
+	delete l;
 
         delete teach;
         delete learner_agent;

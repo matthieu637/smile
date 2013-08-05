@@ -4,6 +4,7 @@ EXEC="../build/stest"
 DATA="../data"
 
 . job_pool.sh
+. extract.sh
 
 if [ $# -eq 1 ]; then
 	CPU=$1
@@ -49,13 +50,15 @@ job_pool_shutdown
 if [ $fusion -eq 1 ] ; then
 	cat $DATA/$test_nospace.* > $DATA/$test_nospace
 	rm $DATA/$test_nospace.*
+
+	extract_data $DATA/$test_nospace
 fi
 
 }
 
 nbrTest=10
 
-launch_test "NIMO2" 1 3
+launch_test "Z1" 1 3
 
 #launch_test "FMQ3" 1 12
 

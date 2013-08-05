@@ -37,7 +37,7 @@ public:
 ///       lrate : le taux d'apprentissage
 ///	  epsilon : politique "epsilon-greedy"
 ///	  discount : importance du prochain état de la récompense 
-    DAction* learn(const DState& s, double r);
+    LearnReturn _learn(const DState& s, double r);
     
 ///
 ///\brief Retourner l'action à faire selon l'algorithme QLearning sans apprentissage 
@@ -48,6 +48,8 @@ public:
     void clear_history(const DState& ds, const DAction& da);
     
     void should_done(const DState& s, const DAction& a);
+    void had_choosed(const DState&, const DAction&, double, bool);
+    bool learn_gotGreeding() const;
     void should_do(const DState& s, const DAction& a, double reward);
     const QTable& getPolicy();
     Policy<DState>* copyPolicy();

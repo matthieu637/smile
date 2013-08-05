@@ -92,7 +92,7 @@ public:
 ///	  lambda : importance de l'historique
 ///	  discount : importance du prochain état de la récompense
 ///	  accumulative : si les traces est accumulative ou non
-    DAction* learn(const State& state, double r)
+    LearnReturn _learn(const State& state, double r)
     {
         DAction* a;
         a = lastAction;
@@ -114,12 +114,13 @@ public:
 
 
         delete ap;
-        a = decision_learn(state);
+	LearnReturn lr = decision_learn(state);
+        a = lr.ac;
 
         //take action a, observe reward, and next state
         delete lastAction;
         lastAction = a;
-        return a;
+        return lr;
     }
 
     void clear_history(const State&, const DAction& a) {
@@ -135,14 +136,14 @@ public:
 
     }
 
-    void should_do(const State& s, const DAction& ba, double r) {
+    void had_choosed(const State& state, const DAction& ba, double r, bool did_greedy) {
         DAction* a;
         a = lastAction;
 
         float delta = r - Qa(*a);
 
         // For all a in A(s')
-        computeQa(s);
+        computeQa(state);
 
 
         DAction* ap = Qa.argmax();
@@ -156,7 +157,31 @@ public:
 
 
         delete ap;
-        a = decision_learn(s, true, new DAction(ba));;
+        a = decision_learn(state, true, new DAction(ba), did_greedy).ac;
+
+        //take action a, observe reward, and next state
+        delete lastAction;
+        lastAction = a;
+    }
+
+    void should_do(const State& s, const DAction& ba, double r) {
+        DAction* a;
+        a = lastAction;
+
+        float delta = r - Qa(*a);
+
+        // For all a in A(s')
+        computeQa(s);
+
+        delta = delta + this->param.gamma * Qa(ba); //TODO:should be pretty sure of this one
+
+// 	teta = teta + lrate * delta * e;
+        for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
+            int index = *it;
+            teta[index] = teta[index] + this->param.alpha * delta * e[index];
+        }
+
+        a = decision_learn(s, true, new DAction(ba)).ac;
 
         //take action a, observe reward, and next state
         delete lastAction;
@@ -193,21 +218,30 @@ public:
 
 private:
 
-    DAction* decision_learn(const State& state, bool lucky=false, DAction* lucky_ac=nullptr) {
+    LearnReturn decision_learn(const State& state, bool lucky=false, DAction* lucky_ac=nullptr, bool clear_histo=false) {
         DAction* a = nullptr;
+	bool gotGreedy = false;
+	
         computeQa(state);
 
         //begin
         if( !lucky && sml::Utils::rand01() < this->param.epsilon) {
+// 	    LOG_DEBUG("got greeding");
             a = new DAction(atmpl, rand() % atmpl->sizeNeeded());
-            for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
-                e[*it] = 0L;
-            history.clear();
+	    clear_histo = true;
+	    gotGreedy = true;
         } else {
             if(!lucky)
                 a = Qa.argmax();
             else
                 a = lucky_ac;
+        }
+
+        if(clear_histo) {
+            for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
+                e[*it] = 0L;
+            history.clear();
+        } else {
             for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
                 unsigned int index = *it;
                 e[index] = this->param.lambda * this->param.gamma * e[index];
@@ -225,7 +259,7 @@ private:
         }
         delete activeIndex;
 
-        return a;
+        return {a, gotGreedy};
     }
 
 ///

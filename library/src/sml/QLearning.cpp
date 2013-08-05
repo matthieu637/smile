@@ -20,7 +20,7 @@ QLearning::~QLearning() {
     delete da;
 }
 
-DAction* QLearning::learn(const DState& s, double r)
+LearnReturn QLearning::_learn(const DState& s, double r)
 {
     DAction *ap = Q.argmax(s);
     Q(ds,da) = Q(ds,da) + param.alpha*(r+param.gamma*Q(s, *ap) - Q(ds, da) );
@@ -37,7 +37,7 @@ DAction* QLearning::learn(const DState& s, double r)
     ds = new DState(s);
     da = a;
 
-    return a;
+    return {a, false};
 }
 
 void QLearning::should_done(const DState& s, const DAction& a)
@@ -108,6 +108,10 @@ void QLearning::should_do(const DState& s, const DAction& a, double reward) {
     clear_history(s, a);
 }
 
+void QLearning::had_choosed(const DState&, const DAction&, double, bool){
+  
+}
+
 Policy<DState>* QLearning::copyPolicy() {
     return new QLearning(*this);
 }
@@ -127,6 +131,7 @@ void QLearning::load(boost::archive::xml_iarchive* xml)
 }
 
 }
+
 
 
 

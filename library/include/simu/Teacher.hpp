@@ -10,6 +10,8 @@
 
 #define FDB "feedbacks"
 
+#define STEP_REACH_RND_BEST_POL 2000
+#define STEP_REACH_BEST_POL 2000
 #define LEARNER_STEP 100
 #define MAX_NUMBER_ADVICE 100
 
@@ -19,6 +21,8 @@ template<typename EnvState>
 struct TeacherState {
     EnvState learner_state;
     DAction* learner_action;
+    int episod;
+    int givenFdb;
 };
 
 enum AdviseStrategy {
@@ -92,6 +96,8 @@ struct Tstats {
     int lstep;
     int lepisod;
     double treward;
+    int nbAdvice;
+    float ratio_ad_ch;
 };
 
 template<typename TeacherPolicyState>
@@ -120,13 +126,13 @@ public:
         // Compute the best policy of the learner for the teacher
         learner->run();
 
-        std::list<stats>* hist = learner->keepRun(8000, true);
+        std::list<stats>* hist = learner->keepRun(STEP_REACH_RND_BEST_POL, true);
         delete hist;
-        hist = learner->keepRun(2000, false);
+        hist = learner->keepRun(STEP_REACH_BEST_POL, false);
         best_policy = learner->get_best_policy()->copyPolicy();
 //         best_policy = learner->get_policy()->copyPolicy();
         best_policy_teacher = hist->back().min_step;
-	
+
         LOG_DEBUG(best_policy_teacher << " after " << hist->back().index_min << " runs");
 
         delete hist;
@@ -145,15 +151,11 @@ public:
     }
 
     double reward() const {
-//         return policy_reward(giveAdvise, advice_cost, prob->reward());
         if(goal())
             return 0;
 
         float based = -1.;
         if(!giveAdvise) {
-//             DAction* best_action = this->best_policy->decision(getState(this->prob), false);
-//             bool eg = (*best_action == *this->state->learner_action);
-//             delete best_action;
             if(tookBestAction)
                 return 0.;
             return based;
@@ -161,6 +163,7 @@ public:
         else {
 // 	  if(advice_limit_per_ep > 0)
             return based*advice_cost;
+// 	  return 6. - sml::Utils::transform(learner_reached_goal, 0, 100, 0, (6.-1.5) );
 // 	  else
 // 	    return based*-10;
         }
@@ -192,8 +195,9 @@ public:
 
 protected:
     virtual void applyOn(const DAction& ac) {
-        int a = ac[FDB];
-        giveAdvise = a;
+        int fdb = ac[FDB];
+//         giveAdvise = sml::Utils::rand01() <= 80./100. ;
+	giveAdvise = fdb;
 
         lstep ++;
         lreward += prob->reward();
@@ -219,16 +223,19 @@ protected:
         case before:
             if(giveAdvise && sea != None && advice_limit_per_ep > 0) {
                 DAction* best_action = best_policy->decision(state_learner, false);
+		learner->get_policy()->should_do(state_learner, *best_action, prob->reward());
+		
                 prob->apply(*best_action);
-
-                learner->get_policy()->should_do(state_learner, *best_action, prob->reward());
                 delete best_action;
                 nbAdvice++;
                 advice_limit_per_ep--;
             }
             else {
                 DAction* best_action = best_policy->decision(state_learner, false);
-                DAction* la = learner->computeNextAction(state_learner, prob->reward());
+// 		take greeding in consideration
+		DAction* la = this->state->learner_action;
+		learner->get_policy()->had_choosed(state_learner, *la, prob->reward(), gotGreedy);
+		
                 tookBestAction = (*best_action == *la);
                 delete best_action;
 
@@ -236,14 +243,17 @@ protected:
             }
 
             Policy<PolicyState>* cp =  learner->get_policy()->copyPolicy();
-            learner_next_action = new DAction(*cp->learn(getState(prob), prob->reward()));
+	    LearnReturn lr = cp->_learn(getState(prob), prob->reward());
+            learner_next_action = new DAction(*lr.ac);
+	    gotGreedy = lr.gotGreedy;
             delete cp;
             break;
         }
 
         //TODO: should clear_history of my own algo | try without
         if(prob->goal() || prob->maxStep() < lstep) {
-            run_stats.push_back( {lreward, lstep, learner_reached_goal, treward});
+            run_stats.push_back( {lreward, lstep, learner_reached_goal, treward, nbAdvice - sumLastNbAvice, (float)(nbAdvice - sumLastNbAvice) / (float) lstep });
+            sumLastNbAvice = nbAdvice;
 
             prob->init();
             DAction* ac = prob->getInitialAction();
@@ -263,12 +273,15 @@ protected:
             lreward = 0;
             treward = 0;
             advice_limit_per_ep = MAX_NUMBER_ADVICE;
+	    gotGreedy = false;
         }
 
 // 	LOG_DEBUG(prob->getDState() << " " << *learner_next_action << " " << giveAdvise << " " << *(this->state->learner_action));
 
         EnvState car = prob->getState();
         this->state->learner_state = car;
+        this->state->episod = learner_reached_goal;
+	this->state->givenFdb = nbAdvice - sumLastNbAvice;
 
         delete this->state->learner_action;
         if(astart == before)
@@ -291,10 +304,12 @@ protected:
         learner->reset();
         learner->get_policy()->setAdviseStrat(sea);
         nbAdvice = 0;
+        sumLastNbAvice=0;
         learner_reached_goal = 0;
         this->state->learner_state = prob->getState();
+        this->state->episod = 0;
+	this->state->givenFdb = 0;
 
-	
         if(alreadyInit)
             delete this->state->learner_action;
         this->state->learner_action = prob->getInitialAction();
@@ -303,6 +318,7 @@ protected:
         treward = 0;
         advice_limit_per_ep = MAX_NUMBER_ADVICE;
         tookBestAction = false;
+	gotGreedy = false;
         run_stats.clear();
 
         alreadyInit=true;
@@ -320,12 +336,14 @@ private:
     float advice_cost;
     int best_policy_teacher;
     int nbAdvice;
+    int sumLastNbAvice;
     int lstep;
     int advice_limit_per_ep;
     double lreward;
     double treward;
     int learner_reached_goal;
     bool alreadyInit;
+    bool gotGreedy;
     list<Tstats> run_stats;
     AdviseStrategy astart;
     StrategyEffectsAdvice sea;
@@ -348,4 +366,5 @@ using CCTeacher = Teacher<PolicyReward, EnvState, EnvState, ContinuousSelection,
 }
 
 #endif
+
 
