@@ -152,7 +152,7 @@ public:
 
     double reward() const {
         if(goal())
-            return 0;
+            return 1;
 
         float based = -1.;
         if(!giveAdvise) {
@@ -161,11 +161,14 @@ public:
             return based;
         }
         else {
-// 	  if(advice_limit_per_ep > 0)
-            return based*advice_cost;
+//             if(advice_limit_per_ep > 0) {
+                if(tookBestAction)
+                    return based*advice_cost*2;
+                else
+                    return based*advice_cost;
+//             } else
+//                 return based*advice_cost*3;
 // 	  return 6. - sml::Utils::transform(learner_reached_goal, 0, 100, 0, (6.-1.5) );
-// 	  else
-// 	    return based*-10;
         }
     }
 
@@ -197,7 +200,7 @@ protected:
     virtual void applyOn(const DAction& ac) {
         int fdb = ac[FDB];
 //         giveAdvise = sml::Utils::rand01() <= 80./100. ;
-	giveAdvise = fdb;
+        giveAdvise = fdb;
 
         lstep ++;
         lreward += prob->reward();
@@ -223,19 +226,22 @@ protected:
         case before:
             if(giveAdvise && sea != None && advice_limit_per_ep > 0) {
                 DAction* best_action = best_policy->decision(state_learner, false);
-		learner->get_policy()->should_do(state_learner, *best_action, prob->reward());
-		
+                learner->get_policy()->should_do(state_learner, *best_action, prob->reward());
+
+                tookBestAction = (*best_action == *this->state->learner_action);
+
                 prob->apply(*best_action);
                 delete best_action;
                 nbAdvice++;
                 advice_limit_per_ep--;
             }
-            else {
+            else
+            {
                 DAction* best_action = best_policy->decision(state_learner, false);
 // 		take greeding in consideration
-		DAction* la = this->state->learner_action;
-		learner->get_policy()->had_choosed(state_learner, *la, prob->reward(), gotGreedy);
-		
+                DAction* la = this->state->learner_action;
+                learner->get_policy()->had_choosed(state_learner, *la, prob->reward(), gotGreedy);
+
                 tookBestAction = (*best_action == *la);
                 delete best_action;
 
@@ -243,9 +249,9 @@ protected:
             }
 
             Policy<PolicyState>* cp =  learner->get_policy()->copyPolicy();
-	    LearnReturn lr = cp->_learn(getState(prob), prob->reward());
+            LearnReturn lr = cp->_learn(getState(prob), prob->reward());
             learner_next_action = new DAction(*lr.ac);
-	    gotGreedy = lr.gotGreedy;
+            gotGreedy = lr.gotGreedy;
             delete cp;
             break;
         }
@@ -272,8 +278,8 @@ protected:
             lstep = 0;
             lreward = 0;
             treward = 0;
-            advice_limit_per_ep = MAX_NUMBER_ADVICE;
-	    gotGreedy = false;
+//             advice_limit_per_ep = MAX_NUMBER_ADVICE;
+            gotGreedy = false;
         }
 
 // 	LOG_DEBUG(prob->getDState() << " " << *learner_next_action << " " << giveAdvise << " " << *(this->state->learner_action));
@@ -281,7 +287,7 @@ protected:
         EnvState car = prob->getState();
         this->state->learner_state = car;
         this->state->episod = learner_reached_goal;
-	this->state->givenFdb = nbAdvice - sumLastNbAvice;
+        this->state->givenFdb = nbAdvice - sumLastNbAvice;
 
         delete this->state->learner_action;
         if(astart == before)
@@ -308,7 +314,7 @@ protected:
         learner_reached_goal = 0;
         this->state->learner_state = prob->getState();
         this->state->episod = 0;
-	this->state->givenFdb = 0;
+        this->state->givenFdb = 0;
 
         if(alreadyInit)
             delete this->state->learner_action;
@@ -318,7 +324,7 @@ protected:
         treward = 0;
         advice_limit_per_ep = MAX_NUMBER_ADVICE;
         tookBestAction = false;
-	gotGreedy = false;
+        gotGreedy = false;
         run_stats.clear();
 
         alreadyInit=true;
@@ -366,5 +372,6 @@ using CCTeacher = Teacher<PolicyReward, EnvState, EnvState, ContinuousSelection,
 }
 
 #endif
+
 
 

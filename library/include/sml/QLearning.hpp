@@ -51,6 +51,7 @@ public:
     void had_choosed(const DState&, const DAction&, double, bool);
     bool learn_gotGreeding() const;
     void should_do(const DState& s, const DAction& a, double reward);
+    float getStateImportance(const DState& s);
     const QTable& getPolicy();
     Policy<DState>* copyPolicy();
     

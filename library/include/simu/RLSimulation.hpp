@@ -130,21 +130,41 @@ public:
 
     void reset() {
         prob->init();
-	if(agentSet)
-	  delete agent;
+        if(agentSet)
+            delete agent;
         init();
-	
-	if(bestPolicySet)
-	  delete best_policy;
+
+        if(bestPolicySet)
+            delete best_policy;
         bestPolicySet = false;
     }
 
     virtual Policy<PolicyState>* createAgent(const PolicyState& s, const DAction& a) = 0;
 
-    DAction* computeNextAction(const PolicyState& s, double reward) {
+    virtual DAction* computeNextAction(const PolicyState& s, double reward) {
         return agent->learn(s, reward);
     }
 
+    stats run_best(int index) {
+	prob->init();
+        DAction* ac = new DAction(*fac);
+        int step = 0;
+        double total_reward = 0;
+        do
+        {
+            step++;
+            prob->apply(*ac);
+	    delete ac;
+            total_reward += prob->reward();
+
+            ac = best_policy->decision(getState(prob), false);
+        }
+        while(!prob->goal() && step < (int)prob->maxStep());
+	
+	delete ac;
+
+        return {step, total_reward, step, index};
+    }
 
 protected:
     virtual stats local_run(int index) {

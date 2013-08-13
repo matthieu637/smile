@@ -52,6 +52,7 @@ public:
 ///
 ///\brief Retourner l'actions maximale dans le tableau
     DAction* argmax() const ;
+    DAction* argmin() const ;
 
 ///
 ///\brief Renvoyer la valeur de (s,a) dans le tableau Q 

@@ -112,6 +112,10 @@ void QLearning::had_choosed(const DState&, const DAction&, double, bool){
   
 }
 
+float QLearning::getStateImportance(const DState& s){
+    return 0;
+};
+
 Policy<DState>* QLearning::copyPolicy() {
     return new QLearning(*this);
 }

@@ -44,8 +44,7 @@ public:
         features(features), atmpl(atmp), history()
     {
         for(unsigned int i=0; i<nbFeature; i++)
-//             teta[i]=-1./5.+ 2.*sml::Utils::rand01()/5.;//TODO:kinda important
-            teta[i] =  -1 ;
+            teta[i] =  0L ;
 
         for(unsigned int i=0; i < atmp->sizeNeeded() ; i++) {
             actions[i] = new DAction(atmpl, i);
@@ -94,6 +93,7 @@ public:
 ///	  accumulative : si les traces est accumulative ou non
     LearnReturn _learn(const State& state, double r)
     {
+// 	this->param.alpha = this->param.alpha * 0.999999999;
         DAction* a;
         a = lastAction;
 
@@ -114,7 +114,7 @@ public:
 
 
         delete ap;
-	LearnReturn lr = decision_learn(state);
+        LearnReturn lr = decision_learn(state, false, nullptr, false);
         a = lr.ac;
 
         //take action a, observe reward, and next state
@@ -173,7 +173,10 @@ public:
         // For all a in A(s')
         computeQa(s);
 
-        delta = delta + this->param.gamma * Qa(ba); //TODO:should be pretty sure of this one
+        DAction* ap = Qa.argmax();
+//         delta = delta + this->param.gamma * Qa(ba); //TODO:should be pretty sure of this one
+        delta = delta + this->param.gamma * Qa(*ap);
+        delete ap;
 
 // 	teta = teta + lrate * delta * e;
         for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
@@ -181,11 +184,25 @@ public:
             teta[index] = teta[index] + this->param.alpha * delta * e[index];
         }
 
-        a = decision_learn(s, true, new DAction(ba)).ac;
+        a = decision_learn(s, true, new DAction(ba), false).ac;
 
         //take action a, observe reward, and next state
         delete lastAction;
         lastAction = a;
+    }
+
+    float getStateImportance(const State& state) {
+        computeQa(state);
+
+        DAction* amax = Qa.argmax();
+        DAction* amin = Qa.argmin();
+
+        float importance = Qa(*amax) - Qa(*amin);
+// 	LOG_DEBUG(Qa(*amax) << " " << Qa(*amin) << " " << importance);
+        delete amax;
+        delete amin;
+
+        return importance;
     }
 
     Policy<State>* copyPolicy() {
@@ -218,23 +235,24 @@ public:
 
 private:
 
-    LearnReturn decision_learn(const State& state, bool lucky=false, DAction* lucky_ac=nullptr, bool clear_histo=false) {
+    LearnReturn decision_learn(const State& state, bool lucky, DAction* lucky_ac, bool clear_histo) {
         DAction* a = nullptr;
-	bool gotGreedy = false;
-	
+        bool gotGreedy = false;
+
         computeQa(state);
 
         //begin
         if( !lucky && sml::Utils::rand01() < this->param.epsilon) {
 // 	    LOG_DEBUG("got greeding");
             a = new DAction(atmpl, rand() % atmpl->sizeNeeded());
-	    clear_histo = true;
-	    gotGreedy = true;
+            clear_histo = true;
+            gotGreedy = true;
         } else {
             if(!lucky)
                 a = Qa.argmax();
-            else
+            else {
                 a = lucky_ac;
+	    }
         }
 
         if(clear_histo) {
@@ -269,7 +287,7 @@ private:
 
 //         LOG_DEBUG(mcs.position<< " " << mcs.velocity);
         for(vector<DAction*>::iterator ai = actions.begin(); ai != actions.end() ; ++ai) { // each actions
-            double _Qa = 0.;
+            double _Qa = this->param.initial;
 
             list<int>* actived = extractFeatures(state, **ai);
 // 	    LOG_DEBUG((*ai)->get("motor"));

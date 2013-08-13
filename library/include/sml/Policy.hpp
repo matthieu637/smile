@@ -12,6 +12,7 @@ struct RLParam {
     float lambda;
     float gamma;
     bool accumu;
+    float initial;
 };  
   
 enum StrategyEffectsAdvice {
@@ -41,6 +42,7 @@ public:
     virtual void should_do(const State& s, const DAction& a, double reward) = 0;
     virtual void had_choosed(const State& s, const DAction& a, double reward, bool) = 0;
     virtual LearnReturn _learn(const State& s, double reward) = 0;
+    virtual float getStateImportance(const State& s) = 0;
     DAction* learn(const State& s, double reward){
 	return _learn(s, reward).ac;
     }

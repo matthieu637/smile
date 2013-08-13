@@ -16,10 +16,10 @@ enum Algo {
     QL, QL_trace, QL_gen, Sarsa_, Sarsa_trace, Sarsa_gen
 };
 
-static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., false};
-static const RLParam GridWorldLSParam= {0.05, 0.08, 0.9, 0.6, false};
-static const RLParam GridWorldParam= {0.05, 0.08, 0.9, 0.6, false};
-static const RLParam DefaultParam= {0.05, 0.08, 0.9, 0.6, false};
+static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., false, -250.};
+static const RLParam GridWorldLSParam= {0.05, 0.08, 0.9, 0.6, false, 0.};
+static const RLParam GridWorldParam= {0.05, 0.08, 0.9, 0.6, false, 0.};
+static const RLParam DefaultParam= {0.05, 0.08, 0.9, 0.6, false, 0.};
 
 template <typename EnvState>
 class RLTable : public RLSimulation<EnvState, DState, DiscretizeSelection>

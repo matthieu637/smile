@@ -8,6 +8,7 @@
 #include <simu/GridWorld.hpp>
 #include <simu/Teacher.hpp>
 #include <sml/Utils.hpp>
+#include "TeachingBudget.hpp"
 #include <boost/bind.hpp>
 
 using namespace simu;
@@ -101,27 +102,27 @@ public:
     double callAction(const TeacherState<MCarState>& st, const DAction& ac)
     {
         (void) ac;
-        return ((double)st.learner_action->get("motor")) /*+ i*((3/3)/M)*/;
+        return ((double)st.learner_action->get("motor")) + i*((3/3)/M);
     }
 
     double callAction2(const TeacherState<MCarState>& st, const DAction& ac)
     {
         (void) st;
-        return ((double)ac["feedbacks"]) /*+ i*((2/2)/M)*/;
+        return ((double)ac["feedbacks"]) + i*((2/2)/M);
     }
-    
+
     double callEpisod(const TeacherState<MCarState>& st, const DAction& ac)
     {
         (void) ac;
-        return st.episod;
+        return st.episod + i*((100./30.)/M);
     }
-    
+
     double callGivenFdb(const TeacherState<MCarState>& st, const DAction& ac)
     {
         (void) ac;
-        return st.givenFdb;
+        return st.givenFdb + i*((100./30.)/M);;
     }
-    
+
     int i;
 };
 
@@ -173,11 +174,11 @@ public:
             typename Feature<EnvState>::featuring1D fonctor2 = boost::bind(&Functor1D<EnvState>::callVelocity, inst_call, _1, _2);
             typename Feature<EnvState>::featuring1D fonctor3 = boost::bind(&Functor1D<EnvState>::callAction, inst_call, _1, _2);
             typename Feature<EnvState>::featuring1D fonctor4 = boost::bind(&Functor1D<EnvState>::callAction2, inst_call, _1, _2);
-	    typename Feature<EnvState>::featuring1D fonctor5 = boost::bind(&Functor1D<EnvState>::callEpisod, inst_call, _1, _2);
-	    typename Feature<EnvState>::featuring1D fonctor6 = boost::bind(&Functor1D<EnvState>::callGivenFdb, inst_call, _1, _2);
+            typename Feature<EnvState>::featuring1D fonctor5 = boost::bind(&Functor1D<EnvState>::callEpisod, inst_call, _1, _2);
+            typename Feature<EnvState>::featuring1D fonctor6 = boost::bind(&Functor1D<EnvState>::callGivenFdb, inst_call, _1, _2);
 
 
-            Feature<EnvState>* f = new Feature<EnvState>( {fonctor1, fonctor2, fonctor3, fonctor4, fonctor5/*, fonctor6*/}, { K, 1.8, K, 0.14, 3, 3, 2, 2, 25, 100/*, 25, 100*/});
+            Feature<EnvState>* f = new Feature<EnvState>( {fonctor1, fonctor2, fonctor3, fonctor4, fonctor5, fonctor6}, { K, 1.8, K, 0.14, 3, 3, 2, 2, 30, 100, 30, 100});
             features->push_back(f);
             instances->push_back(inst_call);
         }
@@ -190,33 +191,40 @@ public:
         Utils::srand_mili();
 
         Simulation* s;
-        featuredList<EnvState> *features;
+        featureData<MCarState> features;
 
         if(a == simu::QL_gen || a == simu::Sarsa_gen ) {
             unsigned int nbFeature = 0;
             features = getMCarFeatures<EnvState>();
-            for(fLiterator<EnvState> flist = features->begin() ; flist != features->end(); ++flist) {
-                nbFeature += flist->getSize();
+            for(fLiterator<MCarState> flist = features.func->begin() ; flist != features.func->end(); ++flist) {
+                nbFeature += (*flist)->getSize();
             }
             LOG_DEBUG(nbFeature);
-            s = new RLGradient<EnvState>(a, env, p, features, nbFeature);
+            s = new RLGradient<EnvState>(a, env, p, features.func, nbFeature);
         }
         else s = new RLTable<EnvState>(a, env, p);
 
         s->init();
-        int step = s->run().nbStep;
         std::list<stats>* l = s->keepRun(numberRun);
         LOG_DEBUG(l->back().min_step);
-        LOG_DEBUG(step);
 
         bib::Logger::getInstance()->enableBuffer();
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
             LOG(it->total_reward);
         bib::Logger::getInstance()->flushBuffer();
 
+        if(a == simu::QL_gen || a == simu::Sarsa_gen) {
+            for(fLiterator<MCarState> it = features.func->begin() ; it != features.func->end(); ++it)
+                delete *it;
+            for(list<Functor1D<MCarState>*>::iterator it = features.inst->begin(); it != features.inst->end() ; ++it)
+                delete *it;
+            delete features.func;
+            delete features.inst;
+        }
+
         delete s;
         delete l;
-        delete features;
+
     }
 
 //     template<typename EnvState, typename PolicyReward>
@@ -262,7 +270,6 @@ public:
 //         DDTeacher<PolicyReward, EnvState>* teach = new DDTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
 //         RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);
 // 	r.init();
-//         r.run();
 //         std::list<stats>* l = r.keepRun(numberRun);
 //
 //         bib::Logger::getInstance()->enableBuffer();
@@ -299,7 +306,6 @@ public:
 //         r.init();
 //         teach->setTeacherPolicy(r.get_policy());
 //
-//         r.run();
 //
 //         bib::Logger::getInstance()->enableBuffer();
 //
@@ -324,7 +330,7 @@ public:
 //     }
 
     void runme() {
-        Environnement<MCarState> *learner_env = new MCar(8, 8);
+        Environnement<MCarState> *learner_env = new MCar(16, 16);
         Utils::srand_mili();
 // 	Utils::srand_mili(true);
 
@@ -351,13 +357,12 @@ public:
         r.init();
         teach->setTeacherPolicy(r.get_policy());
 
-        r.run();
-
         bib::Logger::getInstance()->enableBuffer();
 
         // 	LOG_DEBUG(teach->get_best_policy_teacher());
 
-        std::list<stats>* l = r.keepRun(400);
+        std::list<stats>* l = r.keepRun(10000);
+        r.run_best(0);
 
         LOG("#1");
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
@@ -370,18 +375,18 @@ public:
             LOG(it->treward);
         bib::Logger::getInstance()->flushBuffer();
 
-	LOG("#3");
+        LOG("#3");
         for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
             LOG(it->lreward);
         bib::Logger::getInstance()->flushBuffer();
-	
-	LOG("#4");
-	for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
+
+        LOG("#4");
+        for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
             LOG(it->nbAdvice);
         bib::Logger::getInstance()->flushBuffer();
-	
-	LOG("#5");
-	for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
+
+        LOG("#5");
+        for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
             LOG(it->ratio_ad_ch);
         bib::Logger::getInstance()->flushBuffer();
 
@@ -389,9 +394,68 @@ public:
         LOG(teach->get_given_advice());
         bib::Logger::getInstance()->flushBuffer();
 
-	delete l;
+        delete l;
 
         delete teach;
+        delete learner_agent;
+
+
+        for(fLiterator<MCarState> it = features.func->begin() ; it != features.func->end(); ++it)
+            delete *it;
+        for(list<Functor1D<MCarState>*>::iterator it = features.inst->begin(); it != features.inst->end() ; ++it)
+            delete *it;
+        delete features.func;
+        delete features.inst;
+
+
+        for(fLiterator<TeacherState<MCarState>> it = tfeatures.func->begin() ; it != tfeatures.func->end(); ++it)
+            delete *it;
+        for(list<Functor1D<TeacherState<MCarState>>*>::iterator it = tfeatures.inst->begin(); it != tfeatures.inst->end() ; ++it)
+            delete *it;
+        delete tfeatures.func;
+        delete tfeatures.inst;
+
+        delete learner_env;
+    }
+
+    void runTeachingBudget() {
+        Environnement<MCarState> *learner_env = new MCar(8, 8);
+        Utils::srand_mili();
+// 	Utils::srand_mili(true);
+
+        unsigned int nbFeature = 0;
+        featureData<MCarState> features = getMCarFeatures<MCarState>();
+        for(fLiterator<MCarState> flist = features.func->begin() ; flist != features.func->end(); ++flist) {
+            nbFeature += (*flist)->getSize();
+        }
+        unsigned int nbTFeature = 0;
+        featureData<TeacherState<MCarState>> tfeatures = getTMCarFeatures<TeacherState<MCarState>>();
+        for(fLiterator<TeacherState<MCarState>> flist = tfeatures.func->begin() ; flist != tfeatures.func->end(); ++flist) {
+            nbTFeature += (*flist)->getSize();
+        }
+
+
+        RLSimulation<MCarState, MCarState, ContinuousSelection>* learner_agent = new RLGradient<MCarState>(simu::QL_gen, learner_env, MCarParam, features.func, nbFeature);
+        learner_agent->init();
+
+        TeachingBudget<MCarState, MCarState, ContinuousSelection>* teacher = new TeachingBudget<MCarState, MCarState, ContinuousSelection>(learner_agent, 100);
+        std::list<statsTB>* l = teacher->keepRun(100);
+
+        bib::Logger::getInstance()->enableBuffer();
+
+//         LOG("#1");
+        for(std::list<statsTB>::iterator it = l->begin(); it != l->end(); ++it)
+            LOG(it->total_reward);
+        bib::Logger::getInstance()->flushBuffer();
+
+        LOG("#2");
+        for(std::list<statsTB>::iterator it = l->begin(); it != l->end(); ++it)
+            LOG(it->nbAdvice);
+        bib::Logger::getInstance()->flushBuffer();
+
+        delete l;
+
+        delete teacher;
         delete learner_agent;
 
 

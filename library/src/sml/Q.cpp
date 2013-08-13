@@ -67,6 +67,17 @@ DAction* QTable::argmax() const {
     return new DAction(atmpl, imax);
 }
 
+DAction* QTable::argmin() const {
+
+    unsigned int imin = rand() % atmpl->sizeNeeded();
+    for(unsigned int j=0; j< atmpl->sizeNeeded(); j++)
+        if(map->at(imin) > map->at(j) )
+            imin = j;
+
+    return new DAction(atmpl, imin);
+}
+
+
 double QTable::operator()(const DState& s, const DAction& a) const
 {
     return this->operator()(s.hash(), a.hash());
