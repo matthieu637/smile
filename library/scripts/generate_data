@@ -58,9 +58,11 @@ fi
 
 nbrTest=10
 
-#launch_test "Z1" 1 2
+launch_test "Z1" 1 10
 
-launch_test "TBMC" 1 300
+#launch_test "TBMC" 1 600
+#launch_test "TBEA" 1 600
+#launch_test "TBIA" 1 600
 
 #launch_test "FMQ3" 1 3000
 

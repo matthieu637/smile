@@ -237,19 +237,19 @@ public:
 //     }
 
 
-    template<typename EnvState, typename PolicyState, typename StateType, typename PolicyReward, typename TeacherPolicyState>
+    template<typename EnvState, typename PolicyState, typename StateType, typename TeacherPolicyState>
     ATeacher<TeacherPolicyState> createTeacher(Algo algoLearn, Algo algoTeach, RLSimulation<EnvState, PolicyState, StateType>* learner,
             const StateTemplate& teacher_repr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost) {
         if(algoTeach == simu::QL_gen || algoTeach == simu::Sarsa_gen ) {
             if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
-                return new CCTeacher<PolicyReward, EnvState, TeacherState<EnvState>>(learner, teacher_repr, cost, as, sea);
+                return new CCTeacher<EnvState, TeacherState<EnvState>>(learner, teacher_repr, cost, as, sea);
             else
-                return new DCTeacher<PolicyReward, EnvState, TeacherState<EnvState>>(learner, teacher_repr, cost, as, sea);
+                return new DCTeacher<EnvState, TeacherState<EnvState>>(learner, teacher_repr, cost, as, sea);
         } else {
             if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
-                return new CDTeacher<PolicyReward, EnvState>(learner, teacher_repr, cost, as, sea);
+                return new CDTeacher<EnvState>(learner, teacher_repr, cost, as, sea);
             else
-                return new DDTeacher<PolicyReward, EnvState>(learner, teacher_repr, cost, as, sea);
+                return new DDTeacher<EnvState>(learner, teacher_repr, cost, as, sea);
         }
     }
 
@@ -267,7 +267,7 @@ public:
 //             teacher_repr.setSize(VEL, 24);
 //         }
 //
-//         DDTeacher<PolicyReward, EnvState>* teach = new DDTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
+//         DDTeacher<EnvState>* teach = new DDTeacher<EnvState>(learner_agent, teacher_repr, cost, as, sea);
 //         RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);
 // 	r.init();
 //         std::list<stats>* l = r.keepRun(numberRun);
@@ -301,7 +301,7 @@ public:
 //             teacher_repr.setSize(VEL, 24);
 //         }
 //
-//         CDTeacher<PolicyReward, EnvState>* teach = new CDTeacher<PolicyReward, EnvState>(learner_agent, teacher_repr, cost, as, sea);
+//         CDTeacher<EnvState>* teach = new CDTeacher<EnvState>(learner_agent, teacher_repr, cost, as, sea);
 //         RLTable<TeacherState<EnvState> > r(algoTeach, teach, paramTeach);
 //         r.init();
 //         teach->setTeacherPolicy(r.get_policy());
@@ -349,7 +349,7 @@ public:
         RLSimulation<MCarState, MCarState, ContinuousSelection>* learner_agent = new RLGradient<MCarState>(simu::QL_gen, learner_env, MCarParam, features.func, nbFeature);
         learner_agent->init();
 
-        CCTeacher<CostlyAdvise, MCarState, TeacherState<MCarState>>* teach = new CCTeacher<CostlyAdvise, MCarState, TeacherState<MCarState>>(learner_agent, *learner_env->getStates(), 1.5, before, Max);
+        CCTeacher< MCarState, TeacherState<MCarState>>* teach = new CCTeacher< MCarState, TeacherState<MCarState>>(learner_agent, *learner_env->getStates(), 2, before, Max);
         // 	CCTeacher<FavorAdvice, MCarState, TeacherState<MCarState>>* teach = new CCTeacher<FavorAdvice, MCarState, TeacherState<MCarState>>(learner_agent, *learner_env->getStates(), 1.5, before, Max);
         //         RLTable<TeacherState<MCarState> > r(QL_gen, teach, DefaultParam);
 
@@ -361,7 +361,7 @@ public:
 
         // 	LOG_DEBUG(teach->get_best_policy_teacher());
 
-        std::list<stats>* l = r.keepRun(10000);
+        std::list<stats>* l = r.keepRun(2000);
         r.run_best(0);
 
         LOG("#1");
@@ -438,7 +438,7 @@ public:
         RLSimulation<MCarState, MCarState, ContinuousSelection>* learner_agent = new RLGradient<MCarState>(simu::QL_gen, learner_env, MCarParam, features.func, nbFeature);
         learner_agent->init();
 
-        TeachingBudget<MCarState, MCarState, ContinuousSelection>* teacher = new TeachingBudget<MCarState, MCarState, ContinuousSelection>(learner_agent, 100);
+        TeachingBudget<MCarState, MCarState, ContinuousSelection>* teacher = new TeachingBudget<MCarState, MCarState, ContinuousSelection>(learner_agent, 100, mistake_correction);
         std::list<statsTB>* l = teacher->keepRun(100);
 
         bib::Logger::getInstance()->enableBuffer();

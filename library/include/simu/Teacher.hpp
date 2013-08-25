@@ -29,49 +29,6 @@ enum AdviseStrategy {
     before, after
 };
 
-class FavorAdvice {
-protected:
-    double policy_reward(bool giveAdvise, float cost, double reward) const {
-        (void) cost;
-        (void) reward;
-        if(giveAdvise)
-            return 10;
-        else
-            return -10;
-    }
-};
-
-class CostlyAdvise {
-protected:
-    double policy_reward(bool giveAdvise, float cost, double reward) const {
-        float based = -1.;
-        (void) reward;
-        if(!giveAdvise)
-            return based;
-        else
-            return based*cost;
-    }
-};
-
-class LearnerAdvise {
-protected:
-    double policy_reward(bool giveAdvise, float cost, double reward) const {
-        (void) cost;
-        (void) giveAdvise;
-        return reward;
-    }
-};
-
-class CostlyLearnerAdvise {//TODO: should only works with negative reward
-protected:
-    double policy_reward(bool giveAdvise, float cost, double reward) const {
-        if(!giveAdvise)
-            return reward;
-        else
-            return reward*cost;
-    }
-};
-
 
 class DiscretizeTSelection {
 protected:
@@ -107,10 +64,9 @@ class ATeacher
 };
 
 
-template<typename PolicyReward, typename EnvState, typename PolicyState, typename StateType, typename TeacherPolicyState, typename TeacherStateType>
-class Teacher : public Environnement < TeacherState < EnvState > >, protected PolicyReward, private StateType, private TeacherStateType, public ATeacher<TeacherPolicyState> {
+template<typename EnvState, typename PolicyState, typename StateType, typename TeacherPolicyState, typename TeacherStateType>
+class Teacher : public Environnement < TeacherState < EnvState > >, private StateType, private TeacherStateType, public ATeacher<TeacherPolicyState> {
 
-    using PolicyReward::policy_reward;
     using StateType::getState;
     using TeacherStateType::getTState;
 
@@ -155,20 +111,13 @@ public:
             return 1;
 
         float based = -1.;
-        if(!giveAdvise) {
-            if(tookBestAction)
+        if(!giveAdvise) { //don't give advice
+            if(tookBestAction) //agent take the best action , no need to advice
                 return 0.;
             return based;
         }
         else {
-//             if(advice_limit_per_ep > 0) {
-                if(tookBestAction)
-                    return based*advice_cost*2;
-                else
-                    return based*advice_cost;
-//             } else
-//                 return based*advice_cost*3;
-// 	  return 6. - sml::Utils::transform(learner_reached_goal, 0, 100, 0, (6.-1.5) );
+            return based*advice_cost;
         }
     }
 
@@ -256,7 +205,6 @@ protected:
             break;
         }
 
-        //TODO: should clear_history of my own algo | try without
         if(prob->goal() || prob->maxStep() < lstep) {
             run_stats.push_back( {lreward, lstep, learner_reached_goal, treward, nbAdvice - sumLastNbAvice, (float)(nbAdvice - sumLastNbAvice) / (float) lstep });
             sumLastNbAvice = nbAdvice;
@@ -265,9 +213,10 @@ protected:
             DAction* ac = prob->getInitialAction();
             learner->get_policy()->clear_history(getState(prob), *ac);
 
-            DAction* ia = getInitialAction();
-            tpolicy->clear_history(getTState(this), *ia);
-            delete ia;
+	    //TODO: should clear_history of my own algo | try without
+//             DAction* ia = getInitialAction();
+//             tpolicy->clear_history(getTState(this), *ia);
+//             delete ia;
 
             learner_reached_goal++;
             if(astart == before)
@@ -356,17 +305,17 @@ private:
 };
 
 
-template<typename PolicyReward, typename EnvState>
-using DDTeacher = Teacher<PolicyReward, EnvState, DState, DiscretizeSelection, DState, DiscretizeTSelection>;
+template< typename EnvState>
+using DDTeacher = Teacher<EnvState, DState, DiscretizeSelection, DState, DiscretizeTSelection>;
 
-template<typename PolicyReward, typename EnvState>
-using CDTeacher = Teacher<PolicyReward, EnvState, EnvState, ContinuousSelection, DState, DiscretizeTSelection>;
+template< typename EnvState>
+using CDTeacher = Teacher<EnvState, EnvState, ContinuousSelection, DState, DiscretizeTSelection>;
 
-template<typename PolicyReward, typename EnvState, typename TeacherPolicyState>
-using DCTeacher = Teacher<PolicyReward, EnvState, DState, DiscretizeSelection, TeacherPolicyState, ContinuousTSelection>;
+template< typename EnvState, typename TeacherPolicyState>
+using DCTeacher = Teacher<EnvState, DState, DiscretizeSelection, TeacherPolicyState, ContinuousTSelection>;
 
-template<typename PolicyReward, typename EnvState, typename TeacherPolicyState>
-using CCTeacher = Teacher<PolicyReward, EnvState, EnvState, ContinuousSelection, TeacherPolicyState, ContinuousTSelection>;
+template< typename EnvState, typename TeacherPolicyState>
+using CCTeacher = Teacher<EnvState, EnvState, ContinuousSelection, TeacherPolicyState, ContinuousTSelection>;
 
 
 }

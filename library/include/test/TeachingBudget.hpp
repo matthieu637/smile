@@ -7,7 +7,8 @@
 
 using namespace simu;
 
-#define THRESHOLD 40.
+#define THRESHOLD 35.
+#define IA_THRESHOLD 35.
 
 struct statsTB
 {
@@ -18,14 +19,17 @@ struct statsTB
     int nbAdvice;
 };
 
+
+enum tb_strategy { mistake_correction, importance_advice, early_advice};
+
 template<typename EnvState, typename PolicyState, typename StateType>
 class TeachingBudget : private StateType
 {
     using StateType::getState;
 
 public:
-    TeachingBudget(RLSimulation<EnvState, PolicyState, StateType>* learner, int n):
-        learner(learner), n(n), nn(n)
+    TeachingBudget(RLSimulation<EnvState, PolicyState, StateType>* learner, int n, tb_strategy str):
+        learner(learner), n(n), nn(n), str(str)
     {
         learner->run();
 
@@ -79,6 +83,7 @@ public:
 
         return stats_history;
     }
+    
 
     statsTB local_run(int index) {
         DAction* ac = new DAction(*fac);
@@ -101,7 +106,21 @@ public:
             DAction* best_action = best_policy->decision(getState(prob), false);
 // 	    LOG_DEBUG(!(*best_action == *ac) << " " << (nn > 0) << " " << best_policy->getStateImportance(getState(prob)) );
 	    
-            if(!(*best_action == *ac) && nn > 0 && best_policy->getStateImportance(getState(prob)) > THRESHOLD ) {
+	    bool gonna_advice = false;
+	    
+	    switch(str){
+	      case early_advice:
+		gonna_advice = nn > 0;
+		break;
+	      case mistake_correction:
+		gonna_advice = !(*best_action == *ac) && nn > 0 && best_policy->getStateImportance(getState(prob)) > THRESHOLD ;
+		break;
+	      case importance_advice:
+		gonna_advice = nn > 0 && best_policy->getStateImportance(getState(prob)) > IA_THRESHOLD ;
+		break;
+	    }
+	    
+	    if(gonna_advice) {
 		delete ac;
                 ac = new DAction(*best_action);
                 nn--;
@@ -125,6 +144,7 @@ protected:
     Policy<PolicyState>* best_policy, *agent;
     DAction* fac;
     int n, nn;
+    tb_strategy str;
 };
 
 #endif // TEACHINGBUDGET_H
