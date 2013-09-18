@@ -130,7 +130,7 @@ public:
     }
 
     unsigned int maxStep() const {
-        return 500*LEARNER_STEP;
+        return prob->maxStep()*LEARNER_STEP;
     }
 
     int get_best_policy_teacher() const {
@@ -150,10 +150,7 @@ protected:
         int fdb = ac[FDB];
 //         giveAdvise = sml::Utils::rand01() <= 80./100. ;
         giveAdvise = fdb;
-
-        lstep ++;
-        lreward += prob->reward();
-        treward += reward();
+//         giveAdvise = true;
 
         DAction* learner_next_action = nullptr;
         PolicyState state_learner = getState(prob);
@@ -186,49 +183,36 @@ protected:
             }
             else
             {
-                DAction* best_action = best_policy->decision(state_learner, false);
 // 		take greeding in consideration
                 DAction* la = this->state->learner_action;
                 learner->get_policy()->had_choosed(state_learner, *la, prob->reward(), gotGreedy);
 
-                tookBestAction = (*best_action == *la);
-                delete best_action;
-
                 prob->apply(*la);
             }
 
-            Policy<PolicyState>* cp =  learner->get_policy()->copyPolicy();
-            LearnReturn lr = cp->_learn(getState(prob), prob->reward());
-            learner_next_action = new DAction(*lr.ac);
-            gotGreedy = lr.gotGreedy;
-            delete cp;
+
+            learner_next_action = computePossibleNextAction();
             break;
         }
 
-        if(prob->goal() || prob->maxStep() < lstep) {
+        if(prob->goal() || prob->maxStep() <= lstep) {
             run_stats.push_back( {lreward, lstep, learner_reached_goal, treward, nbAdvice - sumLastNbAvice, (float)(nbAdvice - sumLastNbAvice) / (float) lstep });
             sumLastNbAvice = nbAdvice;
 
-            prob->init();
-            DAction* ac = prob->getInitialAction();
-            learner->get_policy()->clear_history(getState(prob), *ac);
-
-	    //TODO: should clear_history of my own algo | try without
-//             DAction* ia = getInitialAction();
-//             tpolicy->clear_history(getTState(this), *ia);
-//             delete ia;
-
             learner_reached_goal++;
+
+            //called last time to get a +1
+            if(astart == before)
+                learner->computeNextAction(getState(prob), prob->reward());
+
+            learner_prob_init();
             if(astart == before)
                 delete learner_next_action;
-            learner_next_action = new DAction(*ac);
-            delete ac;
-
-            lstep = 0;
-            lreward = 0;
-            treward = 0;
-//             advice_limit_per_ep = MAX_NUMBER_ADVICE;
-            gotGreedy = false;
+            learner_next_action = computePossibleNextAction();;
+        } else {
+            lstep ++;
+            lreward += prob->reward();
+            treward += reward();
         }
 
 // 	LOG_DEBUG(prob->getDState() << " " << *learner_next_action << " " << giveAdvise << " " << *(this->state->learner_action));
@@ -244,6 +228,34 @@ protected:
         else this->state->learner_action = new DAction(*learner_next_action);
     }
 
+    void learner_prob_init() {
+        prob->init();
+        DAction* ac = prob->getInitialAction();
+        learner->get_policy()->clear_history(getState(prob), *ac);
+
+        //TODO: should clear_history of my own algo | try without
+//             DAction* ia = getInitialAction();
+//             tpolicy->clear_history(getTState(this), *ia);
+//             delete ia;
+        prob->apply(*ac);
+        delete ac;
+
+        lstep = 1;
+        lreward = prob->reward();
+        treward = reward();
+        gotGreedy = false;
+    }
+
+    DAction* computePossibleNextAction() {
+        DAction* learner_next_action;
+        Policy<PolicyState>* cp =  learner->get_policy()->copyPolicy();
+        LearnReturn lr = cp->_learn(getState(prob), prob->reward());
+        learner_next_action = new DAction(*lr.ac);
+        gotGreedy = lr.gotGreedy;
+        delete cp;
+        return learner_next_action;
+    }
+
     void computeDState(const TeacherState<EnvState>& s, DState* dst, const StateTemplate* repr) {
 // 	const GridWorldLSState ss = ((const GridWorldLSState&)prob->getState());
 // 	LOG_DEBUG("begin with : " << *dst << " copy first {" << ss.x << "," << ss.y << "," << ss.p << "} and then " << *s.learner_action);
@@ -253,24 +265,23 @@ protected:
 // 	LOG_DEBUG(*dst);
     }
 
-    void initState(bool random=false) {
-        (void)random;
+    void initState(bool) {
 
         learner->reset();
-        learner->get_policy()->setAdviseStrat(sea);
         nbAdvice = 0;
         sumLastNbAvice=0;
         learner_reached_goal = 0;
+
+        learner_prob_init();
+
         this->state->learner_state = prob->getState();
         this->state->episod = 0;
         this->state->givenFdb = 0;
 
         if(alreadyInit)
             delete this->state->learner_action;
-        this->state->learner_action = prob->getInitialAction();
-        lstep = 0;
-        lreward = 0;
-        treward = 0;
+        this->state->learner_action = computePossibleNextAction();
+
         advice_limit_per_ep = MAX_NUMBER_ADVICE;
         tookBestAction = false;
         gotGreedy = false;
@@ -321,6 +332,8 @@ using CCTeacher = Teacher<EnvState, EnvState, ContinuousSelection, TeacherPolicy
 }
 
 #endif
+
+
 
 
 

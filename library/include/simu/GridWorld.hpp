@@ -9,17 +9,20 @@ namespace simu {
 #define YPOS "YPOS"
 #define XG "XGOAL"
 #define YG "YGOAL"
+#define GL "GOAL"
   
 #define MOV "move"
 
 #define XMAX 10
 #define YMAX 10
+#define GMAX 5
 
 struct GridWorldState {
     int x;
     int y;
     int xgoal;
     int ygoal;
+    int currentGoal;
 };
 
 class GridWorld : public Environnement<GridWorldState>
@@ -42,12 +45,11 @@ protected:
 public:
 // private:
     static const int REWARD[XMAX][YMAX];
-    static const int NBGOALS = 5;
+    static const int NBGOALS = GMAX;
     static const int XGOALS [NBGOALS];
     static const int YGOALS [NBGOALS];
 
     int world[XMAX][YMAX];
-    int currentGoal;
     int last_reward;
 };
 

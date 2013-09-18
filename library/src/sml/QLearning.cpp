@@ -3,14 +3,14 @@
 
 namespace sml {
 
-QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, RLParam param, const LearnConfig& conf) :
-    LearnStat(conf), DPolicy(param), Q(stmp, atmp), P(stmp, atmp), atmp(atmp)
+QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, RLParam param, StrategyEffectsAdvice sea, const LearnConfig& conf) :
+    LearnStat(conf), DPolicy(param, sea), Q(stmp, atmp), P(stmp, atmp), atmp(atmp)
 {
     ds = new DState(s);
     da = new DAction(a);
 }
 
-QLearning::QLearning(const QLearning& q):LearnStat(q.conf), DPolicy(q.param), Q(q.Q), P(q.P), atmp(q.atmp) {
+QLearning::QLearning(const QLearning& q):LearnStat(q.conf), DPolicy(q.param, q.adviceStrat), Q(q.Q), P(q.P), atmp(q.atmp) {
     ds = new DState(*q.ds);
     da = new DAction(*q.da);
 }
@@ -40,43 +40,43 @@ LearnReturn QLearning::_learn(const DState& s, double r)
     return {a, false};
 }
 
-void QLearning::should_done(const DState& s, const DAction& a)
+void QLearning::should_done(const DState&, const DAction&)
 {
 //     LOG_DEBUG("advice "<< s << " " << a);
-    switch(adviceStrat) {
-    case FixedNExploration:
-    case FixedNMax:
-        DAction* b = P.argmax(s);
-        if(P(s, *b) == 1 && !(*b == a) )
-            P(s, *b) = 0;
-        delete b;
-
-        P(s,a)=1;
-        break;
-    }
-
-    switch(adviceStrat) {
-    case FixedNMax:
-    case Max:
-        DAction* ba = Q.argmax(s);
-        Q(s,a) = Q(s,*ba) + 0.000001;
-        delete ba;
-    }
+//     switch(adviceStrat) {
+//     case FixedNExploration:
+//     case FixedNMax:
+//         DAction* b = P.argmax(s);
+//         if(P(s, *b) == 1 && !(*b == a) )
+//             P(s, *b) = 0;
+//         delete b;
+// 
+//         P(s,a)=1;
+//         break;
+//     }
+// 
+//     switch(adviceStrat) {
+//     case FixedNMax:
+//     case Max:
+//         DAction* ba = Q.argmax(s);
+//         Q(s,a) = Q(s,*ba) + 0.000001;
+//         delete ba;
+//     }
 }
 
 DAction* QLearning::decision(const DState& s, bool greedy) {
     DAction* a = Q.argmax(s);
 
     bool may_greedy = greedy;
-    if(adviceStrat == FixedNExploration || adviceStrat == FixedNMax) {
-        DAction* b = P.argmax(s);
-        if( P(s, *b) == 1 ) {
-            a = b;
-            may_greedy = false;
-        }
-        else
-            delete b;
-    }
+//     if(adviceStrat == FixedNExploration || adviceStrat == FixedNMax) {
+//         DAction* b = P.argmax(s);
+//         if( P(s, *b) == 1 ) {
+//             a = b;
+//             may_greedy = false;
+//         }
+//         else
+//             delete b;
+//     }
 
     //exploration
     if(may_greedy && sml::Utils::rand01() < param.epsilon ) {
@@ -112,7 +112,7 @@ void QLearning::had_choosed(const DState&, const DAction&, double, bool){
   
 }
 
-float QLearning::getStateImportance(const DState& s){
+float QLearning::getStateImportance(const DState&){
     return 0;
 };
 

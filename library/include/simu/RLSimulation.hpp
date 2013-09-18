@@ -49,7 +49,7 @@ class RLSimulation : private StateType, public Simulation
 
 public:
 
-    RLSimulation(Environnement<EnvState>* prob):prob(prob),agentSet(false),bestPolicySet(false) {
+    RLSimulation(Environnement<EnvState>* prob, bool no_learn_knowledge):prob(prob),agentSet(false),bestPolicySet(false), no_learn_knowledge(no_learn_knowledge) {
         fac = prob->getInitialAction();
     }
 
@@ -68,9 +68,8 @@ public:
 
     stats run(bool random=false) {
         assert(agentSet);
-
-        prob->init(random);
-        stats s = local_run(0);
+	
+        stats s = local_run(0, random);
         best_policy = agent->copyPolicy();
         bestPolicySet = true;
         return s;
@@ -81,9 +80,7 @@ public:
         std::list<stats>* stats_history = new std::list<stats>;
 
         additional_step--;
-        prob->init(random_init);
-        agent->clear_history(getState(prob), *fac);
-        stats s = local_run(0);
+        stats s = local_run(0, random_init);
         int min_step = s.min_step;
         int index_min = 0;
         int index = 1;
@@ -92,12 +89,14 @@ public:
         if(bestPolicySet)
             delete best_policy;
         best_policy = agent->copyPolicy();
+        bestPolicySet = true;
+
+        if(additional_step <= 0)
+            return stats_history;
 
         do {
             additional_step--;
-            prob->init(random_init);
-            agent->clear_history(getState(prob), *fac);
-            stats s = local_run(index);
+            stats s = local_run(index, random_init);
 
             if(s.nbStep <= min_step) {
                 min_step = s.nbStep;
@@ -114,6 +113,19 @@ public:
         while(additional_step > 0);
 
         return stats_history;
+    }
+    
+    stats local_run(int index, bool random_init) {
+        prob->init(random_init);
+        agent->clear_history(getState(prob), *fac);
+        if(no_learn_knowledge) {
+            local_run_l(index, true);
+            prob->init(random_init);
+            agent->clear_history(getState(prob), *fac);
+            return local_run_l(index, false);
+        }
+
+        return local_run_l(index, true);
     }
 
     Policy<PolicyState>* get_best_policy() {
@@ -146,7 +158,7 @@ public:
     }
 
     stats run_best(int index) {
-	prob->init();
+        prob->init();
         DAction* ac = new DAction(*fac);
         int step = 0;
         double total_reward = 0;
@@ -154,20 +166,20 @@ public:
         {
             step++;
             prob->apply(*ac);
-	    delete ac;
+            delete ac;
             total_reward += prob->reward();
 
             ac = best_policy->decision(getState(prob), false);
         }
         while(!prob->goal() && step < (int)prob->maxStep());
-	
-	delete ac;
+
+        delete ac;
 
         return {step, total_reward, step, index};
     }
 
 protected:
-    virtual stats local_run(int index) {
+    virtual stats local_run_l(int index, bool learn) {
         DAction* ac = fac;
         int step = 0;
         double total_reward = 0;
@@ -177,13 +189,14 @@ protected:
             prob->apply(*ac);
             total_reward += prob->reward();
 
-            ac = this->computeNextAction(getState(prob), prob->reward());
-
-//  	    LOG_DEBUG(*ac << " " << getState(prob));
+	    if(learn)
+	      ac = this->computeNextAction(getState(prob), prob->reward());
+	    else 
+	      ac = this->agent->decision(getState(prob), false);
+	    
+//   	   index > 900 &&  LOG_DEBUG(*ac);
         }
         while(!prob->goal() && step < (int)prob->maxStep());
-
-//      LOG(step<< " " << total_reward);
 
         return {step, total_reward, step, index};
     }
@@ -193,7 +206,7 @@ protected:
     DAction* fac;
     Policy<PolicyState>* agent;
     Policy<PolicyState>* best_policy;
-    bool agentSet, bestPolicySet;
+    bool agentSet, bestPolicySet, no_learn_knowledge;
 };
 
 }

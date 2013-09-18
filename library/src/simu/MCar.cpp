@@ -47,7 +47,7 @@ double MCar::reward() const {
     if(!goal())
         return -1.;
 	
-    return 1;
+    return 0;
 }
 
 DAction* MCar::getInitialAction() const {

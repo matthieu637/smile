@@ -7,10 +7,19 @@
 namespace sml {
 
 float Utils::rand01() {
+//     LOG_DEBUG("rand");
     return (float)rand()/(float)RAND_MAX;
 }
 
+bool Utils::rand01(float limit){
+    if(limit > 0.L){
+      return Utils::rand01() < limit;
+    }
+    return false;
+}
+
 float Utils::randin(float a, float b) {
+//     LOG_DEBUG("rand");
     float random = ((float) rand()) / (float) RAND_MAX;
     float diff = b - a;
     float r = random * diff;

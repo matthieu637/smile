@@ -56,52 +56,32 @@ fi
 
 }
 
-nbrTest=10
-
-launch_test "Z1" 1 10
-
-#launch_test "TBMC" 1 600
-#launch_test "TBEA" 1 600
-#launch_test "TBIA" 1 600
-
-#launch_test "FMQ3" 1 3000
-
-
-#launch_test "TMQ3Q1ANTB 5 1" 1 2000
-
-#graph partie 1
-# # launch_test "TMQ1Q1AMTB" 1 $nbrTest
-# # launch_test "TMQ1Q1AOTB" 1 $nbrTest
-# # launch_test "TMQ1Q1ANTB" 1 $nbrTest
-# # launch_test "TMQ1Q1AITB" 1 $nbrTest
-
-# launch_test "TMQ1Q1AMTA" 1 $nbrTest
-# launch_test "TMQ1Q1AOTA" 1 $nbrTest
-# launch_test "TMQ1Q1ANTA" 1 $nbrTest
-# launch_test "TMQ1Q1AITA" 1 $nbrTest
+# # #grid
+# launch_test "FG 200 0" 1 3000
+# launch_test "TBGEA 200 0 150" 1 1000
+# launch_test "TBGIA 200 0 150" 1 1000
+# launch_test "TBGMC 200 0 150" 1 1000
+# 
+# launch_test "FG 200 1" 1 3000
+# launch_test "TBGEA 200 1 150" 1 1000
+# launch_test "TBGIA 200 1 150" 1 1000
+# launch_test "TBGMC 200 1 150" 1 1000
 # 
 # 
-# # # launch_test "TGQ1Q1AMTB" 1 $nbrTest
-# # # launch_test "TGQ1Q1AOTB" 1 $nbrTest
-# # # launch_test "TGQ1Q1ANTB" 1 $nbrTest
-# # # launch_test "TGQ1Q1AITB" 1 $nbrTest
+# # #car
+# launch_test "FM 100 0" 1 3000
+# launch_test "TBMEA 100 0 150" 1 1000
+# launch_test "TBMIA 100 0 150" 1 1000
+# launch_test "TBMMC 100 0 150" 1 1000
 # 
-# launch_test "TGQ1Q1AMTA" 1 $nbrTest
-# launch_test "TGQ1Q1AOTA" 1 $nbrTest
-# launch_test "TGQ1Q1ANTA" 1 $nbrTest
-# launch_test "TGQ1Q1AITA" 1 $nbrTest
-# 
-# 
-# # # launch_test "TLQ1Q1AMTB" 1 $nbrTest
-# # # launch_test "TLQ1Q1AOTB" 1 $nbrTest
-# # # launch_test "TLQ1Q1ANTB" 1 $nbrTest
-# # # launch_test "TLQ1Q1AITB" 1 $nbrTest
-# 
-# launch_test "TLQ1Q1AMTA" 1 $nbrTest
-# launch_test "TLQ1Q1AOTA" 1 $nbrTest
-# launch_test "TLQ1Q1ANTA" 1 $nbrTest
-# launch_test "TLQ1Q1AITA" 1 $nbrTest
+# launch_test "FM 100 1" 1 3000
+# launch_test "TBMEA 100 1 150" 1 1000
+# launch_test "TBMIA 100 1 150" 1 1000
+# launch_test "TBMMC 100 1 150" 1 1000
 
+
+launch_test "TBMEA 100 0 150 M" 1 100
+launch_test "TBMEA 100 0 150 I" 1 100
 
 # k=".001"
 # incr=".001"

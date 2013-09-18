@@ -49,4 +49,7 @@ U = load('../../data/Z1#6');
  size(Y, 2) * size(W, 2) 
  mean(U)
 
+X = mean(X)(1:100);
+Y = mean(Y)(1:100);
 
+sum(Y - X)/100

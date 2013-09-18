@@ -1,5 +1,5 @@
 \documentclass[a4paper,12pt]{article}
-\usepackage[utf8x]{inputenc} %fac
+\usepackage[utf8]{inputenc} %fac
 %\usepackage[utf8]{inputenc} %fac
 
 %\usepackage[square,sort,comma]{natbib}
@@ -34,6 +34,35 @@
 \rhead{ %\rightmark 
 }
 
+\usepackage[style=authoryear,backend=bibtex,sortlocale=fr_FR]{biblatex}
+\addbibresource{dependance/biblio.bib}
+
+
+\newrobustcmd*{\parentexttrack}[1]{%
+  \begingroup
+  \blx@blxinit
+  \blx@setsfcodes
+  \blx@bibopenparen#1\blx@bibcloseparen
+  \endgroup}
+
+\AtEveryCite{%
+  \let\parentext=\parentexttrack%
+  \let\bibopenparen=\bibopenbracket%
+  \let\bibcloseparen=\bibclosebracket}
+
+\renewbibmacro*{cite}{%
+  \iffieldundef{shorthand}
+    {\ifthenelse{\ifnameundef{labelname}\OR\iffieldundef{labelyear}}
+       {\usebibmacro{cite:label}%
+        \setunit{\addspace}}
+       {\printnames{labelname}%
+        \setunit{\nameyeardelim}}%
+%     \usebibmacro{cite:labelyear+extrayear}}% DELETED
+     \printtext{(\usebibmacro{cite:labelyear+extrayear})}}% ADDED
+    {\usebibmacro{cite:shorthand}}}
+
+    
+    
 
 
 \sloppy % ne pas faire déborder les lignes dans la marge
@@ -42,8 +71,8 @@
 
 %\setcounter{tocdepth}{1} %hideallsubsections
 
-%\setcounter{secnumdepth}{5}
-%\setcounter{tocdepth}{5}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
 
 \graphicspath{{images/}}
 
@@ -51,7 +80,7 @@
   \begin{titlepage}
   \def\titletype{Experiments}
    \def\majortitle{Learning from expert}
-   \def\docversion{1.0}
+   \def\docversion{1.1}
    \input{dependance/title_page.tex}
   \end{titlepage}
 
@@ -83,7 +112,7 @@
     car must drive up a steep hill. Since gravity is stronger than the car's engine, even at full 
     throttle, the car cannot simply accelerate up the steep slope. The car is situated in a valley
     and must learn to leverage potential energy by driving up the opposite hill before the car is 
-    able to make it to the goal at the top of the rightmost hill.
+    able to make it to the goal at the top of the rightmost hill, \cite{ReinforceLearningIntro} .
     \begin{figure}[H]
       \begin{center}
 	\includegraphics[width=270px]{Mcar}
@@ -91,35 +120,49 @@
 	\end{center}
     \end{figure}
     
-    \subsubsection{State Variables}
-    Two dimensional continuous state space : Velocity = (-0.07,0.07) and Position = (-1.2,0.6)
+    \paragraph{State Variables}
+    Two dimensional continuous state space : \\
+    $(x,y) \in Position \times Velocity $
+      $ with \left\lbrace \begin{array}{lll} 
+      Position = [-1.2, 0.6]\\
+      Velocity = [-0.07, 0.07]\
+      \end{array} \right.$
     
-    \subsubsection{Actions}
-     One dimensional discrete action space : Motor = (left, neutral, right)
+    
+    
+    \paragraph{Actions}
+     One dimensional discrete action space : \\
+     a $\in$ Motor = \{-1,0,+1\} corresponding respectivly to left, neutral, right
      
-     \subsubsection{Reward}
-      For every time step: -1, when goal is reached: +1
+     \paragraph{Reward}
+      For every time step: -1, when goal is reached: 0
 
-    \subsubsection{Update Function}
-    Velocity = Velocity + Action *0.001+cos(3*Position)*-0.0025
-    \newline Position = Position + Velocity
+    \paragraph{Transition}
+     $ \left\lbrace \begin{array}{lll} 
+      y = y + a \times 0.001+cos(3 \times x) \times -0.0025\\
+      x = x + y
+      \end{array} \right.$
 
-    \subsubsection{Starting Condition}
-    Position = -0.5 Velocity = 0.0
+    \paragraph{Initial State}
+         $ \left\lbrace \begin{array}{lll} 
+      x = -0.5\\
+      y = 0.0 
+      \end{array} \right.$
     
-    \subsubsection{Termination Condition}
-    Position >= 0.6
+    \paragraph{Termination Condition}
+    $x >= 0.6$
     
     
-    
-    \subsection{Grid Game}
+    \newpage
+    \subsection{Open the Gate}
 
 The mountain car problem gives a -1 reward at every step, and the state allows to 
     determine exactly the best action to take. So we could think that there is no state more important than other (to give feedbacks). 
 
 Here, we introduce an other problem where rewards will be different according to our state.
     
-    The agent have to reach every green boxes in the given order.
+    The agent have to reach every green boxes \textbf{according to the given order} to solve the problem.
+    
 
     \begin{figure}[H]
       \begin{center}
@@ -128,63 +171,119 @@ Here, we introduce an other problem where rewards will be different according to
 	\end{center}
     \end{figure}
     
-    \subsubsection{State Variables}
-    Four dimensional discretized state space :\newline
-    X = \{0, 9\} ; Y = \{0, 9\} ; XGOAL = \{0, 9\} ; YGOAL = \{0, 9\}
+    \paragraph{State Variables}
+    Three dimensional discretized state space :\newline
+    $(x,y,n) \in \{1, 10\} \times \{1, 10\} \times \{1, 5\}$ \newline
+    x and y are the coordinates of the grid\newline
+    n determines which future case must be reached
     
-    \subsubsection{Actions}
-    One dimensional discrete action space : Direction = (left, up, right, bottom)
+    \paragraph{Actions}
+    One dimensional discrete action space : the direction \newline
+    $d \in \{left, up, right, bottom\}$ 
 
-     \subsubsection{Reward}
+     \paragraph{Reward} 
       white boxes : -1 \newline
-      green boxes : +10 (only the first time)\newline
-      red boxes : -10 \newline
-    
-    \subsection{Second Grid Game (LS)}
-
-    The main difference in this problem, is that, given a state there isn't only one best possible action.
-     
-    The agent have to reach every green boxes in any order.
-
-    \begin{figure}[H]
-      \begin{center}
-	\includegraphics[width=270px]{gridworldls}
-	\caption{ Gris World Insconsistent State }
-	\end{center}
-    \end{figure}
-    
-    \subsubsection{State Variables}
-    Four dimensional discretized state space : X = \{0, 9\} ; Y = \{0, 9\}
-    
-    \subsubsection{Actions}
-     One dimensional discrete action space : Direction = (left, up, right, bottom)
-     
-     \subsubsection{Reward}
-      white boxes : -1 \newline
-      green boxes : +10 (only the first time)\newline
-      red boxes : -10 \newline
+      green boxes : +20 if n = number\_box(x, y) 
+                    else -1 
+      \newline
+      red boxes : -20 
       
-      \subsubsection{State inconsistency}
+      \paragraph{Transition}  
+	x = x + 1 if d = right $\wedge \neg$ black\_box(x + 1, y) \newline
+	y = y + 1 if d = up $\wedge \neg$ black\_box(x, y + 1) \newline
+	x = x - 1 if d = left $\wedge \neg$ black\_box(x - 1, y) \newline
+	y = y - 1 if d = bottom $\wedge \neg$ black\_box(x, y - 1) \newline
+	n = n + 1 if green\_box(x, y) $\wedge$ n = number\_box(x, y) 
       
-      Imagine your in the boxe (6,0), you only know that you are in this box, you don't already know 
-      if you reach the goal in (4,0). Thus, there is two different reasonable chooses.
+      \paragraph{Initial State}
+      (x,y,n) = (1, 1 ,1)
+      
+      \paragraph{Termination Condition}
+      n > 5
+    
+%     \subsection{Second Grid Game (LS)}
+% 
+%     The main difference in this problem, is that, given a state there isn't only one best possible action.
+%      
+%     The agent have to reach every green boxes in any order.
+% 
+%     \begin{figure}[H]
+%       \begin{center}
+% 	\includegraphics[width=270px]{gridworldls}
+% 	\caption{ Gris World Insconsistent State }
+% 	\end{center}
+%     \end{figure}
+%     
+%     \subsubsection{State Variables}
+%     Four dimensional discretized state space : X = \{0, 9\} ; Y = \{0, 9\}
+%     
+%     \subsubsection{Actions}
+%      One dimensional discrete action space : Direction = (left, up, right, bottom)
+%      
+%      \subsubsection{Reward}
+%       white boxes : -1 \newline
+%       green boxes : +10 (only the first time)\newline
+%       red boxes : -10 \newline
+%       
+%       \subsubsection{State inconsistency}
+%       
+%       Imagine your in the boxe (6,0), you only know that you are in this box, you don't already know 
+%       if you reach the goal in (4,0). Thus, there is two different reasonable chooses.
 
-      \section{Comparing strategy : how the advice affects the learner}
+      \newpage
+      \section{Effects of advices}
+      
+      In this section, we are experimenting how the advice should affect the learner in reinforcement
+      learning algorithms like Q-Learning or Sarsa. 
+      We are working with an approximation of the Q-function with a common linear function 
+      \begin{footnotesize}
+       $Q(s,a) = \sum\limits_{i} \theta_{i} \times f_{i}(s,a)$.
+      \end{footnotesize}
+      The features $f$ are binary and follow a tile coding, \cite{ReinforceLearningIntro}.
+      Then, it is necessary to perform a gradient descent to approximate $\vec\theta$.
+      
+      Let's 
+      
       \subsection{Strategies}
-      \subsubsection{Max}
-       $Q(s,a) = max(Q(s,\_)) + \delta$
-       \subsubsection{Override (Lucky Exploration)}
-       $\pi(s)=a$ \newline
-       $Q(s,a)$ will be updating according with the reward given the next time in this state.
-       \subsubsection{Max + Override}
+      
+      We always advise with a action. Here $a$ is the recommended action, and $s$ the current state.
+     
+     Let us also introduce an other notation, the vector $\vec\theta(f(s,a))$, this represents the actived $\theta_i$ in 
+      the state $s$ with the action $a$. It only make sense because the features $f$ are binary.
+      Thus, $Q(s,a)$ can be rewrite like $Q(s,a) = \sum\limits_{i} \theta_{i}(f(s,a))$.
+      We also asume that features $f$ always depends of $s$ and $a$.
+      \newline
+      \newline
+      Here is our different strategies :
+      
+      \paragraph{Max} In this strategy, we increase the Q value of the recommended action, 
+      with the best possible Q value in the current state, so that it is selected next time. \newline
+      \begin{center}
+       $Q(s,a) = \underset{a'}{\operatorname{max}}\ Q(s,a') + \delta$
+      \end{center}
+      With the approximation :
+      \begin{center}
+	$\vec\theta(f(s,a)) = \vec\theta(f(s,a'))$
+	\end{center}
+       
+       \paragraph{Decrease} Instead of increasing the Q value of the recommanded action, we will decrease
+       the Q-value of the others actions.
+       
+       \paragraph{Informed Exploration}
+       This strategy can only be used in the case of advising before acting. Agent takes action $a$,
+       and $Q(s,a)$ will be updating according with the next reward.
+       
+       
+       
+       \paragraph{Fixed} 
 	$\pi(s)=a$ \newline
 	$Q(s,a) = max(Q(s,\_) + \delta$
 
-	\subsubsection{Others}
+	\paragraph{Others}
       We could imagine an other strategy as Lucky Exploration only for 
       the next time we encounter this state ( not fixed for everytime ).
       
-      \subsection{Experiment A : Advice after}
+      \subsection{Advice after acting}
       In this experiment, we have two agent, a teacher (QLearning) and a learner (QLearning).
       The teacher is favored to advice (it is done to compare advice effects) : +10 if advice
       else -10. With this reward function, it is not important to display the algorithm ``advice before''
@@ -193,7 +292,7 @@ Here, we introduce an other problem where rewards will be different according to
       The teacher advices the learner with the best action to take (according to 
       the best policy previously computed). They have the same state representation.
             
-      \subsubsection{Mountain Car}
+      \paragraph{Mountain Car}
       \begin{figure}[H]
       \begin{center}
 	\includegraphics[width=320px]{graphA_MA}
@@ -205,7 +304,7 @@ Here, we introduce an other problem where rewards will be different according to
       updates the Q value directly).
 %       Moreover, the Max strat is really better but 
       
-      \subsubsection{Grid World}
+      \paragraph{Grid World}
       \begin{figure}[H]
       \begin{center}
 	\includegraphics[width=320px]{graphA_GA}
@@ -216,28 +315,60 @@ Here, we introduce an other problem where rewards will be different according to
       This time in the grid world, the best strategy is Max.
       The fixed policy strat are really bad, more than without advice.
       
-      \subsubsection{Grid World (LS)}
-      \begin{figure}[H]
-      \begin{center}
-	\includegraphics[width=320px]{graphA_LA}
-	\caption{ Teacher advices all the time. Number of step to reach to goal at the first episod }
-	\end{center}
-      \end{figure}
+%       \subsubsection{Grid World (LS)}
+%       \begin{figure}[H]
+%       \begin{center}
+% 	\includegraphics[width=320px]{graphA_LA}
+% 	\caption{ Teacher advices all the time. Number of step to reach to goal at the first episod }
+% 	\end{center}
+%       \end{figure}
+%       
+%       In this environnement, all strategies are bad when the teacher advice after because of 
+%       the different good choose possible in a same state.
+%       
       
-      In this environnement, all strategies are bad when the teacher advice after because of 
-      the different good choose possible in a same state.
-      
-      
-      \subsection{Experiment B : Advice before}
+      \subsection{Advice before acting}
       
       This experiment is used to compare the advice effect when the teacher can correct a mistake of the 
       learner before he perform it.
       Also, we need to use a different reward function (based on a cost when he advice) for the teacher, 
       otherwise he will advice always and all algorithms will be at the same performance.
       
-      \section{Comparing teaching strategies : teacher reward function}
+      \subsection{Conclusion}
       
-      \subsection{Reward functions}
+      \section{Teacher Model}
+      
+      How the teacher is computed?
+      
+      \subsection{Criterion}
+      
+      \subsection{Learn to teach}
+      
+      \paragraph{Reward functions}
+      
+      Minimizing the number of step -1 everytime.
+      
+      Maximazing the reward
+      
+      \subsubsection{Advice or not}
+      
+      \subsubsection{Learn the action}
+     
+      
+      \subsection{Comparaisons}
+      
+      
+      \section{Conclusion}
+      
+      \subsection{Future research}
+      
+      Differents state representations.
+      
+      Softmax
+      
+      \subsection{Main results}
+      
+      
 %       \begin{itemize}
 %        \item Max
 %        
@@ -414,6 +545,8 @@ Here, we introduce an other problem where rewards will be different according to
       
 
   \clearpage
+  
+  \printbibliography
   
 %   \clearpage
 %   \section{Performances}

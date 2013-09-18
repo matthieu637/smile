@@ -12,7 +12,9 @@ do
 	if [ $ok -ne 0 ] ; then
 		cat $file | grep "^#$i" | sed "s/#$i//" > "$file#$i"
 	else
-		break
+		if [ $i -gt 4 ] ; then
+			break
+		fi
 	fi
 
 	i=`expr $i + 1`

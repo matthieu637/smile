@@ -36,8 +36,8 @@ public:
 ///       initial : l'action initiale
 ///       conf : la configuration d'apprentissage
     QLearnGradient(featuredList<State>* features, unsigned int nbFeature, const ActionTemplate* atmp,
-                   const DAction& initial, RLParam param, const LearnConfig& conf= {false,0,0}) :
-        LearnStat(conf), Policy<State>(param),
+                   const DAction& initial, RLParam param, StrategyEffectsAdvice sea, const LearnConfig& conf= {false,0,0}) :
+        LearnStat(conf), Policy<State>(param, sea),
         nbFeature(nbFeature),
         teta(nbFeature), e(zero_vector<double>(nbFeature)),
         Qa(atmp), actions(atmp->sizeNeeded()),
@@ -54,7 +54,7 @@ public:
         lastAction = new DAction(initial);
     }
 
-    QLearnGradient(const QLearnGradient& q) : LearnStat(q.conf), Policy<State>(q.param), nbFeature(q.nbFeature),
+    QLearnGradient(const QLearnGradient& q) : LearnStat(q.conf), Policy<State>(q.param, q.adviceStrat), nbFeature(q.nbFeature),
         teta(q.teta), e(q.e), Qa(q.Qa), actions(q.atmpl->sizeNeeded()), features(q.features), atmpl(q.atmpl),
         history(q.history)
     {
@@ -73,7 +73,7 @@ public:
 ///\brief Retourner l'action à faire selon l'algorithme sans apprentissage
 ///\param state : l'état présent
     DAction* decision(const State& state, bool greedy) {
-        if(greedy && sml::Utils::rand01() < this->param.epsilon ) {
+        if(greedy && sml::Utils::rand01(this->param.epsilon)  ) {
 // 	    LOG_DEBUG("got greeding");
             return new DAction(atmpl, {rand() % (int)atmpl->sizeNeeded()});
         }
@@ -174,7 +174,6 @@ public:
         computeQa(s);
 
         DAction* ap = Qa.argmax();
-//         delta = delta + this->param.gamma * Qa(ba); //TODO:should be pretty sure of this one
         delta = delta + this->param.gamma * Qa(*ap);
         delete ap;
 
@@ -184,7 +183,19 @@ public:
             teta[index] = teta[index] + this->param.alpha * delta * e[index];
         }
 
-        a = decision_learn(s, true, new DAction(ba), false).ac;
+        if(this->adviceStrat == InformedExploration) {
+            a = decision_learn(s, true, new DAction(ba), false).ac;
+        } else if(this->adviceStrat == Max) {
+            adviceMax(s, ba);
+            a = decision_learn(s, true, new DAction(ba), false).ac;
+//             for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
+//                 unsigned int index = *it;
+//                 e[index] = this->param.lambda * this->param.gamma * e[index];
+//             }
+//             a = new DAction(ba);
+        } else if(this->adviceStrat == None) {
+            LOG_ERROR("a none sea call should_do");
+        }
 
         //take action a, observe reward, and next state
         delete lastAction;
@@ -235,6 +246,7 @@ public:
 
 private:
 
+
     LearnReturn decision_learn(const State& state, bool lucky, DAction* lucky_ac, bool clear_histo) {
         DAction* a = nullptr;
         bool gotGreedy = false;
@@ -242,7 +254,7 @@ private:
         computeQa(state);
 
         //begin
-        if( !lucky && sml::Utils::rand01() < this->param.epsilon) {
+        if( !lucky && sml::Utils::rand01(this->param.epsilon)) {
 // 	    LOG_DEBUG("got greeding");
             a = new DAction(atmpl, rand() % atmpl->sizeNeeded());
             clear_histo = true;
@@ -252,7 +264,7 @@ private:
                 a = Qa.argmax();
             else {
                 a = lucky_ac;
-	    }
+            }
         }
 
         if(clear_histo) {
@@ -278,6 +290,39 @@ private:
         delete activeIndex;
 
         return {a, gotGreedy};
+    }
+
+    void adviceMax(const State& state, const DAction& ba) {
+        computeQa(state);
+        DAction* amax = Qa.argmax();
+        list<int>* f_amax = extractFeatures(state, *amax);
+        list<int>* f_ba = extractFeatures(state, ba);
+
+// 	LOG_DEBUG(f_amax->size() << " " << f_ba->size());
+// 	bib::Logger::PRINT_ELEMENTS<list<int>>(*f_amax);
+// 	bib::Logger::PRINT_ELEMENTS<list<int>>(*f_ba);
+        assert(f_amax->size() == f_ba->size());
+
+	float tot = Qa(*amax) - Qa(ba);
+	tot = tot / f_ba->size();
+	
+// 	for(list<int>::iterator it2=f_ba->begin(); it2 != f_ba->end(); ++it2) {
+//             teta[*it2] = teta[*it2] + tot + 0.0001;
+//         }
+
+//         list<int>::iterator it=f_ba->begin();
+//         for(list<int>::iterator it2=f_amax->begin(); it2 != f_amax->end(); ++it2) {
+//             teta[*it] = teta[*it2] + 0.0001;
+//             ++it;
+//         }
+
+        delete amax;
+        delete f_amax;
+        delete f_ba;
+
+// 	computeQa(state);
+// 	LOG_DEBUG(*Qa.argmax() << " " << ba);
+// 	assert(*Qa.argmax() == ba);
     }
 
 ///
@@ -345,6 +390,7 @@ private:
 }
 
 #endif // QLEARNGRADIENT_HPP
+
 
 
 
