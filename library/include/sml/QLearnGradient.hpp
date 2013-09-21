@@ -192,7 +192,8 @@ public:
 //                 unsigned int index = *it;
 //                 e[index] = this->param.lambda * this->param.gamma * e[index];
 //             }
-//             a = new DAction(ba);
+//             a = new DAction(atmpl, {rand() % (int)atmpl->sizeNeeded()});
+// 	    a = new DAction(ba);
         } else if(this->adviceStrat == None) {
             LOG_ERROR("a none sea call should_do");
         }
@@ -303,18 +304,18 @@ private:
 // 	bib::Logger::PRINT_ELEMENTS<list<int>>(*f_ba);
         assert(f_amax->size() == f_ba->size());
 
-	float tot = Qa(*amax) - Qa(ba);
-	tot = tot / f_ba->size();
-	
+//         float tot = Qa(*amax) - Qa(ba);
+//         tot = tot / f_ba->size();
+
 // 	for(list<int>::iterator it2=f_ba->begin(); it2 != f_ba->end(); ++it2) {
 //             teta[*it2] = teta[*it2] + tot + 0.0001;
 //         }
 
-//         list<int>::iterator it=f_ba->begin();
-//         for(list<int>::iterator it2=f_amax->begin(); it2 != f_amax->end(); ++it2) {
-//             teta[*it] = teta[*it2] + 0.0001;
-//             ++it;
-//         }
+        list<int>::iterator it=f_ba->begin();
+        for(list<int>::iterator it2=f_amax->begin(); it2 != f_amax->end(); ++it2) {
+            teta[*it] = teta[*it2] + 0.0001;
+            ++it;
+        }
 
         delete amax;
         delete f_amax;

@@ -27,7 +27,7 @@ sum (U - X )/100
 Z = mean(Z);
 sum( Z - X )/100
 
-ad = load('../../data/TBMIA_100_0_150#2');
-mean(ad)(100)
 ad = load('../../data/TBMMC_100_0_150#2');
 mean(ad)(100)
+
+print('TB_0.png')

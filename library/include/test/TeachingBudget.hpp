@@ -125,7 +125,7 @@ public:
                 gonna_advice = nn > 0 && best_policy->getStateImportance(getState(prob)) > agent->getParams().ia_threshold ;
                 break;
 	    case pourcentage:
-		gonna_advice = sml::Utils::rand01(0.05);
+		gonna_advice = sml::Utils::rand01(0.1);
 		break;
             }
 

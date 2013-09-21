@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
 // 	m.T_run_simple<MCarState>(new MCar(1,1), MCarParam, MCarParam, simu::before, sml::Max, 2, 0);
 
         m.runTeachingBudget(new MCar(1,1), MCarParam, pourcentage, 100, false, 150, Max);
-// 	m.runTeachingBudget(new MCar(1,1), MCarParam, pourcentage, 100, false, 150, InformedExploration);
+// 	m.runTeachingBudget(new MCar(1,1), MCarParam, early_advice, 100, false, 150, InformedExploration);
 	
 // 	m.F_run_simple<MCarState>(simu::QL_gen, new MCar(1, 1), MCarParam, 300, false);
 

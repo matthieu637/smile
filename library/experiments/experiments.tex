@@ -24,6 +24,8 @@
 \usepackage{nameref}
 
 \usepackage{amsmath}
+% \usepackage{algorithm2e}
+\usepackage{algpseudocode}
 
 
 % Style Page
@@ -200,6 +202,15 @@ Here, we introduce an other problem where rewards will be different according to
       
       \paragraph{Termination Condition}
       n > 5
+      \\[1.5cm]
+      \paragraph{Conclusion}
+      Thus, we have 2 environnement with different property :
+      \begin{itemize}
+       \item In each state, (except the goal) mountain car receives the same reward
+       \item In each state, mountain car receives a negative reward (the Q function decreased over time)
+       \item The grid environnement reverses these 2 points
+      \end{itemize}
+
     
 %     \subsection{Second Grid Game (LS)}
 % 
@@ -234,40 +245,55 @@ Here, we introduce an other problem where rewards will be different according to
       \section{Effects of advices}
       
       In this section, we are experimenting how the advice should affect the learner in reinforcement
-      learning algorithms like Q-Learning or Sarsa. 
+      learning algorithms like Q-Learning or Sarsa.
       We are working with an approximation of the Q-function with a common linear function 
       \begin{footnotesize}
        $Q(s,a) = \sum\limits_{i} \theta_{i} \times f_{i}(s,a)$.
       \end{footnotesize}
       The features $f$ are binary and follow a tile coding, \cite{ReinforceLearningIntro}.
       Then, it is necessary to perform a gradient descent to approximate $\vec\theta$.
+      Our advise is always the best action.
       
-      Let's 
+      
+      \paragraph{Notations}
+      
+%       Let us also introduce some notations :
+\begin{itemize}
+ \item Here $a$ is the recommended action, and $s$ the current state.
+ \item $\vec\theta(f(s,a))$ represents the actived $\theta_i$ in 
+      the state $s$ with the action $a$. It only make sense because the features $f$ are binary.
+      Thus, $Q(s,a)$ can be rewrite like $Q(s,a) = \sum\limits_{i} \theta_{i}(f(s,a))$.
+\end{itemize}
+
+     
+     Moreover, we asume that :
+      \begin{center}
+	$\forall s \in State, \forall a \in Actions(s), \forall a' \in Actions(s), |\vec\theta (f(s,a))| = | \vec\theta (f(s,a'))|$ 
+      \end{center}
+      with means that the number of actived features is always the same for a state, in case of using
+      tile coding, it is trivial.
+      
+
       
       \subsection{Strategies}
       
-      We always advise with a action. Here $a$ is the recommended action, and $s$ the current state.
-     
-     Let us also introduce an other notation, the vector $\vec\theta(f(s,a))$, this represents the actived $\theta_i$ in 
-      the state $s$ with the action $a$. It only make sense because the features $f$ are binary.
-      Thus, $Q(s,a)$ can be rewrite like $Q(s,a) = \sum\limits_{i} \theta_{i}(f(s,a))$.
-      We also asume that features $f$ always depends of $s$ and $a$.
-      \newline
-      \newline
-      Here is our different strategies :
-      
       \paragraph{Max} In this strategy, we increase the Q value of the recommended action, 
-      with the best possible Q value in the current state, so that it is selected next time. \newline
+      with the best possible Q value in the current state, so that it is selected next time. 
+      \newline
+      Tabular version :
       \begin{center}
        $Q(s,a) = \underset{a'}{\operatorname{max}}\ Q(s,a') + \delta$
       \end{center}
-      With the approximation :
+      Approximation version :
       \begin{center}
 	$\vec\theta(f(s,a)) = \vec\theta(f(s,a'))$
+	
+	$with\ a' = \underset{b}{\operatorname{argmax}}\ Q(s,b) $ 
 	\end{center}
        
        \paragraph{Decrease} Instead of increasing the Q value of the recommanded action, we will decrease
        the Q-value of the others actions.
+       
        
        \paragraph{Informed Exploration}
        This strategy can only be used in the case of advising before acting. Agent takes action $a$,
@@ -279,42 +305,38 @@ Here, we introduce an other problem where rewards will be different according to
 	$\pi(s)=a$ \newline
 	$Q(s,a) = max(Q(s,\_) + \delta$
 
-	\paragraph{Others}
-      We could imagine an other strategy as Lucky Exploration only for 
-      the next time we encounter this state ( not fixed for everytime ).
-      
       \subsection{Advice after acting}
-      In this experiment, we have two agent, a teacher (QLearning) and a learner (QLearning).
-      The teacher is favored to advice (it is done to compare advice effects) : +10 if advice
-      else -10. With this reward function, it is not important to display the algorithm ``advice before''
-      because it will advice all the time.
-      
-      The teacher advices the learner with the best action to take (according to 
-      the best policy previously computed). They have the same state representation.
-            
-      \paragraph{Mountain Car}
-      \begin{figure}[H]
-      \begin{center}
-	\includegraphics[width=320px]{graphA_MA}
-	\caption{ Teacher advices all the time. Number of step to reach to goal at the first episod }
-	\end{center}
-      \end{figure}
-      
-      The two best strategies are Override and Max+Override. (Max+Override is a little quite better because it
-      updates the Q value directly).
-%       Moreover, the Max strat is really better but 
-      
-      \paragraph{Grid World}
-      \begin{figure}[H]
-      \begin{center}
-	\includegraphics[width=320px]{graphA_GA}
-	\caption{ Teacher advices all the time. Number of step to reach to goal at the first episod }
-	\end{center}
-      \end{figure}
-      
-      This time in the grid world, the best strategy is Max.
-      The fixed policy strat are really bad, more than without advice.
-      
+%       In this experiment, we have two agent, a teacher (QLearning) and a learner (QLearning).
+%       The teacher is favored to advice (it is done to compare advice effects) : +10 if advice
+%       else -10. With this reward function, it is not important to display the algorithm ``advice before''
+%       because it will advice all the time.
+%       
+%       The teacher advices the learner with the best action to take (according to 
+%       the best policy previously computed). They have the same state representation.
+%             
+%       \paragraph{Mountain Car}
+%       \begin{figure}[H]
+%       \begin{center}
+% 	\includegraphics[width=320px]{graphA_MA}
+% 	\caption{ Teacher advices all the time. Number of step to reach to goal at the first episod }
+% 	\end{center}
+%       \end{figure}
+%       
+%       The two best strategies are Override and Max+Override. (Max+Override is a little quite better because it
+%       updates the Q value directly).
+% %       Moreover, the Max strat is really better but 
+%       
+%       \paragraph{Grid World}
+%       \begin{figure}[H]
+%       \begin{center}
+% 	\includegraphics[width=320px]{graphA_GA}
+% 	\caption{ Teacher advices all the time. Number of step to reach to goal at the first episod }
+% 	\end{center}
+%       \end{figure}
+%       
+%       This time in the grid world, the best strategy is Max.
+%       The fixed policy strat are really bad, more than without advice.
+%       
 %       \subsubsection{Grid World (LS)}
 %       \begin{figure}[H]
 %       \begin{center}
@@ -331,8 +353,8 @@ Here, we introduce an other problem where rewards will be different according to
       
       This experiment is used to compare the advice effect when the teacher can correct a mistake of the 
       learner before he perform it.
-      Also, we need to use a different reward function (based on a cost when he advice) for the teacher, 
-      otherwise he will advice always and all algorithms will be at the same performance.
+      We still give advice 10\% of time to compare the different strategy.
+      
       
       \subsection{Conclusion}
       
@@ -340,19 +362,65 @@ Here, we introduce an other problem where rewards will be different according to
       
       How the teacher is computed?
       
-      \subsection{Criterion}
+      \subsection{Heuristics}
+      
+      \cite{Torrey:2013:TBA:2484920.2485086} introduce different teacher model, where 2 reinforcement learning agent
+      learn the same task. One have fully learn, the teacher, and the other one, the learner, starts.
+      
+      During the learning, using a heuristics, the learner will receive the best action compute by the teacher
+      for a state. The number of advice is fixed.
       
       \subsection{Learn to teach}
       
+      Now, we could like to introduce an other configuration, that we trust better.
+      The teacher will not learn the same task that the learner. However, he computes the best policy internally. 
+      He will have to solve an other problem, his state is define like 
+      $Teacher\_States = Learner\_States \times Learner\_Actions$\\
+      which is the state of the learner and the action he takes in this state.
+      
       \paragraph{Reward functions}
       
-      Minimizing the number of step -1 everytime.
+      We have to choose which criterion we want to optimize :
       
-      Maximazing the reward
+      \subparagraph{Minimizing the number of step}
+
+	  \begin{algorithmic}
+	  \If {$giveAdvice$}
+	      \State $r\gets -1 \times cost$
+	  \Else
+	      \If {$learner\_take\_best\_action$}
+		  \State $r\gets 0$
+	      \Else
+		  \State $r\gets -1$
+	      \EndIf
+	  \EndIf
+	  \end{algorithmic}
+
+      
+      \subparagraph{Maximazing the learner reward}
+      
+	  \begin{algorithmic}
+	  \If {$giveAdvice$}
+	      \State $r\gets -1  \times cost \times learner\_reward $
+	  \Else
+	      \State $r\gets learner\_reward$
+	  \EndIf
+	  \end{algorithmic}
+	  
+	  
+	  We will mainly focus on minimizing the number of step.
       
       \subsubsection{Advice or not}
       
+      Our first model will decide if the teacher have to advice with the best action or not.
+      $Teacher\_Actions = \{\neg F, F\}$
+      
       \subsubsection{Learn the action}
+      
+      In this section, we will change the model of the teacher, instead of having to choose to give a feedback or not,
+      he can choose which action he wants to advice.
+      
+       $Teacher\_Actions = \{ \neg F\} \cup Learner\_Actions $
      
       
       \subsection{Comparaisons}

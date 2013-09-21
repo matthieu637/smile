@@ -33,3 +33,6 @@ sum (U - X )/100
 
 Z = mean(Z);
 sum( Z - X )/100
+
+
+print('TB_1.png')
