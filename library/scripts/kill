@@ -1,0 +1,3 @@
+killall generate_data
+killall stest
+killall stest

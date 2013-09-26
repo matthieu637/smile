@@ -20,7 +20,7 @@ using namespace simu;
 #define G_K2 5.
 #define G_M  1.
 
-static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., false, -250., (int) M, 40., 40.};
+static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., false, 0., (int) M, 40., 40.};
 static const RLParam GridWorldParam= {0.05, 0.08, 0.9, 0.8, false, -2., (int) G_M, 22., 18.85};
 
 static const RLParam GridWorldLSParam= {0.05, 0.08, 0.9, 0.6, false, 0., (int) M, 0., 0.};
@@ -39,19 +39,19 @@ public:
     double callPosition(const MCarState& st, const DAction& ac)
     {
         (void) ac;
-        return sml::Utils::transform(st.position, -1.2, 0.6, 0., 1.8) + i*((1.8/K)/M);
+        return sml::Utils::transform(st.position, -1.2, 0.6, 0., 1.8) - (1.8/K) + i*(((2*1.8)/K)/M);
     }
 
     double callVelocity(const MCarState& st, const DAction& ac)
     {
         (void) ac;
-        return sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14) + i*((0.14/K)/M) ;
+        return sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14) - (0.14/K) + i*(((2*0.14)/K)/M) ;
     }
 
     double callAction(const MCarState& st, const DAction& ac)
     {
         (void) st;
-        return ((double)ac["motor"]) /*+ i*((3/3)/M)*/;
+        return ((double)ac["motor"]);
     }
     double i;
 };

@@ -22,6 +22,8 @@ using namespace std;
 //     return simu::QL_gen;
 // }
 
+void debug();
+
 AdviseStrategy parseAdviseStrat(char*c, int start) {
     if(c[start]=='B') {
         return AdviseStrategy::before;
@@ -95,12 +97,12 @@ int main(int argc, char* argv[])
 
         } else if(argv[1][0] == 'T' && argv[1][1] == 'B') {
             tbs = parseTBStrategyAdvice(argv[1], 3);
-	    sea = sml::InformedExploration;
+            sea = sml::InformedExploration;
 
             if(argc > 4)
                 numberAdvice = atoi(argv[4]);
-	    if(argc > 5)
-		sea = parseStrategyEffectsAdvice(argv[5], 0);
+            if(argc > 5)
+                sea = parseStrategyEffectsAdvice(argv[5], 0);
         }
         else handled = false;
 
@@ -184,9 +186,9 @@ int main(int argc, char* argv[])
 
 // 	m.T_run_simple<MCarState>(new MCar(1,1), MCarParam, MCarParam, simu::before, sml::Max, 2, 0);
 
-        m.runTeachingBudget(new MCar(1,1), MCarParam, pourcentage, 100, false, 150, Max);
+//         m.runTeachingBudget(new MCar(1,1), MCarParam, pourcentage, 100, false, 150, Max);
 // 	m.runTeachingBudget(new MCar(1,1), MCarParam, early_advice, 100, false, 150, InformedExploration);
-	
+
 // 	m.F_run_simple<MCarState>(simu::QL_gen, new MCar(1, 1), MCarParam, 300, false);
 
 
@@ -196,9 +198,52 @@ int main(int argc, char* argv[])
 // 	m.F_run_simple<MCarState>(simu::QL, new MCar(8,8), MCarParam, 1000);
 //         m.T_run_simple<GridWorldLSState, FavorAdvice>(simu::Sarsa_, simu::QL, new GridWorldLS(), GridWorldLSParam, DefaultParam, true, after, sml::Max, 5, 1000);
 // 	m.F_run_simple<GridWorldLSState>(simu::QL, new GridWorldLS, GridWorldLSParam, 10000);
+
+        debug();
     }
 
 
     bib::Logger::endInstance();
     return 0;
+}
+
+void debug() {
+    Utils::srand_mili();
+    MCar car(8, 8);
+    DraftTest t;DAction *a;
+
+    unsigned int nbFeature = 0;
+    featureData<MCarState> features = t.createFeatures<MCarState>(MCarParam);
+    for(fLiterator<MCarState> flist = features.func->begin() ; flist != features.func->end(); ++flist) {
+        nbFeature += (*flist)->getSize();
+    }
+
+    car.init();
+    QLearnGradient<MCarState> q(features.func, nbFeature, car.getActions(), *car.getInitialAction(), MCarParam, InformedExploration);
+    car.apply(*car.getInitialAction());
+    q.should_do(car.getState(), *new DAction(car.getActions(), 1), car.reward());
+    car.apply(*new DAction(car.getActions(), 1));
+    q.learn(car.getState(), car.reward());
+    
+    car.init();
+    q.clear_history(car.getState(), *car.getInitialAction());
+    car.apply(*car.getInitialAction());
+    a = q.learn(car.getState(), car.reward());
+    LOG_DEBUG(*a);
+    
+// // // // // // //     
+    /*
+    
+    car.init();
+    QLearnGradient<MCarState> q2(features.func, nbFeature, car.getActions(), *car.getInitialAction(), MCarParam, InformedExploration);
+    car.apply(*car.getInitialAction());
+    q2.lear
+    car.apply(*new DAction(car.getActions(), 1));
+    q2.learn(car.getState(), car.reward());
+    
+    car.init();
+    q2.clear_history(car.getState(), *car.getInitialAction());
+    car.apply(*car.getInitialAction());
+    a = q2.learn(car.getState(), car.reward());
+    LOG_DEBUG(*a);*/
 }

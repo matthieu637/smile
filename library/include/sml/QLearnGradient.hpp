@@ -342,10 +342,11 @@ private:
             for(list<int>::iterator it=actived->begin(); it != actived->end(); ++it)
                 _Qa += teta[*it];
 
-// 	    LOG_DEBUG("old :" << Qa(*ai) << " new :" << _Qa);
+// 	    LOG_DEBUG("old :" << Qa(**ai) << " new :" << _Qa);
             Qa(**ai) = _Qa;
             delete actived;
         }
+//         LOG_DEBUG("#########");
     }
 
 

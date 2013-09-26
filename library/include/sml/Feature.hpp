@@ -44,9 +44,9 @@ public:
 
         int index = 0;
         for(int i=0; i< params.size(); i+=2) {
-            maxi[index] = params[i];
+            maxi[index] = params[i] + 2; // add external 
             total[index] = params[i+1];
-            width[index] = total[index]/maxi[index];
+            width[index] = total[index]/(maxi[index] - 2);
             size *= maxi[index];
             index++;
         }
@@ -84,6 +84,7 @@ public:
         for(int index=0; index < featuresl.size(); index++) {
 // 	    LOG_DEBUG(featuresl[index](st, ac) << " " << (int) floor( featuresl[index](st, ac) / width[index]) << " " <<  maxi[index] << " " << width[index] << " " << index);
             var[index] = (int) floor( featuresl[index](st, ac) / width[index]);
+	    var[index] ++; //for left depassement
             if(var[index] < 0 || var[index] >= maxi[index])
                 return -1;
         }

@@ -69,19 +69,19 @@ fi
 # 
 # 
 # # #car
-# launch_test "FM 100 0" 1 3000
-# launch_test "TBMEA 100 0 150" 1 1000
-# launch_test "TBMIA 100 0 150" 1 1000
-# launch_test "TBMMC 100 0 150" 1 1000
-# 
-# launch_test "FM 100 1" 1 3000
-# launch_test "TBMEA 100 1 150" 1 1000
-# launch_test "TBMIA 100 1 150" 1 1000
-# launch_test "TBMMC 100 1 150" 1 1000
+launch_test "FM 100 0" 1 100
+launch_test "TBMEA 100 0 150" 1 30
+launch_test "TBMIA 100 0 150" 1 30
+launch_test "TBMMC 100 0 150" 1 30
+
+#launch_test "FM 100 1" 1 300
+#launch_test "TBMEA 100 1 150" 1 100
+#launch_test "TBMIA 100 1 150" 1 100
+#launch_test "TBMMC 100 1 150" 1 100
 
 
-launch_test "TBMPP 100 0 500 M" 1 300
-launch_test "TBMPP 100 0 500 I" 1 300
+# launch_test "TBMPP 100 0 500 M" 1 300
+# launch_test "TBMPP 100 0 500 I" 1 300
 
 # launch_test "TBMPP 100 1 500 M" 1 300
 # launch_test "TBMPP 100 1 500 I" 1 300
