@@ -51,11 +51,11 @@ public:
     RLGradient(Algo algo, Environnement<EnvState>* p, RLParam rlp, featuredList<EnvState>* features, int nbFeature, bool no_learn_knowledge, StrategyEffectsAdvice sea) : 
     RLSimulation<EnvState, EnvState, ContinuousSelection>(p, no_learn_knowledge), type(algo),rlp(rlp), features(features), sea(sea),nbFeature(nbFeature) {}
 
-    Policy<EnvState>* createAgent(const EnvState&, const DAction& a) {
+    Policy<EnvState>* createAgent(const EnvState& s, const DAction& a) {
 
         switch(type) {
         case QL_gen:
-            return new QLearnGradient<EnvState>(features, nbFeature, this->prob->getActions(), a, rlp, sea);
+            return new QLearnGradient<EnvState>(features, nbFeature, this->prob->getActions(), s, a, rlp, sea);
         default:
             LOG_ERROR("wrong param");
         }

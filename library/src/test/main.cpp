@@ -219,7 +219,7 @@ void debug() {
     }
 
     car.init();
-    QLearnGradient<MCarState> q(features.func, nbFeature, car.getActions(), *car.getInitialAction(), MCarParam, InformedExploration);
+    QLearnGradient<MCarState> q(features.func, nbFeature, car.getActions(), car.getState(), *car.getInitialAction(), MCarParam, InformedExploration);
     car.apply(*car.getInitialAction());
     q.should_do(car.getState(), *new DAction(car.getActions(), 1), car.reward());
     car.apply(*new DAction(car.getActions(), 1));

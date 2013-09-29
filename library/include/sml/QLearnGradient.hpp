@@ -35,7 +35,7 @@ public:
 /// 	  atmp : le modèle d'action
 ///       initial : l'action initiale
 ///       conf : la configuration d'apprentissage
-    QLearnGradient(featuredList<State>* features, unsigned int nbFeature, const ActionTemplate* atmp,
+    QLearnGradient(featuredList<State>* features, unsigned int nbFeature, const ActionTemplate* atmp, const State& s,
                    const DAction& initial, RLParam param, StrategyEffectsAdvice sea, const LearnConfig& conf= {false,0,0}) :
         LearnStat(conf), Policy<State>(param, sea),
         nbFeature(nbFeature),
@@ -52,6 +52,7 @@ public:
         }
 
         lastAction = new DAction(initial);
+        clear_history(s, initial);
     }
 
     QLearnGradient(const QLearnGradient& q) : LearnStat(q.conf), Policy<State>(q.param, q.adviceStrat), nbFeature(q.nbFeature),
@@ -106,15 +107,14 @@ public:
         DAction* ap = Qa.argmax();
         delta = delta + this->param.gamma * Qa(*ap);
 
-// 	teta = teta + lrate * delta * e;
+// 	teta = teta + this->param.alpha * delta * e;
         for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
             int index = *it;
-            teta[index] = teta[index] + this->param.alpha * delta * e[index];
+            teta[index] = teta[index] + ( this->param.alpha/this->param.tiling ) * delta * e[index];
         }
 
-
+        LearnReturn lr = decision_learn(state, true, *ap);
         delete ap;
-        LearnReturn lr = decision_learn(state, false, nullptr, false);
         a = lr.ac;
 
         //take action a, observe reward, and next state
@@ -123,13 +123,19 @@ public:
         return lr;
     }
 
-    void clear_history(const State&, const DAction& a) {
+    void clear_history(const State& s, const DAction& a) {
         delete lastAction;
         lastAction = new DAction(a);
 
+        // 	e *= 0.;
         for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
             e[*it] = 0L;
         history.clear();
+
+
+        //start an new episod
+        computeQa(s);
+        delete decision_learn(s, false, a).ac;
     }
 
     void should_done(const State&, const DAction&) {
@@ -148,16 +154,14 @@ public:
 
         DAction* ap = Qa.argmax();
         delta = delta + this->param.gamma * Qa(*ap);
+	delete ap;
 
-// 	teta = teta + lrate * delta * e;
         for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
             int index = *it;
-            teta[index] = teta[index] + this->param.alpha * delta * e[index];
+            teta[index] = teta[index] + ( this->param.alpha/this->param.tiling ) * delta * e[index];
         }
-
-
-        delete ap;
-        a = decision_learn(state, true, new DAction(ba), did_greedy).ac;
+        
+        a = decision_learn(state, false, ba, did_greedy ? forced_clear : forced_no_clear).ac;
 
         //take action a, observe reward, and next state
         delete lastAction;
@@ -175,19 +179,19 @@ public:
 
         DAction* ap = Qa.argmax();
         delta = delta + this->param.gamma * Qa(*ap);
-        delete ap;
+        
 
 // 	teta = teta + lrate * delta * e;
         for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
             int index = *it;
-            teta[index] = teta[index] + this->param.alpha * delta * e[index];
+            teta[index] = teta[index] + ( this->param.alpha/this->param.tiling ) * delta * e[index];
         }
 
         if(this->adviceStrat == InformedExploration) {
-            a = decision_learn(s, true, new DAction(ba), false).ac;
+            a = decision_learn(s, false, ba, *ap==ba ? forced_clear : forced_no_clear).ac;
         } else if(this->adviceStrat == Max) {
             adviceMax(s, ba);
-            a = decision_learn(s, true, new DAction(ba), false).ac;
+            a = decision_learn(s, false, ba).ac;
 //             for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
 //                 unsigned int index = *it;
 //                 e[index] = this->param.lambda * this->param.gamma * e[index];
@@ -198,6 +202,8 @@ public:
             LOG_ERROR("a none sea call should_do");
         }
 
+        delete ap;
+        
         //take action a, observe reward, and next state
         delete lastAction;
         lastAction = a;
@@ -246,37 +252,35 @@ public:
 
 
 private:
+    enum custom_dl {normal, forced_clear, forced_no_clear};
 
-
-    LearnReturn decision_learn(const State& state, bool lucky, DAction* lucky_ac, bool clear_histo) {
+    LearnReturn decision_learn(const State& state, bool want_greedy, const DAction& argmax, custom_dl comp=normal) {
         DAction* a = nullptr;
         bool gotGreedy = false;
 
-        computeQa(state);
-
         //begin
-        if( !lucky && sml::Utils::rand01(this->param.epsilon)) {
-// 	    LOG_DEBUG("got greeding");
+        if( want_greedy && sml::Utils::rand01(this->param.epsilon)) {
             a = new DAction(atmpl, rand() % atmpl->sizeNeeded());
-            clear_histo = true;
             gotGreedy = true;
         } else {
-            if(!lucky)
-                a = Qa.argmax();
-            else {
-                a = lucky_ac;
-            }
+            a = new DAction(argmax);
         }
 
-        if(clear_histo) {
+        if(comp == normal)
+            gotGreedy = !( *a == argmax) ; //comment me to speed up convergence?
+        else gotGreedy = comp == forced_clear;
+
+        if(gotGreedy) {
             for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it)
                 e[*it] = 0L;
             history.clear();
+// 	   e *= 0.;
         } else {
             for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
                 unsigned int index = *it;
                 e[index] = this->param.lambda * this->param.gamma * e[index];
             }
+//            e *= this->param.lambda * this->param.gamma;
         }
 
         list<int>* activeIndex = extractFeatures(state, *a);
@@ -342,7 +346,7 @@ private:
             for(list<int>::iterator it=actived->begin(); it != actived->end(); ++it)
                 _Qa += teta[*it];
 
-// 	    LOG_DEBUG("old :" << Qa(**ai) << " new :" << _Qa);
+// // 	    LOG_DEBUG("old :" << Qa(**ai) << " new :" << _Qa);
             Qa(**ai) = _Qa;
             delete actived;
         }
@@ -367,10 +371,31 @@ private:
                 actived->push_back(layer + active);
             layer += size;
         }
+//         LOG_DEBUG("##");
 
         return actived;
     }
 
+// #include <simu/MCar.hpp>
+// 
+//     list<int>* extractFeatures(const State& st, const DAction& ac) {
+// 	int a = ac["motor"];
+// 	simu::MCarState& state = (simu::MCarState&)st;
+//         list<int>* actived = new list<int>;
+// 
+//         float state_vars[2];
+// 	int F[8];
+//         state_vars[0] = state.position / (1.7 / 16);
+//         state_vars[1] = state.velocity / (0.14 / 16);
+// 	
+// 	GetTiles(&F[0], 8, state_vars, 2, 7776, a);
+// 	
+// 	for(int i=0;i<8;i++)
+// 	  actived->push_back( F[i] );
+// 
+// // 	bib::Logger::PRINT_ELEMENTS<list<int>>(*actived);
+//         return actived;
+//     }
 
 
 private:
@@ -392,6 +417,7 @@ private:
 }
 
 #endif // QLEARNGRADIENT_HPP
+
 
 
 
