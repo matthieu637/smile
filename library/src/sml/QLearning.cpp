@@ -93,7 +93,7 @@ DAction* QLearning::decision(const DState& s, bool greedy) {
     return a;
 }
 
-void QLearning::clear_history(const DState& s, const DAction& a)
+void QLearning::startEpisode(const DState& s, const DAction& a)
 {
     delete ds;
     delete da;
@@ -105,7 +105,7 @@ void QLearning::should_do(const DState& s, const DAction& a, double reward) {
     (void) reward;
     should_done(s, a);
 
-    clear_history(s, a);
+    startEpisode(s, a);
 }
 
 void QLearning::had_choosed(const DState&, const DAction&, double, bool){

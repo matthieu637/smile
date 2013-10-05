@@ -45,7 +45,7 @@ public:
     DAction* decision(const DState& s, bool greedy);
     
     
-    void clear_history(const DState& ds, const DAction& da);
+    void startEpisode(const DState& ds, const DAction& da);
     
     void should_done(const DState& s, const DAction& a);
     void had_choosed(const DState&, const DAction&, double, bool);

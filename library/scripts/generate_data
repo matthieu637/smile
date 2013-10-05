@@ -56,54 +56,63 @@ fi
 
 }
 
+
+# # # #car
+# launch_test "FMS3T 300" 1 300
+# launch_test "FMQ3T 300" 1 300
+# launch_test "FMS3_ 300" 1 300
+# launch_test "FMQ3_ 300" 1 300
+# 
+# # S3T
+# launch_test "TBMS3TIEA 300 100" 1 100
+# launch_test "TBMS3TIIA 300 100" 1 100
+# launch_test "TBMS3TIMC 300 100" 1 100
+# # S3_
+# launch_test "TBMS3_IEA 300 100" 1 100
+# launch_test "TBMS3_IIA 300 100" 1 100
+# launch_test "TBMS3_IMC 300 100" 1 100
+# 
+# # Q3T
+# launch_test "TBMQ3TIEA 300 100" 1 100
+# launch_test "TBMQ3TIIA 300 100" 1 100
+# launch_test "TBMQ3TIMC 300 100" 1 100
+# # Q3_
+# launch_test "TBMQ3_IEA 300 100" 1 100
+# launch_test "TBMQ3_IIA 300 100" 1 100
+# launch_test "TBMQ3_IMC 300 100" 1 100
+
+
+
 # # #grid
-# launch_test "FG 200 0" 1 3000
-# launch_test "TBGEA 200 0 150" 1 1000
-# launch_test "TBGIA 200 0 150" 1 1000
-# launch_test "TBGMC 200 0 150" 1 1000
+# launch_test "FGS3T 200" 1 200
+# launch_test "FGQ3T 200" 1 200
+# launch_test "FGS3_ 200" 1 200
+# launch_test "FGQ3_ 200" 1 200
 # 
-# launch_test "FG 200 1" 1 3000
-# launch_test "TBGEA 200 1 150" 1 1000
-# launch_test "TBGIA 200 1 150" 1 1000
-# launch_test "TBGMC 200 1 150" 1 1000
+# # S3T
+# launch_test "TBGS3TIEA 200 150" 1 100
+# launch_test "TBGS3TIIA 200 150" 1 100
+# launch_test "TBGS3TIMC 200 150" 1 100
+# S3_
+# launch_test "TBGS3_IEA 200 150" 1 100
+launch_test "TBGS3_IIA 200 150" 1 100
+launch_test "TBGS3_IMC 200 150" 1 100
 # 
-# 
-# # #car
-#launch_test "FM 600 0" 1 100
-#launch_test "FM 600 1" 1 100
-
-launch_test "FM 300 0" 1 300
-launch_test "TBMEA 300 0 150" 1 100
-launch_test "TBMIA 300 0 150" 1 100
-launch_test "TBMMC 300 0 150" 1 100
-
-launch_test "FM 300 1" 1 300
-launch_test "TBMEA 300 1 150" 1 100
-launch_test "TBMIA 300 1 150" 1 100
-launch_test "TBMMC 300 1 150" 1 100
+# # Q3T
+# launch_test "TBGQ3TIEA 200 150" 1 100
+# launch_test "TBGQ3TIIA 200 150" 1 100
+# launch_test "TBGQ3TIMC 200 150" 1 100
+# Q3_
+# launch_test "TBGQ3_IEA 200 150" 1 100
+# launch_test "TBGQ3_IIA 200 150" 1 100
+# launch_test "TBGQ3_IMC 200 150" 1 100
 
 
-# launch_test "TBMPP 100 0 500 M" 1 300
-# launch_test "TBMPP 100 0 500 I" 1 300
 
-# launch_test "TBMPP 100 1 500 M" 1 300
-# launch_test "TBMPP 100 1 500 I" 1 300
-
-# launch_test "FM 1000 0" 1 1000
-# launch_test "TBMPP 1000 0 500 M" 1 1000
-# launch_test "TBMPP 1000 0 500 I" 1 1000
 
 # k=".001"
 # incr=".001"
 # end=".04"
-# 
-# #while [ `echo "$k <= $end" | bc` -eq 1 ]
-# #do
-# #	echo $k
-# #	launch_test "mcar_qltable_teacher $k" 1
-# #	k=`echo $k + $incr | bc`
-# #done
-# 
 # 
 # while [ `echo "$k <= $end" | bc` -eq 1 ]
 # do

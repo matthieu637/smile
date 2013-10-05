@@ -5,22 +5,22 @@
 
 using namespace std;
 
-// Algo parseAlgo(char*c, int start) {
-//     if(c[start]=='Q' && c[start+1]=='1') {
-//         return simu::QL;
-//     } else if(c[start]=='Q' && c[start+1]=='2') {
-//         return simu::QL;
-//     } else if(c[start]=='Q' && c[start+1]=='3') {
-//         return simu::QL_gen;
-//     } else if(c[start]=='S' && c[start+1]=='1') {
-//         return simu::Sarsa_;
-//     } else if(c[start]=='S' && c[start+1]=='2') {
-//         return simu::Sarsa_trace;
-//     } else if(c[start]=='S' && c[start+1]=='3') {
-//         return simu::Sarsa_gen;
-//     }
-//     return simu::QL_gen;
-// }
+Algo parseAlgo(char*c, int start) {
+    if(c[start]=='Q' && c[start+1]=='1') {
+        return simu::QL;
+    } else if(c[start]=='Q' && c[start+1]=='2') {
+        return simu::QL;
+    } else if(c[start]=='Q' && c[start+1]=='3') {
+        return simu::QL_gen;
+    } else if(c[start]=='S' && c[start+1]=='1') {
+        return simu::Sarsa_;
+    } else if(c[start]=='S' && c[start+1]=='2') {
+        return simu::Sarsa_trace;
+    } else if(c[start]=='S' && c[start+1]=='3') {
+        return simu::Sarsa_gen;
+    }
+    return simu::QL_gen;
+}
 
 void debug();
 
@@ -69,8 +69,8 @@ int main(int argc, char* argv[])
     Environnement<GridWorldLSState>* gridls = new GridWorldLS();
     Environnement<MCarState>* car = new MCar(8, 8);
 
-    Algo learnAlgo = simu::QL_gen/*, teachAlgo = QL_gen*/;
-    StrategyEffectsAdvice sea = Max;
+    Algo learnAlgo = simu::QL_gen;
+    StrategyEffectsAdvice sea = sml::InformedExploration;
     bool learn_knowledge = false;
     AdviseStrategy as = simu::before;
     tb_strategy tbs = early_advice;
@@ -82,27 +82,28 @@ int main(int argc, char* argv[])
     if(argc > 1 ) {
         if(argc > 2)
             numberRun = atoi(argv[2]);
-        if(argc > 3)
-            learn_knowledge = atoi(argv[3]);
 
         // additional params
         if(argv[1][0] == 'F') {
-//             learnAlgo = parseAlgo(argv[1], 2);
+            learnAlgo = parseAlgo(argv[1], 2);
+            learn_knowledge = argv[1][4] == 'T';
         } else if(argv[1][0] == 'T' && argv[1][1] != 'B') {
-            as = parseAdviseStrat(argv[1], 2);
-            sea = parseStrategyEffectsAdvice(argv[1], 3);
+            learnAlgo = parseAlgo(argv[1], 2);
+            learn_knowledge = argv[1][4] == 'T';
+            as = parseAdviseStrat(argv[1], 5);
+            sea = parseStrategyEffectsAdvice(argv[1], 6);
 
-            if(argc > 4)
-                cost = atof(argv[4]);
+            if(argc > 3)
+                cost = atof(argv[3]);
 
         } else if(argv[1][0] == 'T' && argv[1][1] == 'B') {
-            tbs = parseTBStrategyAdvice(argv[1], 3);
-            sea = sml::InformedExploration;
+            learnAlgo = parseAlgo(argv[1], 3);
+            learn_knowledge = argv[1][5] == 'T';
+	    sea = parseStrategyEffectsAdvice(argv[1], 6);
+            tbs = parseTBStrategyAdvice(argv[1], 7);
 
-            if(argc > 4)
-                numberAdvice = atoi(argv[4]);
-            if(argc > 5)
-                sea = parseStrategyEffectsAdvice(argv[5], 0);
+            if(argc > 3)
+                numberAdvice = atoi(argv[3]);
         }
         else handled = false;
 
@@ -121,18 +122,18 @@ int main(int argc, char* argv[])
 //      TM
         else if(argv[1][0] == 'T') {
             if (argv[1][1] == 'M')
-                m.T_run_simple<MCarState>(car, MCarParam, DefaultParam, as, sea, cost, numberRun, learn_knowledge);
+                m.T_run_simple<MCarState>(car, MCarParam, DefaultParam, as, sea, cost, numberRun, learn_knowledge, learnAlgo);
             else if(argv[1][1] == 'G')
-                m.T_run_simple<GridWorldState>(grid, GridWorldParam, DefaultParam, as, sea, cost, numberRun, learn_knowledge);
+                m.T_run_simple<GridWorldState>(grid, GridWorldParam, DefaultParam, as, sea, cost, numberRun, learn_knowledge, learnAlgo);
             else if(argv[1][1] == 'L')
-                m.T_run_simple<GridWorldLSState>(gridls, GridWorldLSParam, DefaultParam, as, sea, cost, numberRun, learn_knowledge);
+                m.T_run_simple<GridWorldLSState>(gridls, GridWorldLSParam, DefaultParam, as, sea, cost, numberRun, learn_knowledge, learnAlgo);
             else if(argv[1][1] == 'B') {
                 if (argv[1][2] == 'M')
-                    m.runTeachingBudget<MCarState>(car, MCarParam, tbs, numberRun, learn_knowledge, numberAdvice, sea);
+                    m.runTeachingBudget<MCarState>(car, MCarParam, tbs, numberRun, learn_knowledge, numberAdvice, sea, learnAlgo);
                 else if(argv[1][2] == 'G')
-                    m.runTeachingBudget<GridWorldState>(grid, GridWorldParam, tbs, numberRun, learn_knowledge, numberAdvice, sea);
+                    m.runTeachingBudget<GridWorldState>(grid, GridWorldParam, tbs, numberRun, learn_knowledge, numberAdvice, sea, learnAlgo);
                 else if(argv[1][2] == 'L')
-                    m.runTeachingBudget<GridWorldLSState>(gridls, GridWorldLSParam, tbs, numberRun, learn_knowledge, numberAdvice, sea);
+                    m.runTeachingBudget<GridWorldLSState>(gridls, GridWorldLSParam, tbs, numberRun, learn_knowledge, numberAdvice, sea, learnAlgo);
                 else handled = false;
             }
             else handled = false;
@@ -199,7 +200,7 @@ int main(int argc, char* argv[])
 //         m.T_run_simple<GridWorldLSState, FavorAdvice>(simu::Sarsa_, simu::QL, new GridWorldLS(), GridWorldLSParam, DefaultParam, true, after, sml::Max, 5, 1000);
 // 	m.F_run_simple<GridWorldLSState>(simu::QL, new GridWorldLS, GridWorldLSParam, 10000);
 
-        debug();
+//         debug();
     }
 
 
@@ -210,7 +211,8 @@ int main(int argc, char* argv[])
 void debug() {
     Utils::srand_mili();
     MCar car(8, 8);
-    DraftTest t;DAction *a;
+    DraftTest t;
+    DAction *a;
 
     unsigned int nbFeature = 0;
     featureData<MCarState> features = t.createFeatures<MCarState>(MCarParam);
@@ -224,23 +226,23 @@ void debug() {
     q.should_do(car.getState(), *new DAction(car.getActions(), 1), car.reward());
     car.apply(*new DAction(car.getActions(), 1));
     q.learn(car.getState(), car.reward());
-    
+
     car.init();
-    q.clear_history(car.getState(), *car.getInitialAction());
+    q.startEpisode(car.getState(), *car.getInitialAction());
     car.apply(*car.getInitialAction());
     a = q.learn(car.getState(), car.reward());
     LOG_DEBUG(*a);
-    
-// // // // // // //     
+
+// // // // // // //
     /*
-    
+
     car.init();
     QLearnGradient<MCarState> q2(features.func, nbFeature, car.getActions(), *car.getInitialAction(), MCarParam, InformedExploration);
     car.apply(*car.getInitialAction());
     q2.lear
     car.apply(*new DAction(car.getActions(), 1));
     q2.learn(car.getState(), car.reward());
-    
+
     car.init();
     q2.clear_history(car.getState(), *car.getInitialAction());
     car.apply(*car.getInitialAction());

@@ -91,26 +91,26 @@ public:
 //     }
 
 
-    template<typename EnvState, typename PolicyState, typename StateType, typename TeacherPolicyState>
-    ATeacher<TeacherPolicyState> createTeacher(Algo algoLearn, Algo algoTeach, RLSimulation<EnvState, PolicyState, StateType>* learner,
-            const StateTemplate& teacher_repr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost) {
-        if(algoTeach == simu::QL_gen || algoTeach == simu::Sarsa_gen ) {
-            if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
-                return new CCTeacher<EnvState, TeacherState<EnvState>>(learner, teacher_repr, cost, as, sea);
-            else
-                return new DCTeacher<EnvState, TeacherState<EnvState>>(learner, teacher_repr, cost, as, sea);
-        } else {
-            if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
-                return new CDTeacher<EnvState>(learner, teacher_repr, cost, as, sea);
-            else
-                return new DDTeacher<EnvState>(learner, teacher_repr, cost, as, sea);
-        }
-    }
+//     template<typename EnvState, typename PolicyState, typename StateType, typename TeacherPolicyState>
+//     ATeacher<TeacherPolicyState> createTeacher(Algo algoLearn, Algo algoTeach, RLSimulation<EnvState, PolicyState, StateType>* learner,
+//             const StateTemplate& teacher_repr, AdviseStrategy as, StrategyEffectsAdvice sea, float cost) {
+//         if(algoTeach == simu::QL_gen || algoTeach == simu::Sarsa_gen ) {
+//             if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
+//                 return new CCTeacher<EnvState, TeacherState<EnvState>>(learner, teacher_repr, cost, as, sea);
+//             else
+//                 return new DCTeacher<EnvState, TeacherState<EnvState>>(learner, teacher_repr, cost, as, sea);
+//         } else {
+//             if(algoLearn == simu::QL_gen || algoLearn == simu::Sarsa_gen )
+//                 return new CDTeacher<EnvState>(learner, teacher_repr, cost, as, sea);
+//             else
+//                 return new DDTeacher<EnvState>(learner, teacher_repr, cost, as, sea);
+//         }
+//     }
 
 
     template<typename EnvState>
-    void T_run_simple(Environnement<EnvState>* learner_env, RLParam paramLearn,
-                          RLParam paramTeach, AdviseStrategy as, StrategyEffectsAdvice sea, float cost, int numberRun, bool learn_knowledge) {
+    void T_run_simple(Environnement<EnvState>* learner_env, RLParam paramLearn, RLParam paramTeach, AdviseStrategy as, 
+		      StrategyEffectsAdvice sea, float cost, int numberRun, bool learn_knowledge, Algo algo) {
         Utils::srand_mili();
 // 	Utils::srand_mili(true);
 
@@ -126,12 +126,12 @@ public:
         }
 // 
 
-        RLSimulation<EnvState, EnvState, ContinuousSelection>* learner_agent = new RLGradient<EnvState>(simu::QL_gen, learner_env, paramLearn, features.func, nbFeature, false, sea);
+        RLSimulation<EnvState, EnvState, ContinuousSelection>* learner_agent = new RLGradient<EnvState>(algo, learner_env, paramLearn, features.func, nbFeature, false, sea);
         learner_agent->init();
 
         CCTeacher< EnvState, TeacherState<EnvState>>* teach = new CCTeacher< EnvState, TeacherState<EnvState>>(learner_agent, *learner_env->getStates(), cost, as, sea);
 
-        RLGradient<TeacherState<EnvState>> r(QL_gen, teach, paramLearn, tfeatures.func, nbTFeature, learn_knowledge, None);
+        RLGradient<TeacherState<EnvState>> r(algo, teach, paramLearn, tfeatures.func, nbTFeature, learn_knowledge, None);
         r.init();
         teach->setTeacherPolicy(r.get_policy());
 
@@ -194,7 +194,8 @@ public:
     }
 
     template<typename EnvState>
-    void runTeachingBudget(Environnement<EnvState>* learner_env, RLParam paramLearn, tb_strategy stra, int numberRun, bool learn_knowledge, int numberAdvice, StrategyEffectsAdvice sea) {
+    void runTeachingBudget(Environnement<EnvState>* learner_env, RLParam paramLearn, tb_strategy stra, int numberRun, 
+			   bool learn_knowledge, int numberAdvice, StrategyEffectsAdvice sea, Algo algo) {
         Utils::srand_mili();
 // 	Utils::srand_mili(true);
 
@@ -204,7 +205,7 @@ public:
             nbFeature += (*flist)->getSize();
         }
 
-        RLSimulation<EnvState, EnvState, ContinuousSelection>* learner_agent = new RLGradient<EnvState>(simu::QL_gen, learner_env, paramLearn, features.func, nbFeature, false, sea);
+        RLSimulation<EnvState, EnvState, ContinuousSelection>* learner_agent = new RLGradient<EnvState>(algo, learner_env, paramLearn, features.func, nbFeature, false, sea);
         learner_agent->init();
 
         TeachingBudget<EnvState, EnvState, ContinuousSelection>* teacher = new TeachingBudget<EnvState, EnvState, ContinuousSelection>(learner_agent, numberAdvice, stra, learn_knowledge);

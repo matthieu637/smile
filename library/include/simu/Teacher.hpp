@@ -231,11 +231,11 @@ protected:
     void learner_prob_init() {
         prob->init();
         DAction* ac = prob->getInitialAction();
-        learner->get_policy()->clear_history(getState(prob), *ac);
+        learner->get_policy()->startEpisode(getState(prob), *ac);
 
-        //TODO: should clear_history of my own algo | try without
+        //TODO: should startEpisode of my own algo | try without
 //             DAction* ia = getInitialAction();
-//             tpolicy->clear_history(getTState(this), *ia);
+//             tpolicy->startEpisode(getTState(this), *ia);
 //             delete ia;
         prob->apply(*ac);
         delete ac;

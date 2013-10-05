@@ -7,6 +7,7 @@
 #include <sml/QLearningLamb.hpp>
 #include <sml/Sarsa.hpp>
 #include <sml/QLearnGradient.hpp>
+#include <sml/SarsaGradient.hpp>
 #include "sml/Feature.hpp"
 #include "simu/Environnement.hpp"
 
@@ -20,8 +21,8 @@ template <typename EnvState>
 class RLTable : public RLSimulation<EnvState, DState, DiscretizeSelection>
 {
 public:
-    RLTable(Algo algo, Environnement<EnvState>* p, RLParam rlp, bool no_learn_knowledge) : 
-    RLSimulation<EnvState, DState, DiscretizeSelection>(p, no_learn_knowledge), type(algo),rlp(rlp) {}
+    RLTable(Algo algo, Environnement<EnvState>* p, RLParam rlp, bool no_learn_knowledge) :
+        RLSimulation<EnvState, DState, DiscretizeSelection>(p, no_learn_knowledge), type(algo),rlp(rlp) {}
 
     Policy<DState>* createAgent(const DState&, const DAction&) {
 
@@ -48,14 +49,16 @@ template<typename EnvState>
 class RLGradient : public RLSimulation<EnvState, EnvState, ContinuousSelection>
 {
 public:
-    RLGradient(Algo algo, Environnement<EnvState>* p, RLParam rlp, featuredList<EnvState>* features, int nbFeature, bool no_learn_knowledge, StrategyEffectsAdvice sea) : 
-    RLSimulation<EnvState, EnvState, ContinuousSelection>(p, no_learn_knowledge), type(algo),rlp(rlp), features(features), sea(sea),nbFeature(nbFeature) {}
+    RLGradient(Algo algo, Environnement<EnvState>* p, RLParam rlp, featuredList<EnvState>* features, int nbFeature, bool no_learn_knowledge, StrategyEffectsAdvice sea) :
+        RLSimulation<EnvState, EnvState, ContinuousSelection>(p, no_learn_knowledge), type(algo),rlp(rlp), features(features), sea(sea),nbFeature(nbFeature) {}
 
     Policy<EnvState>* createAgent(const EnvState& s, const DAction& a) {
 
         switch(type) {
         case QL_gen:
             return new QLearnGradient<EnvState>(features, nbFeature, this->prob->getActions(), s, a, rlp, sea);
+        case Sarsa_gen:
+            return new SarsaGradient<EnvState>(features, nbFeature, this->prob->getActions(), s, a, rlp, sea);
         default:
             LOG_ERROR("wrong param");
         }

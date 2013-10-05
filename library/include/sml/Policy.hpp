@@ -38,7 +38,7 @@ public:
 
 
     virtual DAction* decision(const State& st, bool greedy) = 0;
-    virtual void clear_history(const State& s, const DAction& a) = 0;
+    virtual void startEpisode(const State& s, const DAction& a) = 0;
     virtual void should_done(const State& s, const DAction& a) = 0;
     virtual void should_do(const State& s, const DAction& a, double reward) = 0;
     virtual void had_choosed(const State& s, const DAction& a, double reward, bool) = 0;

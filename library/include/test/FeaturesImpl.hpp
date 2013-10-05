@@ -20,8 +20,9 @@ using namespace simu;
 #define G_K2 5.
 #define G_M  1.
 
-static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., true, -250., (int) M, 40., 40.};
-static const RLParam GridWorldParam= {0.05, 0.08, 0.9, 0.8, false, -2., (int) G_M, 22., 18.85};
+static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., true, -250., (int) M, 20., 19.};
+// static const RLParam GridWorldParam= {0.05, 0.03, 0.9, 0.9, true, 0., (int) G_M, 23., 16.5}; QL
+static const RLParam GridWorldParam= {0.05, 0.03, 0.9, 0.9, true, 0., (int) G_M, 23.5, 13.5};
 
 static const RLParam GridWorldLSParam= {0.05, 0.08, 0.9, 0.6, false, 0., (int) M, 0., 0.};
 static const RLParam DefaultParam= {0.05, 0.08, 0.9, 0.6, false, 0., (int) M, 0., 0.};
@@ -40,14 +41,14 @@ public:
     {
         (void) ac;
 //         return sml::Utils::transform(st.position, -1.2, 0.6, 0., 1.8) - (1.8/K) + i*(((2.*1.8)/K)/M);
-	   return sml::Utils::transform(st.position, -1.2, 0.6, 0., 1.8) - (1.8/K) + p;
+        return sml::Utils::transform(st.position, -1.2, 0.6, 0., 1.8) - (1.8/K) + p;
     }
 
     double callVelocity(const MCarState& st, const DAction& ac)
     {
         (void) ac;
 //         return sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14) - (0.14/K) + i*(((2.*0.14)/K)/M) ;
-	return sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14) - (0.14/K) + v ;
+        return sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14) - (0.14/K) + v ;
     }
 
     double callAction(const MCarState& st, const DAction& ac)
@@ -70,27 +71,30 @@ public:
     double callX(const GridWorldState& st, const DAction& ac)
     {
         (void) ac;
-        return st.x /*+ i/G_M*/;
+        return st.x - (10./G_K1) + x;
     }
 
     double callY(const GridWorldState& st, const DAction& ac)
     {
         (void) ac;
-        return st.y /*+ i/G_M*/ ;
+        return st.y - (10./G_K1) + y ;
     }
 
     double callGoal(const GridWorldState& st, const DAction& ac)
     {
         (void) ac;
-        return st.currentGoal /*+ i/G_M*/ ;
+        return st.currentGoal - (5./G_K2) + g ;
     }
 
     double callAction(const GridWorldState& st, const DAction& ac)
     {
         (void) st;
-        return ((double)ac["move"]) /*+ i*((3/3)/M)*/;
+        return ((double)ac["move"]) ;
     }
     double i;
+    float x = sml::Utils::randin(0.,(2.*10.)/G_K1) ;
+    float y = sml::Utils::randin(0.,(2.*10.)/G_K1) ;
+    float g = sml::Utils::randin(0.,(2.*5.)/G_K2) ;
 };
 
 class Functor1DTeacherStateMCarState : public Functor1D
@@ -140,25 +144,25 @@ public:
 // {
 // public:
 //     Functor1GridWorldState(int i):i(i) {};
-// 
+//
 //     double callX(const GridWorldState& st, const DAction& ac)
 //     {
 //         (void) ac;
 //         return st.x /*+ i/G_M*/;
 //     }
-// 
+//
 //     double callY(const GridWorldState& st, const DAction& ac)
 //     {
 //         (void) ac;
 //         return st.y /*+ i/G_M*/ ;
 //     }
-// 
+//
 //     double callGoal(const GridWorldState& st, const DAction& ac)
 //     {
 //         (void) ac;
 //         return st.currentGoal /*+ i/G_M*/ ;
 //     }
-// 
+//
 //     double callAction(const GridWorldState& st, const DAction& ac)
 //     {
 //         (void) st;
@@ -166,7 +170,7 @@ public:
 //     }
 //     double i;
 // };
-// 
+//
 
 template<typename EnvState>
 struct f_crea {
@@ -238,7 +242,7 @@ f_crea<TeacherState<MCarState>> Factory::createFeature(int tiling) {
 //     typename Feature<GridWorldState>::featuring1D fonctor2 = boost::bind(&Functor1GridWorldState::callY, inst_call, _1, _2);
 //     typename Feature<GridWorldState>::featuring1D fonctor3 = boost::bind(&Functor1GridWorldState::callGoal, inst_call, _1, _2);
 //     typename Feature<GridWorldState>::featuring1D fonctor4 = boost::bind(&Functor1GridWorldState::callAction, inst_call, _1, _2);
-// 
+//
 //     Feature<GridWorldState>* f = new Feature<GridWorldState>( {fonctor1, fonctor2, fonctor3, fonctor4}, { G_K1, 10, G_K1, 10, G_K2, 5, 4, 4 });
 //     return {f, inst_call};
 // }

@@ -80,11 +80,11 @@ public:
 
     statsTB local_run(int index, bool random_init) {
         prob->init(random_init);
-        agent->clear_history(getState(prob), *fac);
+        agent->startEpisode(getState(prob), *fac);
         if(no_teach_knowledge) {
             local_run_l(index);
             prob->init(random_init);
-            agent->clear_history(getState(prob), *fac);
+            agent->startEpisode(getState(prob), *fac);
             return local_run_nl(index);
         }
 

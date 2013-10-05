@@ -1,0 +1,14 @@
+#!/bin/bash
+
+../build/stest > ../data/TBMC
+../build/stest >> ../data/TBMC
+../build/stest >> ../data/TBMC
+../build/stest >> ../data/TBMC
+../build/stest >> ../data/TBMC
+../build/stest >> ../data/TBMC
+../build/stest >> ../data/TBMC
+../build/stest >> ../data/TBMC
+../build/stest >> ../data/TBMC
+
+octave --eval "X=load('TBMC');mean(mean(X))" | grep ans
+

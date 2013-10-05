@@ -117,11 +117,11 @@ public:
     
     stats local_run(int index, bool random_init) {
         prob->init(random_init);
-        agent->clear_history(getState(prob), *fac);
+        agent->startEpisode(getState(prob), *fac);
         if(no_learn_knowledge) {
             local_run_l(index, true);
             prob->init(random_init);
-            agent->clear_history(getState(prob), *fac);
+            agent->startEpisode(getState(prob), *fac);
             return local_run_l(index, false);
         }
 

@@ -1,8 +1,8 @@
-#ifndef QLEARNGRADIENT_HPP
-#define QLEARNGRADIENT_HPP
+#ifndef SARSAGRADIENT_HPP
+#define SARSAGRADIENT_HPP
 
 ///
-///\file QLearnGradient.hpp
+///\file SarsaGradient.hpp
 ///\brief Algorithme par descente de gradient de QLearning avec des fonctions d'approximation
 ///
 
@@ -14,7 +14,7 @@ namespace sml {
 
 
 template <class State>
-class QLearnGradient : public RLGradientDescent<State>
+class SarsaGradient : public RLGradientDescent<State>
 {
 public:
 
@@ -25,14 +25,14 @@ public:
 /// 	  atmp : le modèle d'action
 ///       initial : l'action initiale
 ///       conf : la configuration d'apprentissage
-    QLearnGradient(featuredList<State>* features, unsigned int nbFeature, const ActionTemplate* atmp, const State& s,
-                   const DAction& a, RLParam param, StrategyEffectsAdvice sea, const LearnConfig& conf= {false,0,0}) :
-	RLGradientDescent<State>(features, nbFeature, atmp, s, a, param, sea, conf)
+    SarsaGradient(featuredList<State>* features, unsigned int nbFeature, const ActionTemplate* atmp, const State& s,
+                  const DAction& a, RLParam param, StrategyEffectsAdvice sea, const LearnConfig& conf= {false,0,0}) :
+        RLGradientDescent<State>(features, nbFeature, atmp, s, a, param, sea, conf)
     {
-        this->startEpisode(s, a);
+	this->startEpisode(s, a);
     }
 
-//     QLearnGradient(const QLearnGradient& q) : LearnStat(q.conf), Policy<State>(q.param, q.adviceStrat), nbFeature(q.nbFeature),
+//     SarsaGradient(const SarsaGradient& q) : LearnStat(q.conf), Policy<State>(q.param, q.adviceStrat), nbFeature(q.nbFeature),
 //         teta(q.teta), e(q.e), Qa(q.Qa), actions(q.atmpl->sizeNeeded()), features(q.features), atmpl(q.atmpl),
 //         history(q.history)
 //     {
@@ -41,7 +41,7 @@ public:
 //         lastAction = new DAction(*q.lastAction);
 //     }
 
-    ~QLearnGradient() {
+    ~SarsaGradient() {
 
     }
 
@@ -58,9 +58,7 @@ public:
 ///	  accumulative : si les traces est accumulative ou non
     LearnReturn _learn(const State& state, double r)
     {
-// 	this->param.alpha = this->param.alpha * 0.999999999;
-        DAction* a;
-        a = this->lastAction;
+        DAction* a = this->lastAction;
 
         float delta = r - this->Qa(*a);
 
@@ -69,112 +67,79 @@ public:
 
 
         DAction* ap = this->Qa.argmax();
-        delta = delta + this->param.gamma * this->Qa(*ap);
-	this->updateWeights(delta);
-
-
-        LearnReturn lr = this->decision_learn(state, true, *ap);
-        delete ap;
-        a = lr.ac;
-
-        //take action a, observe reward, and next state
-        delete this->lastAction;
-        this->lastAction = a;
-        return lr;
-    }
-
-
-    void had_choosed(const State& state, const DAction& ba, double r, bool did_greedy) {
-        DAction* a;
-        a = this->lastAction;
-
-        float delta = r - this->Qa(*a);
-
-        // For all a in A(s')
-        this->computeQa(state);
-
-
-        DAction* ap = this->Qa.argmax();
-        delta = delta + this->param.gamma * this->Qa(*ap);
-        delete ap;
-
-	this->updateWeights(delta);
-
-        a = this->decision_learn(state, false, ba, did_greedy ? forced_clear : forced_no_clear).ac;
-
-        //take action a, observe reward, and next state
-        delete this->lastAction;
-        this->lastAction = a;
-    }
-
-    void should_do(const State& s, const DAction& ba, double r) {
-        DAction* a;
-        a = this->lastAction;
-
-        float delta = r - this->Qa(*a);
-
-        // For all a in A(s')
-        this->computeQa(s);
-
-        DAction* ap = this->Qa.argmax();
-        delta = delta + this->param.gamma * this->Qa(*ap);
-
-	this->updateWeights(delta);
-	
-        if(this->adviceStrat == InformedExploration) {
-            a = this->decision_learn(s, false, ba, *ap==ba ? forced_clear : forced_no_clear).ac;
-        } else if(this->adviceStrat == Max) {
-            adviceMax(s, ba);
-            a = this->decision_learn(s, false, ba).ac;
-//             for (std::set<unsigned int>::iterator it=history.begin(); it!=history.end(); ++it) {
-//                 unsigned int index = *it;
-//                 e[index] = this->param.lambda * this->param.gamma * e[index];
-//             }
-//             a = new DAction(atmpl, {rand() % (int)atmpl->sizeNeeded()});
-// 	    a = new DAction(ba);
-        } else if(this->adviceStrat == None) {
-            LOG_ERROR("a none sea call should_do");
+	bool gotGreedy = false;
+        if( sml::Utils::rand01(this->param.epsilon)) {
+	    delete ap;
+            ap = new DAction(this->atmpl, rand() % this->atmpl->sizeNeeded());
+            gotGreedy = true;
         }
+	
+        delta = delta + this->param.gamma * this->Qa(*ap);
+        this->updateWeights(delta);
 
-        delete ap;
+	this->decayTraces();
+	
+	this->addTraces(state, *ap);
 
         //take action a, observe reward, and next state
         delete this->lastAction;
-        this->lastAction = a;
+        this->lastAction = ap;
+        return {ap, gotGreedy};
     }
     
-    LearnReturn decision_learn(const State& state, bool want_greedy, const DAction& argmax, custom_dec_learn comp=normal) {
-        DAction* a = nullptr;
-        bool gotGreedy = false;
-
-        //begin
-        if( want_greedy && sml::Utils::rand01(this->param.epsilon)) {
-            a = new DAction(this->atmpl, rand() % this->atmpl->sizeNeeded());
-            gotGreedy = true;
-        } else {
-            a = new DAction(argmax);
-        }
-
-        if(comp == normal);
-//             gotGreedy = !( *a == argmax) ; //comment me to speed up convergence?
-        else gotGreedy = comp == forced_clear;
-
-        if(gotGreedy)
-            this->resetTraces();
-        else
-            this->decayTraces();
-
-	this->addTraces(state, *a);
-
-        return {a, gotGreedy};
-    }
-
     void _startEpisode(const State& s, const DAction& a){
-      delete decision_learn(s, false, a).ac; 
+	this->decayTraces();
+      
+	this->addTraces(s, a);
     }
+
+
+    void had_choosed(const State& state, const DAction& ba, double r, bool) {
+        DAction* a = this->lastAction;
+
+        float delta = r - this->Qa(*a);
+
+        // For all a in A(s')
+        this->computeQa(state);
+
+
+        DAction* ap = new DAction(ba);
+        delta = delta + this->param.gamma * this->Qa(*ap);
+        this->updateWeights(delta);
+
+	this->decayTraces();
+	
+	this->addTraces(state, *ap);
+
+        //take action a, observe reward, and next state
+        delete this->lastAction;
+        this->lastAction = ap;
+    }
+
+    void should_do(const State& state, const DAction& ba, double r) {
+        DAction* a = this->lastAction;
+        float delta = r - this->Qa(*a);
+
+        // For all a in A(s')
+        this->computeQa(state);
+
+
+        DAction* ap = new DAction(ba);
+        delta = delta + this->param.gamma * this->Qa(*ap);
+        this->updateWeights(delta);
+
+	this->decayTraces();
+	
+	this->addTraces(state, *ap);
+
+        //take action a, observe reward, and next state
+        delete this->lastAction;
+        this->lastAction = ap;
+    }
+
 
     Policy<State>* copyPolicy() {
-        return new QLearnGradient(*this);
+        return new SarsaGradient(*this);
     }
 
 
@@ -220,7 +185,7 @@ private:
 
 }
 
-#endif // QLEARNGRADIENT_HPP
+#endif // SARSAGRADIENT_HPP
 
 
 
