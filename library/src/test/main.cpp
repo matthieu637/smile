@@ -77,6 +77,7 @@ int main(int argc, char* argv[])
     float cost = 2;
     int numberRun = 100;
     int numberAdvice = 100;
+    TBparam tparam= {20.,20.};
 
     bool handled = true;
     if(argc > 1 ) {
@@ -104,6 +105,10 @@ int main(int argc, char* argv[])
 
             if(argc > 3)
                 numberAdvice = atoi(argv[3]);
+	    if(argc > 4)
+		tparam.ia_threshold = atoi(argv[4]);
+	    if(argc > 5)
+		tparam.mc_threshold = atoi(argv[5]);
         }
         else handled = false;
 
@@ -129,11 +134,11 @@ int main(int argc, char* argv[])
                 m.T_run_simple<GridWorldLSState>(gridls, GridWorldLSParam, DefaultParam, as, sea, cost, numberRun, learn_knowledge, learnAlgo);
             else if(argv[1][1] == 'B') {
                 if (argv[1][2] == 'M')
-                    m.runTeachingBudget<MCarState>(car, MCarParam, tbs, numberRun, learn_knowledge, numberAdvice, sea, learnAlgo);
+                    m.runTeachingBudget<MCarState>(car, MCarParam, tbs, numberRun, learn_knowledge, numberAdvice, sea, learnAlgo, tparam);
                 else if(argv[1][2] == 'G')
-                    m.runTeachingBudget<GridWorldState>(grid, GridWorldParam, tbs, numberRun, learn_knowledge, numberAdvice, sea, learnAlgo);
+                    m.runTeachingBudget<GridWorldState>(grid, GridWorldParam, tbs, numberRun, learn_knowledge, numberAdvice, sea, learnAlgo, tparam);
                 else if(argv[1][2] == 'L')
-                    m.runTeachingBudget<GridWorldLSState>(gridls, GridWorldLSParam, tbs, numberRun, learn_knowledge, numberAdvice, sea, learnAlgo);
+                    m.runTeachingBudget<GridWorldLSState>(gridls, GridWorldLSParam, tbs, numberRun, learn_knowledge, numberAdvice, sea, learnAlgo, tparam);
                 else handled = false;
             }
             else handled = false;
@@ -209,29 +214,29 @@ int main(int argc, char* argv[])
 }
 
 void debug() {
-    Utils::srand_mili();
-    MCar car(8, 8);
-    DraftTest t;
-    DAction *a;
-
-    unsigned int nbFeature = 0;
-    featureData<MCarState> features = t.createFeatures<MCarState>(MCarParam);
-    for(fLiterator<MCarState> flist = features.func->begin() ; flist != features.func->end(); ++flist) {
-        nbFeature += (*flist)->getSize();
-    }
-
-    car.init();
-    QLearnGradient<MCarState> q(features.func, nbFeature, car.getActions(), car.getState(), *car.getInitialAction(), MCarParam, InformedExploration);
-    car.apply(*car.getInitialAction());
-    q.should_do(car.getState(), *new DAction(car.getActions(), 1), car.reward());
-    car.apply(*new DAction(car.getActions(), 1));
-    q.learn(car.getState(), car.reward());
-
-    car.init();
-    q.startEpisode(car.getState(), *car.getInitialAction());
-    car.apply(*car.getInitialAction());
-    a = q.learn(car.getState(), car.reward());
-    LOG_DEBUG(*a);
+//     Utils::srand_mili();
+//     MCar car(8, 8);
+//     DraftTest t;
+//     DAction *a;
+// 
+//     unsigned int nbFeature = 0;
+//     featureData<MCarState> features = t.createFeatures<MCarState>(MCarParam);
+//     for(fLiterator<MCarState> flist = features.func->begin() ; flist != features.func->end(); ++flist) {
+//         nbFeature += (*flist)->getSize();
+//     }
+// 
+//     car.init();
+//     QLearnGradient<MCarState> q(features.func, nbFeature, car.getActions(), car.getState(), *car.getInitialAction(), MCarParam, InformedExploration);
+//     car.apply(*car.getInitialAction());
+//     q.should_do(car.getState(), *new DAction(car.getActions(), 1), car.reward());
+//     car.apply(*new DAction(car.getActions(), 1));
+//     q.learn(car.getState(), car.reward());
+// 
+//     car.init();
+//     q.startEpisode(car.getState(), *car.getInitialAction());
+//     car.apply(*car.getInitialAction());
+//     a = q.learn(car.getState(), car.reward());
+//     LOG_DEBUG(*a);
 
 // // // // // // //
     /*

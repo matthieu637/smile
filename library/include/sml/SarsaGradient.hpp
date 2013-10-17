@@ -26,19 +26,15 @@ public:
 ///       initial : l'action initiale
 ///       conf : la configuration d'apprentissage
     SarsaGradient(featuredList<State>* features, unsigned int nbFeature, const ActionTemplate* atmp, const State& s,
-                  const DAction& a, RLParam param, StrategyEffectsAdvice sea, const LearnConfig& conf= {false,0,0}) :
-        RLGradientDescent<State>(features, nbFeature, atmp, s, a, param, sea, conf)
+                  const DAction& a, RLParam param, StrategyEffectsAdvice sea) :
+        RLGradientDescent<State>(features, nbFeature/*12288*/, atmp, s, a, param, sea)
     {
-	this->startEpisode(s, a);
+        this->startEpisode(s, a);
     }
 
-//     SarsaGradient(const SarsaGradient& q) : LearnStat(q.conf), Policy<State>(q.param, q.adviceStrat), nbFeature(q.nbFeature),
-//         teta(q.teta), e(q.e), Qa(q.Qa), actions(q.atmpl->sizeNeeded()), features(q.features), atmpl(q.atmpl),
-//         history(q.history)
+//     SarsaGradient(const SarsaGradient& q) : RLGradientDescent<State>(q)
 //     {
-//         for(unsigned int i=0; i < atmpl->sizeNeeded() ; i++)
-//             actions[i] = new DAction(atmpl, i);
-//         lastAction = new DAction(*q.lastAction);
+//
 //     }
 
     ~SarsaGradient() {
@@ -56,7 +52,8 @@ public:
 ///	  lambda : importance de l'historique
 ///	  discount : importance du prochain état de la récompense
 ///	  accumulative : si les traces est accumulative ou non
-    LearnReturn _learn(const State& state, double r)
+
+    LearnReturn _learn(const State& state, double r, bool done, bool goal)
     {
         DAction* a = this->lastAction;
 
@@ -67,34 +64,38 @@ public:
 
 
         DAction* ap = this->Qa.argmax();
-	bool gotGreedy = false;
+        bool gotGreedy = false;
         if( sml::Utils::rand01(this->param.epsilon)) {
-	    delete ap;
+            delete ap;
             ap = new DAction(this->atmpl, rand() % this->atmpl->sizeNeeded());
             gotGreedy = true;
         }
-	
-        delta = delta + this->param.gamma * this->Qa(*ap);
-        this->updateWeights(delta);
 
-	this->decayTraces();
-	
-	this->addTraces(state, *ap);
+
+        if(!goal)
+            delta = delta + this->param.gamma * this->Qa(*ap);
+
+        if(!done || goal)
+            this->updateWeights(delta);
+
+        this->decayTraces();
+
+        this->addTraces(state, *ap);
 
         //take action a, observe reward, and next state
         delete this->lastAction;
         this->lastAction = ap;
         return {ap, gotGreedy};
     }
-    
-    void _startEpisode(const State& s, const DAction& a){
-	this->decayTraces();
-      
-	this->addTraces(s, a);
+
+    void _startEpisode(const State& s, const DAction& a) {
+        this->decayTraces();
+
+        this->addTraces(s, a);
     }
 
 
-    void had_choosed(const State& state, const DAction& ba, double r, bool) {
+    void had_choosed(const State& state, const DAction& ba, double r, bool, bool done, bool goal) {
         DAction* a = this->lastAction;
 
         float delta = r - this->Qa(*a);
@@ -102,21 +103,23 @@ public:
         // For all a in A(s')
         this->computeQa(state);
 
-
         DAction* ap = new DAction(ba);
-        delta = delta + this->param.gamma * this->Qa(*ap);
-        this->updateWeights(delta);
+        if(!goal)
+            delta = delta + this->param.gamma * this->Qa(*ap);
 
-	this->decayTraces();
-	
-	this->addTraces(state, *ap);
+        if(!done || goal)
+            this->updateWeights(delta);
+
+        this->decayTraces();
+
+        this->addTraces(state, *ap);
 
         //take action a, observe reward, and next state
         delete this->lastAction;
         this->lastAction = ap;
     }
 
-    void should_do(const State& state, const DAction& ba, double r) {
+    void should_do(const State& state, const DAction& ba, double r, bool done, bool goal) {
         DAction* a = this->lastAction;
         float delta = r - this->Qa(*a);
 
@@ -125,12 +128,15 @@ public:
 
 
         DAction* ap = new DAction(ba);
-        delta = delta + this->param.gamma * this->Qa(*ap);
-        this->updateWeights(delta);
+        if(!goal)
+            delta = delta + this->param.gamma * this->Qa(*ap);
 
-	this->decayTraces();
-	
-	this->addTraces(state, *ap);
+        if(!done || goal)
+            this->updateWeights(delta);
+
+        this->decayTraces();
+
+        this->addTraces(state, *ap);
 
         //take action a, observe reward, and next state
         delete this->lastAction;
@@ -186,6 +192,9 @@ private:
 }
 
 #endif // SARSAGRADIENT_HPP
+
+
+
 
 
 

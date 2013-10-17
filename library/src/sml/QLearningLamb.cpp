@@ -4,15 +4,15 @@
 namespace sml
 {
 
-QLearningLamb::QLearningLamb ( const StateTemplate* stmp, const ActionTemplate* atmp, const DState& ds, const DAction& da, const LearnConfig& conf ) :
-    LearnStat ( conf ), Q ( stmp, atmp ), N ( stmp, atmp ), atmp ( atmp )
+QLearningLamb::QLearningLamb ( const StateTemplate* stmp, const ActionTemplate* atmp, const DState& ds, const DAction& da) :
+    Q ( stmp, atmp ), N ( stmp, atmp ), atmp ( atmp )
 {
     this->s = new DState ( ds );
     this->a = new DState ( da );
 //     history.insert ( std::pair< DState* , DAction* > ( s, a ) );
 }
 
-QLearningLamb::QLearningLamb(const QLearningLamb& q):LearnStat(q.conf), Q(q.Q), N(q.N), atmp(q.atmp) {
+QLearningLamb::QLearningLamb(const QLearningLamb& q): Q(q.Q), N(q.N), atmp(q.atmp) {
     this->s = new DState ( *q.s );
     this->a = new DState ( *q.a );
 }

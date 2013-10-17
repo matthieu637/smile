@@ -20,47 +20,39 @@ using namespace simu;
 #define G_K2 5.
 #define G_M  1.
 
-static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., true, -250., (int) M, 20., 19.};
-// static const RLParam GridWorldParam= {0.05, 0.03, 0.9, 0.9, true, 0., (int) G_M, 23., 16.5}; QL
-static const RLParam GridWorldParam= {0.05, 0.03, 0.9, 0.9, true, 0., (int) G_M, 23.5, 13.5};
+static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., true, -250., (int) M};
+static const RLParam GridWorldParam= {0.05, 0.03, 0.9, 0.9, true, 0., (int) G_M};
 
-static const RLParam GridWorldLSParam= {0.05, 0.08, 0.9, 0.6, false, 0., (int) M, 0., 0.};
-static const RLParam DefaultParam= {0.05, 0.08, 0.9, 0.6, false, 0., (int) M, 0., 0.};
-
-class Functor1D
-{
-};
+static const RLParam GridWorldLSParam= {0.05, 0.08, 0.9, 0.6, false, 0., (int) M};
+static const RLParam DefaultParam= {0.05, 0.08, 0.9, 0.6, false, 0., (int) M};
 
 
 class Functor1DMCarState : public Functor1D
 {
 public:
-    Functor1DMCarState(int i):i(i) {};
-
-    double callPosition(const MCarState& st, const DAction& ac)
-    {
-        (void) ac;
-//         return sml::Utils::transform(st.position, -1.2, 0.6, 0., 1.8) - (1.8/K) + i*(((2.*1.8)/K)/M);
-        return sml::Utils::transform(st.position, -1.2, 0.6, 0., 1.8) - (1.8/K) + p;
+    Functor1DMCarState(int i):i(i) {
+        float p = sml::Utils::randin(0.,(2.*1.7)/K) ;
+        float v = sml::Utils::randin(0.,(2.*0.14)/K) ;
+        randomize.push_back(p);
+        randomize.push_back(v);
     }
 
-    double callVelocity(const MCarState& st, const DAction& ac)
+    double callPosition(const MCarState& st, const DAction&)
     {
-        (void) ac;
-//         return sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14) - (0.14/K) + i*(((2.*0.14)/K)/M) ;
-        return sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14) - (0.14/K) + v ;
+        return sml::Utils::transform(st.position, -1.2, 0.6, 0., 1.7) - (1.7/K) +  randomize[0];
     }
 
-    double callAction(const MCarState& st, const DAction& ac)
+    double callVelocity(const MCarState& st, const DAction&)
     {
-        (void) st;
+        return sml::Utils::transform(st.velocity, -0.07, 0.07, 0., 0.14) - (0.14/K) + randomize[1] ;
+    }
+
+    double callAction(const MCarState&, const DAction& ac)
+    {
         return ((double)ac["motor"]);
     }
     double i;
-    float p = sml::Utils::randin(0.,(2.*1.8)/K) ;
-    float v = sml::Utils::randin(0.,(2.*0.14)/K) ;
 };
-
 
 
 class Functor1GridWorldState : public Functor1D
@@ -100,41 +92,43 @@ public:
 class Functor1DTeacherStateMCarState : public Functor1D
 {
 public:
-    Functor1DTeacherStateMCarState(int i):i(i) {};
-    double callPosition(const TeacherState<MCarState>& st, const DAction& ac)
-    {
-        (void) ac;
-        return sml::Utils::transform(st.learner_state.position, -1.2, 0.6, 0., 1.8) + i*((1.8/K)/M);
+    Functor1DTeacherStateMCarState(int i):i(i) {
+        float p = sml::Utils::randin(0.,(2.*1.7)/K) ;
+        float v = sml::Utils::randin(0.,(2.*0.14)/K) ;
+        float fdb = sml::Utils::randin(0.,(2.*100.)/30.);
+        randomize.push_back(p);
+        randomize.push_back(v);
+	randomize.push_back(fdb);
     }
 
-    double callVelocity(const TeacherState<MCarState>& st, const DAction& ac)
+    double callPosition(const TeacherState<MCarState>& st, const DAction&)
     {
-        (void) ac;
-        return sml::Utils::transform(st.learner_state.velocity, -0.07, 0.07, 0., 0.14) + i*((0.14/K)/M) ;
+        return sml::Utils::transform(st.learner_state.position, -1.2, 0.6, 0., 1.7) - (1.7/K) +  randomize[0];
     }
 
-    double callAction(const TeacherState<MCarState>& st, const DAction& ac)
+    double callVelocity(const TeacherState<MCarState>& st, const DAction& )
     {
-        (void) ac;
-        return ((double)st.learner_action->get("motor")) + i*((3/3)/M);
+        return sml::Utils::transform(st.learner_state.velocity, -0.07, 0.07, 0., 0.14) - (0.14/K) + randomize[1] ;
     }
 
-    double callAction2(const TeacherState<MCarState>& st, const DAction& ac)
+    double callAction(const TeacherState<MCarState>& st, const DAction&)
     {
-        (void) st;
-        return ((double)ac["feedbacks"]) /*+ i*((2/2)/M)*/;
+        return st.learner_action->get("motor");
     }
 
-    double callEpisod(const TeacherState<MCarState>& st, const DAction& ac)
+    double callAction2(const TeacherState<MCarState>&, const DAction& ac)
     {
-        (void) ac;
+        return ac["feedbacks"] ;
+    }
+
+    double callEpisod(const TeacherState<MCarState>& st, const DAction& )
+    {
         return st.episod + i*((100./30.)/M);
     }
 
-    double callGivenFdb(const TeacherState<MCarState>& st, const DAction& ac)
+    double callGivenFdb(const TeacherState<MCarState>& st, const DAction&)
     {
-        (void) ac;
-        return st.givenFdb + i*((100./30.)/M);;
+        return st.givenFdb - (100./30.) + randomize[2];
     }
 
     int i;
@@ -203,22 +197,22 @@ f_crea<MCarState> Factory::createFeature(int tiling) {
     typename Feature<MCarState>::featuring1D fonctor3 = boost::bind(&Functor1DMCarState::callAction, inst_call, _1, _2);
 
 
-    Feature<MCarState>* f = new Feature<MCarState>( {fonctor1, fonctor2, fonctor3}, { K, 1.8, K, 0.14, 3, 3});
+    Feature<MCarState>* f = new Feature<MCarState>( {fonctor1, fonctor2, fonctor3}, { K, 1.7, K, 0.14, 3, 3}, inst_call);
     return {f, inst_call};
 }
 
-template<>
-f_crea<GridWorldState> Factory::createFeature(int tiling) {
-    Functor1GridWorldState* inst_call = new Functor1GridWorldState(tiling);
-    typename Feature<GridWorldState>::featuring1D fonctor1 = boost::bind(&Functor1GridWorldState::callX, inst_call, _1, _2);
-    typename Feature<GridWorldState>::featuring1D fonctor2 = boost::bind(&Functor1GridWorldState::callY, inst_call, _1, _2);
-    typename Feature<GridWorldState>::featuring1D fonctor3 = boost::bind(&Functor1GridWorldState::callGoal, inst_call, _1, _2);
-    typename Feature<GridWorldState>::featuring1D fonctor4 = boost::bind(&Functor1GridWorldState::callAction, inst_call, _1, _2);
-
-    Feature<GridWorldState>* f = new Feature<GridWorldState>( {fonctor1, fonctor2, fonctor3, fonctor4}, { G_K1, 10, G_K1, 10, G_K2, 5, 4, 4 });
-    return {f, inst_call};
-}
-
+// template<>
+// f_crea<GridWorldState> Factory::createFeature(int tiling) {
+//     Functor1GridWorldState* inst_call = new Functor1GridWorldState(tiling);
+//     typename Feature<GridWorldState>::featuring1D fonctor1 = boost::bind(&Functor1GridWorldState::callX, inst_call, _1, _2);
+//     typename Feature<GridWorldState>::featuring1D fonctor2 = boost::bind(&Functor1GridWorldState::callY, inst_call, _1, _2);
+//     typename Feature<GridWorldState>::featuring1D fonctor3 = boost::bind(&Functor1GridWorldState::callGoal, inst_call, _1, _2);
+//     typename Feature<GridWorldState>::featuring1D fonctor4 = boost::bind(&Functor1GridWorldState::callAction, inst_call, _1, _2);
+//
+//     Feature<GridWorldState>* f = new Feature<GridWorldState>( {fonctor1, fonctor2, fonctor3, fonctor4}, { G_K1, 10, G_K1, 10, G_K2, 5, 4, 4 });
+//     return {f, inst_call};
+// }
+//
 template<>
 f_crea<TeacherState<MCarState>> Factory::createFeature(int tiling) {
 
@@ -227,11 +221,11 @@ f_crea<TeacherState<MCarState>> Factory::createFeature(int tiling) {
     typename Feature<TeacherState<MCarState>>::featuring1D fonctor2 = boost::bind(&Functor1DTeacherStateMCarState::callVelocity, inst_call, _1, _2);
     typename Feature<TeacherState<MCarState>>::featuring1D fonctor3 = boost::bind(&Functor1DTeacherStateMCarState::callAction, inst_call, _1, _2);
     typename Feature<TeacherState<MCarState>>::featuring1D fonctor4 = boost::bind(&Functor1DTeacherStateMCarState::callAction2, inst_call, _1, _2);
-    /*            typename Feature<TeacherState<MCarState>>::featuring1D fonctor5 = boost::bind(&Functor1DTeacherStateMCarState::callEpisod, inst_call, _1, _2);
-                typename Feature<TeacherState<MCarState>>::featuring1D fonctor6 = boost::bind(&Functor1DTeacherStateMCarState::callGivenFdb, inst_call, _1, _2);
-    */
+//     typename Feature<TeacherState<MCarState>>::featuring1D fonctor5 = boost::bind(&Functor1DTeacherStateMCarState::callEpisod, inst_call, _1, _2);
+    typename Feature<TeacherState<MCarState>>::featuring1D fonctor6 = boost::bind(&Functor1DTeacherStateMCarState::callGivenFdb, inst_call, _1, _2);
 
-    Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2, fonctor3, fonctor4/*, fonctor5, fonctor6*/}, { K, 1.8, K, 0.14, 3, 3, 2, 2/*, 30, 100, 30, 100*/});
+
+    Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2, fonctor3, fonctor4/*, fonctor5,*/, fonctor6}, { K, 1.7, K, 0.14, 3, 3, 2, 2/*, 30, 100,*/, 30, 100}, inst_call);
     return {f, inst_call};
 }
 

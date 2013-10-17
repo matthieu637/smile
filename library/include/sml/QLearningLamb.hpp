@@ -9,7 +9,6 @@
 
 
 #include "Q.hpp"
-#include "LearnStat.hpp"
 #include "Policy.hpp"
 
 namespace sml {
@@ -28,7 +27,7 @@ public:
 };
 
 
-class QLearningLamb : public sml::LearnStat/*, public DPolicy*/
+class QLearningLamb/*, public DPolicy*/
 {
 
 public:
@@ -40,7 +39,7 @@ public:
 ///       s : l'état
 ///       a : l'action
 ///       conf : la configuration d'apprentissage
-    QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf={false, 0, 0});
+    QLearningLamb(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a);
     
     QLearningLamb(const QLearningLamb& q);
     

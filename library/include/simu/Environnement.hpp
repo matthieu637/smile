@@ -21,7 +21,7 @@ protected:
     virtual void applyOn(const DAction& ac) = 0;
     virtual void initState(bool random=false) = 0;
 
-    
+
 public:
     Environnement(const StateTemplate* st, const ActionTemplate* at):stempl(st), atempl(at) {
         state = new State;
@@ -34,15 +34,17 @@ public:
         delete atempl;
         delete stempl;
     }
-    
-    void apply(const DAction& ac){
-	applyOn(ac);
-	computeDState(*state, dstate, stempl);
+
+    void apply(const DAction& ac) {
+        applyOn(ac);
+        computeDState(*state, dstate, stempl);
+        step++;
     }
-    
-    void init(bool random=false){
-	initState(random);
-	computeDState(*state, dstate, stempl);
+
+    void init(bool random=false) {
+        step = 0;
+        initState(random);
+        computeDState(*state, dstate, stempl);
 // 	LOG_DEBUG("reset");
     }
 
@@ -57,9 +59,13 @@ public:
     const sml::ActionTemplate* getActions() const {
         return atempl;
     }
-    
+
     const sml::StateTemplate* getStates() const {
-	return stempl;
+        return stempl;
+    }
+
+    bool done() const {
+        return goal() || step >= maxStep();
     }
 
 protected:
@@ -68,6 +74,9 @@ protected:
 
     const StateTemplate* stempl;
     const ActionTemplate* atempl;
+
+public:
+    int step;
 };
 
 }

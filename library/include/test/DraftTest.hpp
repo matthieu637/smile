@@ -61,8 +61,8 @@ public:
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
             LOG(it->total_reward);
         bib::Logger::getInstance()->flushBuffer();
-	
-	LOG("#2");
+
+        LOG("#2");
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
             LOG(it->nbStep);
         bib::Logger::getInstance()->flushBuffer();
@@ -109,8 +109,8 @@ public:
 
 
     template<typename EnvState>
-    void T_run_simple(Environnement<EnvState>* learner_env, RLParam paramLearn, RLParam paramTeach, AdviseStrategy as, 
-		      StrategyEffectsAdvice sea, float cost, int numberRun, bool learn_knowledge, Algo algo) {
+    void T_run_simple(Environnement<EnvState>* learner_env, RLParam paramLearn, RLParam paramTeach, AdviseStrategy as,
+                      StrategyEffectsAdvice sea, float cost, int numberRun, bool learn_knowledge, Algo algo) {
         Utils::srand_mili();
 // 	Utils::srand_mili(true);
 
@@ -124,7 +124,7 @@ public:
         for(fLiterator<TeacherState<EnvState>> flist = tfeatures.func->begin() ; flist != tfeatures.func->end(); ++flist) {
             nbTFeature += (*flist)->getSize();
         }
-// 
+//
 
         RLSimulation<EnvState, EnvState, ContinuousSelection>* learner_agent = new RLGradient<EnvState>(algo, learner_env, paramLearn, features.func, nbFeature, false, sea);
         learner_agent->init();
@@ -138,6 +138,7 @@ public:
         bib::Logger::getInstance()->enableBuffer();
 
         std::list<stats>* l = r.keepRun(numberRun);
+        r.run_best(0);
 
         LOG("#1");
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
@@ -152,7 +153,7 @@ public:
 
         LOG("#3");
         for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
-            LOG(it->lreward);
+            LOG(it->lstep);
         bib::Logger::getInstance()->flushBuffer();
 
         LOG("#4");
@@ -194,8 +195,8 @@ public:
     }
 
     template<typename EnvState>
-    void runTeachingBudget(Environnement<EnvState>* learner_env, RLParam paramLearn, tb_strategy stra, int numberRun, 
-			   bool learn_knowledge, int numberAdvice, StrategyEffectsAdvice sea, Algo algo) {
+    void runTeachingBudget(Environnement<EnvState>* learner_env, RLParam paramLearn, tb_strategy stra, int numberRun,
+                           bool learn_knowledge, int numberAdvice, StrategyEffectsAdvice sea, Algo algo, TBparam tparam) {
         Utils::srand_mili();
 // 	Utils::srand_mili(true);
 
@@ -208,7 +209,7 @@ public:
         RLSimulation<EnvState, EnvState, ContinuousSelection>* learner_agent = new RLGradient<EnvState>(algo, learner_env, paramLearn, features.func, nbFeature, false, sea);
         learner_agent->init();
 
-        TeachingBudget<EnvState, EnvState, ContinuousSelection>* teacher = new TeachingBudget<EnvState, EnvState, ContinuousSelection>(learner_agent, numberAdvice, stra, learn_knowledge);
+        TeachingBudget<EnvState, EnvState, ContinuousSelection>* teacher = new TeachingBudget<EnvState, EnvState, ContinuousSelection>(learner_agent, numberAdvice, stra, learn_knowledge, tparam);
         std::list<statsTB>* l = teacher->keepRun(numberRun);
 
         bib::Logger::getInstance()->enableBuffer();
@@ -223,12 +224,12 @@ public:
             LOG(it->nbAdvice);
         bib::Logger::getInstance()->flushBuffer();
 
-	LOG("#3");
+        LOG("#3");
         for(std::list<statsTB>::iterator it = l->begin(); it != l->end(); ++it)
             LOG(it->nbStep);
         bib::Logger::getInstance()->flushBuffer();
 
-	
+
         delete l;
 
         delete teacher;
@@ -247,3 +248,4 @@ public:
 };
 
 #endif
+

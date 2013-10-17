@@ -5,6 +5,10 @@
 #include "bib/Logger.hpp"
 #include <sml/Policy.hpp>
 
+
+#define STEP_REACH_RND_BEST_POL 500
+#define STEP_REACH_BEST_POL 2000
+
 namespace simu {
 
 
@@ -68,7 +72,7 @@ public:
 
     stats run(bool random=false) {
         assert(agentSet);
-	
+
         stats s = local_run(0, random);
         best_policy = agent->copyPolicy();
         bestPolicySet = true;
@@ -114,7 +118,7 @@ public:
 
         return stats_history;
     }
-    
+
     stats local_run(int index, bool random_init) {
         prob->init(random_init);
         agent->startEpisode(getState(prob), *fac);
@@ -153,52 +157,87 @@ public:
 
     virtual Policy<PolicyState>* createAgent(const PolicyState& s, const DAction& a) = 0;
 
-    virtual DAction* computeNextAction(const PolicyState& s, double reward) {
-        return agent->learn(s, reward);
+    virtual DAction* computeNextAction(const PolicyState& s, double reward, bool done, bool goal) {
+        return agent->learn(s, reward, done, goal);
+    }
+
+    Policy<PolicyState>* search_best_policy(int forNtime) {
+        string chemin="bpolicy";
+
+        int score = run().nbStep;
+        Policy<PolicyState> *sbest_policy = agent->copyPolicy();
+
+        if(  !boost::filesystem::exists( chemin ) ) {
+            bool stock_nlk = no_learn_knowledge;
+            no_learn_knowledge = true;
+
+            for(int i=0; i<forNtime; i++) {
+//                 std::list<stats>* hist = keepRun(STEP_REACH_RND_BEST_POL, true);
+//                 delete hist;
+                std::list<stats>* hist = keepRun(STEP_REACH_BEST_POL, false);
+                if(score > hist->back().nbStep) {
+                    delete sbest_policy;
+                    sbest_policy = agent->copyPolicy();
+                    score = hist->back().nbStep;
+                }
+                LOG_DEBUG(hist->back().nbStep << " perfs");
+                delete hist;
+
+                reset();
+            }
+
+            LOG_DEBUG("choosed : " << score );
+            best_policy = sbest_policy->copyPolicy();
+            LOG_DEBUG(run_best(0).total_reward);
+            sbest_policy->write(chemin);
+            no_learn_knowledge = stock_nlk;
+        }
+        else //exists
+        {
+            sbest_policy->read(chemin);
+            best_policy = sbest_policy->copyPolicy();
+            LOG_DEBUG(run_best(0).total_reward);
+        }
+
+        return sbest_policy;
     }
 
     stats run_best(int index) {
-        prob->init();
+        prob->init(false);
         DAction* ac = new DAction(*fac);
-        int step = 0;
         double total_reward = 0;
         do
         {
-            step++;
             prob->apply(*ac);
             delete ac;
             total_reward += prob->reward();
 
             ac = best_policy->decision(getState(prob), false);
         }
-        while(!prob->goal() && step < (int)prob->maxStep());
+        while(!prob->done());
 
         delete ac;
 
-        return {step, total_reward, step, index};
+        return {prob->step, total_reward, prob->step, index};
     }
 
 protected:
     virtual stats local_run_l(int index, bool learn) {
         DAction* ac = fac;
-        int step = 0;
         double total_reward = 0;
         do
         {
-            step++;
             prob->apply(*ac);
             total_reward += prob->reward();
 
-	    if(learn)
-	      ac = this->computeNextAction(getState(prob), prob->reward());
-	    else 
-	      ac = this->agent->decision(getState(prob), false);
-	    
-//   	   index > 900 &&  LOG_DEBUG(*ac);
+            if(learn)
+                ac = this->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
+            else
+                ac = this->agent->decision(getState(prob), false);
         }
-        while(!prob->goal() && step < (int)prob->maxStep());
+        while(!prob->done());
 
-        return {step, total_reward, step, index};
+        return {prob->step, total_reward, prob->step, index};
     }
 
 protected:
@@ -212,3 +251,4 @@ protected:
 }
 
 #endif // MCARTASK_H
+

@@ -7,11 +7,39 @@
 //
 
 #include <boost/function.hpp>
+#include <boost/serialization/vector.hpp>
 #include "sml/Action.hpp"
 #include "bib/Logger.hpp"
 
 using std::pair;
 using std::vector;
+
+class Functor1D
+{
+public:/*
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int) {
+        LOG_DEBUG("avant ; ");
+        bib::Logger::PRINT_ELEMENTS<vector<double>>(randomize);
+        LOG_DEBUG("maintenant ; ");
+        ar & BOOST_SERIALIZATION_NVP(randomize);
+        bib::Logger::PRINT_ELEMENTS<vector<double>>(randomize);
+    };*/
+    
+    void save(boost::archive::xml_oarchive* xml, int num) {
+        std::ostringstream oss;
+        oss << "randomize" << num;
+        *xml << make_nvp(oss.str().c_str(), randomize);
+    }
+
+    void load(boost::archive::xml_iarchive* xml, int num) {
+        std::ostringstream oss;
+        oss << "randomize" << num;
+        *xml >> make_nvp(oss.str().c_str(), randomize);
+    }
+protected:
+    vector<double> randomize;
+};
 
 namespace sml {
 
@@ -24,33 +52,54 @@ public:
     typedef int (*featuring) (const S&, const DAction&, std::vector<double> params);
     typedef boost::function<double (const S&, const DAction&)> featuring1D;
 
+
 ///
 ///\brief Constructeur pour créer une couche complexe (RBF, log, ...)
 ///\param f : une fonction
 /// 	  params : paramètre pour la fonction
-    Feature(featuring f, const std::vector<double> &params, type t=custom):
-        f(f), params(params), t(t) {
-        LOG_ERROR("not implemented");
-    }
+//     Feature(featuring f, const std::vector<double> &params, type t=custom):
+//         f(f), params(params), t(t) {
+//         LOG_ERROR("not implemented");
+//     }
 
 ///
 ///\brief Constructeur pour créer une couche regulière : un tiling en dimension quelconque
 ///\param featuresl : liste des fonctions pour chaque dimension
 /// 	  params : paramètre pour la fonction
-    Feature(const vector<featuring1D>& featuresl, const std::vector<double> &params):
-        featuresl(featuresl), params(params), t(_ND), maxi(featuresl.size()), total(featuresl.size()), width(featuresl.size()), size(1)
+    Feature(const vector<featuring1D>& featuresl, const std::vector<double> &params, Functor1D* instances):
+        featuresl(featuresl), params(params), maxi(featuresl.size()), total(featuresl.size()), width(featuresl.size()), size(1),instances(instances)
     {
         assert(params.size()==featuresl.size()*2);
 
         int index = 0;
         for(int i=0; i< params.size(); i+=2) {
-            maxi[index] = params[i] + 2; // add external 
+            maxi[index] = params[i] + 2; // add external
             total[index] = params[i+1];
             width[index] = total[index]/(maxi[index] - 2);
             size *= maxi[index];
             index++;
         }
 
+    }
+    /*
+        friend class boost::serialization::access;
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int)
+        {
+    	ar & BOOST_SERIALIZATION_NVP(instances);
+            ar & BOOST_SERIALIZATION_NVP(params);
+            ar & BOOST_SERIALIZATION_NVP(maxi);
+            ar & BOOST_SERIALIZATION_NVP(total);
+            ar & BOOST_SERIALIZATION_NVP(width);
+            ar & BOOST_SERIALIZATION_NVP(size);
+        }*/
+
+    void save(boost::archive::xml_oarchive* xml, int num) {
+	instances->save(xml, num);
+    }
+
+    void load(boost::archive::xml_iarchive* xml, int num) {
+	instances->load(xml, num);
     }
 
 ///
@@ -60,31 +109,16 @@ public:
     }
 
 ///
-///\brief Déterminer l'indice activé pour l'état et l'action pour un tiling
-///\param st : l'état donné
-/// 	  at : l'action donnée
-    int calc(const S& st, const DAction& ac) {
-        switch(t)
-        {
-        case _ND:
-            return caseND(st, ac);
-        case custom:
-            return f(st, ac, params);
-        }
-        return -1;
-    }
-
-///
 ///\brief Déterminer l'indice activé pour l'état et l'action
 ///\param st : l'état donné
 /// 	  at : l'action donnée
-    int caseND(const S& st, const DAction& ac) {
+    int calc(const S& st, const DAction& ac) {
         vector<int> var(featuresl.size());
 
         for(int index=0; index < featuresl.size(); index++) {
 // 	    LOG_DEBUG(featuresl[index](st, ac) << " " << (int) floor( featuresl[index](st, ac) / width[index]) << " " <<  maxi[index] << " " << width[index] << " " << index);
             var[index] = (int) floor( featuresl[index](st, ac) / width[index]);
-	    var[index] ++; //for left depassement
+            var[index] ++; //for left depassement
             if(var[index] < 0 || var[index] >= maxi[index])
                 return -1;
         }
@@ -134,11 +168,10 @@ public:
         }*/
 
 private:
-    featuring f;
-    featuring1D f1d;
+//     featuring f;
+//     featuring1D f1d;
     vector<featuring1D> featuresl;
     vector<double> params;
-    type t;
 
 //     vector<int> var;
     vector<int> maxi;
@@ -146,6 +179,7 @@ private:
     vector<double> width;
 
     int size;
+    Functor1D* instances;
 };
 
 template<typename State>

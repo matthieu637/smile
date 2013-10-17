@@ -3,8 +3,8 @@
 
 namespace sml {
 
-SarsaLamb::SarsaLamb(const StateTemplate* stmp, const ActionTemplate* atmp, DState& s, DAction& a, const LearnConfig& conf) :
-    LearnStat(conf), Q(stmp, atmp), N(stmp, atmp), atmp(atmp),s(&s),a(&a)
+SarsaLamb::SarsaLamb(const StateTemplate* stmp, const ActionTemplate* atmp, DState& s, DAction& a) :
+    Q(stmp, atmp), N(stmp, atmp), atmp(atmp),s(&s),a(&a)
 {
 
 }

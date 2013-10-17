@@ -9,12 +9,11 @@
 
 
 #include "Q.hpp"
-#include "LearnStat.hpp"
 #include "sml/QLearningLamb.hpp"
 
 namespace sml {
 
-class SarsaLamb : public sml::LearnStat
+class SarsaLamb
 {
 
 public:
@@ -26,7 +25,7 @@ public:
 ///       s : l'état
 ///       a : l'action
 ///       conf : la configuration d'apprentissage
-    SarsaLamb(const StateTemplate* stmp, const ActionTemplate* atmp, DState& s, DAction& a, const LearnConfig& conf);
+    SarsaLamb(const StateTemplate* stmp, const ActionTemplate* atmp, DState& s, DAction& a);
     
     
     void observeTutor(DState& sp, DAction& ac, double r, float lrate, float discount, float lambda, bool accumulative);

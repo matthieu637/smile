@@ -4,8 +4,13 @@
 #include "sml/Q.hpp"
 #include "sml/Feature.hpp"
 #include "sml/Utils.hpp"
-#include "LearnStat.hpp"
 #include "Policy.hpp"
+#include <boost/serialization/list.hpp>
+
+void GetTiles(int tiles[],int num_tilings,float variables[], int num_variables,
+              int memory_size,int hash1=-1, int hash2=-1, int hash3=-1);
+
+
 
 namespace sml {
 
@@ -18,13 +23,13 @@ enum custom_dec_learn {normal, forced_clear, forced_no_clear};
 
 
 template <class State>
-class RLGradientDescent : public Policy<State>, public LearnStat {
+class RLGradientDescent : public Policy<State> {
 
 public:
 
     RLGradientDescent(featuredList<State>* features, unsigned int nbFeature, const ActionTemplate* atmp, const State&,
-               const DAction& initial, RLParam param, StrategyEffectsAdvice sea, const LearnConfig& conf) :
-        Policy<State>(param, sea), LearnStat(conf),
+                      const DAction& initial, RLParam param, StrategyEffectsAdvice sea) :
+        Policy<State>(param, sea),
         nbFeature(nbFeature),
         teta(nbFeature), e(zero_vector<double>(nbFeature)),
         Qa(atmp), actions(atmp->sizeNeeded()),
@@ -40,7 +45,7 @@ public:
         lastAction = new DAction(initial);
     }
 
-    RLGradientDescent(const RLGradientDescent& q) : Policy<State>(q.param, q.adviceStrat), LearnStat(q.conf), nbFeature(q.nbFeature),
+    RLGradientDescent(const RLGradientDescent& q) : Policy<State>(q.param, q.adviceStrat), nbFeature(q.nbFeature),
         teta(q.teta), e(q.e), Qa(q.Qa), actions(q.atmpl->sizeNeeded()), features(q.features), atmpl(q.atmpl),
         history(q.history)
     {
@@ -60,11 +65,11 @@ public:
         delete lastAction;
         lastAction = new DAction(a);
 
-	resetTraces();
+        resetTraces();
 
         //start an new episod
         computeQa(s);
-	_startEpisode(s, a);
+        _startEpisode(s, a);
     }
 
     void should_done(const State&, const DAction&) {
@@ -102,14 +107,27 @@ public:
 ///\param xml : le fichier XML
     void save(boost::archive::xml_oarchive* xml)
     {
+// 	bib::Logger::PRINT_ELEMENTS<dbvector>(teta);
         *xml << make_nvp("teta", teta);
+        int i=0;
+        for(fLiterator<State> flist = features->begin() ; flist != features->end(); ++flist) {
+            (*flist)->save(xml, i);
+            i++;
+        }
     }
 
 ///
 ///\brief Charger ce que l'algorithme a appris
 ///\param xml : le fichier XML
     void load(boost::archive::xml_iarchive* xml) {
+//       	bib::Logger::PRINT_ELEMENTS<dbvector>(teta);
         *xml >> make_nvp("teta", teta);
+        int i=0;
+        for(fLiterator<State> flist = features->begin() ; flist != features->end(); ++flist) {
+            (*flist)->load(xml, i);
+            i++;
+        }
+// 	bib::Logger::PRINT_ELEMENTS<dbvector>(teta);
     }
 
 protected:
@@ -192,6 +210,25 @@ protected:
 
         return actived;
     }
+
+//     list<int>* extractFeatures(const State& st, const DAction& ac) {
+//         int a = ac["motor"];
+//         simu::MCarState& state = (simu::MCarState&)st;
+//         list<int>* actived = new list<int>;
+//
+//         float state_vars[2];
+//         int F[8];
+//         state_vars[0] = state.position / (1.7 / 16.);
+//         state_vars[1] = state.velocity / (0.14 / 16.);
+//
+//         GetTiles(&F[0], 8, state_vars, 2, 12288, a);
+//
+//         for(int i=0; i<8; i++)
+//             actived->push_back( F[i] );
+//
+// //   bib::Logger::PRINT_ELEMENTS<list<int>>(*actived);
+//         return actived;
+//     }
 
     virtual void _startEpisode(const State&, const DAction&) = 0;
 

@@ -7,12 +7,11 @@
 ///
 
 #include "Q.hpp"
-#include "LearnStat.hpp"
 #include "Policy.hpp"
 
 namespace sml {
 
-class Sarsa : public LearnStat/*, public DPolicy*/
+class Sarsa /*, public DPolicy*/
 {
 public:
 ///
@@ -22,7 +21,7 @@ public:
 ///       s : l'état
 ///       a : l'action
 ///       conf : la configuration d'apprentissage
-    Sarsa(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf={false,0,0});
+    Sarsa(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a);
     
     Sarsa(const Sarsa& q);
     

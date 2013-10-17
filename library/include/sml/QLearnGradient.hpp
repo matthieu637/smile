@@ -26,8 +26,8 @@ public:
 ///       initial : l'action initiale
 ///       conf : la configuration d'apprentissage
     QLearnGradient(featuredList<State>* features, unsigned int nbFeature, const ActionTemplate* atmp, const State& s,
-                   const DAction& a, RLParam param, StrategyEffectsAdvice sea, const LearnConfig& conf= {false,0,0}) :
-	RLGradientDescent<State>(features, nbFeature, atmp, s, a, param, sea, conf)
+                   const DAction& a, RLParam param, StrategyEffectsAdvice sea) :
+	RLGradientDescent<State>(features, nbFeature, atmp, s, a, param, sea)
     {
         this->startEpisode(s, a);
     }
@@ -56,9 +56,8 @@ public:
 ///	  lambda : importance de l'historique
 ///	  discount : importance du prochain état de la récompense
 ///	  accumulative : si les traces est accumulative ou non
-    LearnReturn _learn(const State& state, double r)
+    LearnReturn _learn(const State& state, double r, bool, bool)
     {
-// 	this->param.alpha = this->param.alpha * 0.999999999;
         DAction* a;
         a = this->lastAction;
 
@@ -84,7 +83,7 @@ public:
     }
 
 
-    void had_choosed(const State& state, const DAction& ba, double r, bool did_greedy) {
+    void had_choosed(const State& state, const DAction& ba, double r, bool did_greedy, bool, bool) {
         DAction* a;
         a = this->lastAction;
 
@@ -107,7 +106,7 @@ public:
         this->lastAction = a;
     }
 
-    void should_do(const State& s, const DAction& ba, double r) {
+    void should_do(const State& s, const DAction& ba, double r, bool, bool) {
         DAction* a;
         a = this->lastAction;
 

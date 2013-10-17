@@ -58,7 +58,8 @@ DAction* QTable::argmax(const DState& name) const {
 
 DAction* QTable::argmax() const {
 
-    unsigned int imax = rand() % atmpl->sizeNeeded();
+//     unsigned int imax = rand() % atmpl->sizeNeeded();
+       unsigned int imax = 0;
 //     LOG_DEBUG(imax << " " << hashState << " " << atmpl->sizeNeeded() << " " << name["angle"] << " " << name["distance"] );
     for(unsigned int j=0; j< atmpl->sizeNeeded(); j++)
         if(map->at(imax) < map->at(j) )

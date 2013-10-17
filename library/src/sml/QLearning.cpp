@@ -3,14 +3,14 @@
 
 namespace sml {
 
-QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, RLParam param, StrategyEffectsAdvice sea, const LearnConfig& conf) :
-    LearnStat(conf), DPolicy(param, sea), Q(stmp, atmp), P(stmp, atmp), atmp(atmp)
+QLearning::QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, RLParam param, StrategyEffectsAdvice sea) :
+     DPolicy(param, sea), Q(stmp, atmp), P(stmp, atmp), atmp(atmp)
 {
     ds = new DState(s);
     da = new DAction(a);
 }
 
-QLearning::QLearning(const QLearning& q):LearnStat(q.conf), DPolicy(q.param, q.adviceStrat), Q(q.Q), P(q.P), atmp(q.atmp) {
+QLearning::QLearning(const QLearning& q):DPolicy(q.param, q.adviceStrat), Q(q.Q), P(q.P), atmp(q.atmp) {
     ds = new DState(*q.ds);
     da = new DAction(*q.da);
 }
@@ -20,7 +20,7 @@ QLearning::~QLearning() {
     delete da;
 }
 
-LearnReturn QLearning::_learn(const DState& s, double r)
+LearnReturn QLearning::_learn(const DState& s, double r, bool done, bool)
 {
     DAction *ap = Q.argmax(s);
     Q(ds,da) = Q(ds,da) + param.alpha*(r+param.gamma*Q(s, *ap) - Q(ds, da) );
@@ -101,14 +101,14 @@ void QLearning::startEpisode(const DState& s, const DAction& a)
     da = new DAction(a);
 }
 
-void QLearning::should_do(const DState& s, const DAction& a, double reward) {
+void QLearning::should_do(const DState& s, const DAction& a, double reward, bool, bool) {
     (void) reward;
     should_done(s, a);
 
     startEpisode(s, a);
 }
 
-void QLearning::had_choosed(const DState&, const DAction&, double, bool){
+void QLearning::had_choosed(const DState&, const DAction&, double, bool, bool, bool){
   
 }
 

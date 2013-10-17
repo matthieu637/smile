@@ -19,23 +19,21 @@ struct statsTB
 
 enum tb_strategy { mistake_correction, importance_advice, early_advice, pourcentage};
 
+struct TBparam{
+    float ia_threshold;
+    float mc_threshold;
+};
+
 template<typename EnvState, typename PolicyState, typename StateType>
 class TeachingBudget : private StateType
 {
     using StateType::getState;
 
 public:
-    TeachingBudget(RLSimulation<EnvState, PolicyState, StateType>* learner, int n, tb_strategy str, bool no_teach_knowledge):
-        learner(learner), n(n), nn(n), str(str), no_teach_knowledge(no_teach_knowledge)
+    TeachingBudget(RLSimulation<EnvState, PolicyState, StateType>* learner, int n, tb_strategy str, bool no_teach_knowledge, TBparam tparam):
+        learner(learner), n(n), nn(n), str(str), no_teach_knowledge(no_teach_knowledge),tparam(tparam)
     {
-        learner->run();
-
-        std::list<stats>* hist = learner->keepRun(STEP_REACH_RND_BEST_POL, true);
-        delete hist;
-        hist = learner->keepRun(STEP_REACH_BEST_POL, false);
-        best_policy = learner->get_best_policy()->copyPolicy();
-        LOG_DEBUG(hist->back().min_step << " after " << hist->back().index_min << " runs");
-        delete hist;
+        best_policy = learner->search_best_policy(100);
 
         learner->reset();
         //         learner->get_policy()->setAdviseStrat(sea);
@@ -105,7 +103,7 @@ public:
 
             ///
             Policy<PolicyState>* cp =  agent->copyPolicy();
-            LearnReturn lr = cp->_learn(getState(prob), prob->reward());
+            LearnReturn lr = cp->_learn(getState(prob), prob->reward(), prob->done(), prob->goal());
             ac = new DAction(*lr.ac);
             delete cp;
 
@@ -119,49 +117,47 @@ public:
                 gonna_advice = nn > 0;
                 break;
             case mistake_correction:
-                gonna_advice = !(*best_action == *ac) && nn > 0 && best_policy->getStateImportance(getState(prob)) > agent->getParams().mc_threshold ;
+                gonna_advice = !(*best_action == *ac) && nn > 0 && best_policy->getStateImportance(getState(prob)) > tparam.mc_threshold ;
                 break;
             case importance_advice:
-                gonna_advice = nn > 0 && best_policy->getStateImportance(getState(prob)) > agent->getParams().ia_threshold ;
+                gonna_advice = nn > 0 && best_policy->getStateImportance(getState(prob)) > tparam.ia_threshold ;
                 break;
-	    case pourcentage:
-		gonna_advice = sml::Utils::rand01(0.1);
-		break;
+            case pourcentage:
+                gonna_advice = sml::Utils::rand01(0.1);
+                break;
             }
 
             if(gonna_advice) {
                 delete ac;
                 ac = new DAction(*best_action);
                 nn--;
-                agent->should_do(getState(prob), *ac, prob->reward());
+                agent->should_do(getState(prob), *ac, prob->reward(), prob->done(), prob->goal());
             } else {
-                agent->had_choosed(getState(prob), *ac, prob->reward(), lr.gotGreedy);
+                agent->had_choosed(getState(prob), *ac, prob->reward(), lr.gotGreedy, prob->done(), prob->goal());
             }
             delete best_action;
 
         }
-        while(!prob->goal() && step < prob->maxStep());
+        while(!prob->done());
 
         delete ac;
-	
-        return {step, total_reward, step, index, n - nn};
+
+        return {prob->step, total_reward, prob->step, index, n - nn};
     }
 
     statsTB local_run_nl(int index) {
         DAction* ac = fac;
-        int step = 0;
         double total_reward = 0;
         do
         {
-            step++;
             prob->apply(*ac);
             total_reward += prob->reward();
 
             ac = agent->decision(getState(prob), false);
         }
-        while(!prob->goal() && step < prob->maxStep());
+        while(!prob->done());
 
-        return {step, total_reward, step, index, n - nn};
+        return {prob->step, total_reward, prob->step, index, n - nn};
     }
 
 protected:
@@ -172,6 +168,7 @@ protected:
     int n, nn;
     tb_strategy str;
     bool no_teach_knowledge;
+    TBparam tparam;
 };
 
 #endif // TEACHINGBUDGET_H

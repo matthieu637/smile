@@ -64,13 +64,16 @@ fi
 # launch_test "FMQ3_ 300" 1 300
 # 
 # # S3T
-# launch_test "TBMS3TIEA 300 100" 1 100
+# launch_test "TBMS3TIEA 300 100" 1 200
 # launch_test "TBMS3TIIA 300 100" 1 100
 # launch_test "TBMS3TIMC 300 100" 1 100
 # # S3_
-# launch_test "TBMS3_IEA 300 100" 1 100
-# launch_test "TBMS3_IIA 300 100" 1 100
-# launch_test "TBMS3_IMC 300 100" 1 100
+# launch_test "TBMS3_IEA 300 100" 1 300 
+# launch_test "TBMS3_IIA 300 100 24 24" 1 100
+# launch_test "TBMS3_IMC 300 100 12 12" 1 100
+launch_test "TMS3_BI 1 1.15" 1 3
+
+
 # 
 # # Q3T
 # launch_test "TBMQ3TIEA 300 100" 1 100
@@ -82,42 +85,24 @@ fi
 # launch_test "TBMQ3_IMC 300 100" 1 100
 
 
-
-# # #grid
-# launch_test "FGS3T 200" 1 200
-# launch_test "FGQ3T 200" 1 200
-# launch_test "FGS3_ 200" 1 200
-# launch_test "FGQ3_ 200" 1 200
 # 
-# # S3T
-# launch_test "TBGS3TIEA 200 150" 1 100
-# launch_test "TBGS3TIIA 200 150" 1 100
-# launch_test "TBGS3TIMC 200 150" 1 100
-# S3_
-# launch_test "TBGS3_IEA 200 150" 1 100
-launch_test "TBGS3_IIA 200 150" 1 100
-launch_test "TBGS3_IMC 200 150" 1 100
-# 
-# # Q3T
-# launch_test "TBGQ3TIEA 200 150" 1 100
-# launch_test "TBGQ3TIIA 200 150" 1 100
-# launch_test "TBGQ3TIMC 200 150" 1 100
-# Q3_
-# launch_test "TBGQ3_IEA 200 150" 1 100
-# launch_test "TBGQ3_IIA 200 150" 1 100
-# launch_test "TBGQ3_IMC 200 150" 1 100
-
-
-
-
-# k=".001"
-# incr=".001"
-# end=".04"
+# k="0"
+# incr="4"
+# end="190"
 # 
 # while [ `echo "$k <= $end" | bc` -eq 1 ]
 # do
 # 	echo $k
-# 	launch_test "mcar_qltable_teacher_annonce $k" 1
-# 	k=`echo $k + $incr | bc`
+#  	launch_test "TBMS3TIIA 300 100 $k $k" 1 50
+#  	k=`echo $k + $incr | bc`
+# done
+# 
+# 
+# k="0"
+# while [ `echo "$k <= $end" | bc` -eq 1 ]
+# do
+# 	echo $k
+#  	launch_test "TBMS3TIMC 300 100 $k $k" 1 50
+#  	k=`echo $k + $incr | bc`
 # done
 

@@ -3,14 +3,14 @@
 
 namespace sml {
 
-Sarsa::Sarsa(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, const LearnConfig& conf) :
-    LearnStat(conf), Q(stmp, atmp), P(stmp, atmp), atmp(atmp)
+Sarsa::Sarsa(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a) :
+    Q(stmp, atmp), P(stmp, atmp), atmp(atmp)
 {
     ds = new DState(s);
     da = new DAction(a);
 }
 
-Sarsa::Sarsa(const Sarsa& q):LearnStat(q.conf), Q(q.Q), P(q.P), atmp(q.atmp) {
+Sarsa::Sarsa(const Sarsa& q):Q(q.Q), P(q.P), atmp(q.atmp) {
     ds = new DState(*q.ds);
     da = new DAction(*q.da);
 }

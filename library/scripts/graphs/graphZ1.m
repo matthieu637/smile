@@ -1,30 +1,32 @@
 close all
 clear all
 
-X = load('../../data/FMQ3');
+X = load('../../data/FMS3__300');
+XP = load('../../data/TBMS3_IEA_300_100');
 
 h = figure ;
-plot(mean(X));
+plot(mean(X));hold on;
+plot(mean(XP));hold on;
 axis([0 100 -500 -100]);
 
-hold on;
 
 
-Y = load('../../data/Z1#3');
-plot(mean(Y), 'r');
+
+Y = load('../../data/TMS3_BI_1_1.15#3');
+plot(-mean(Y), 'r', "linewidth", 2);hold on;
 
 
-Z = load('../../data/Z1#2');
-plot(mean(Z), 'g');
+Z = load('../../data/TMS3_BI_1_1.15#2');
+plot(mean(Z), 'g');hold on;
 
 
-legend('Leaner no advice', 'Leaner with advice', 'Teacher');
+legend('Leaner no advice', 'EA', 'Leaner with advice', 'Teacher');
 xlabel('Training episodes');
 ylabel('Average episode reward');
 
 h2 = figure ;
 
-W = load('../../data/Z1#1');
+W = load('../../data/TMS3_BI_1_1.15#1');
 plot(mean(W))
 
 title('Teacher reward over episods');
@@ -35,16 +37,16 @@ ylabel('Average episode reward');
 
 h3 = figure ;
 
-V = load('../../data/Z1#4');
+V = load('../../data/TMS3_BI_1_1.15#4');
 plot(mean(V))
 hold on;
 
-M = load('../../data/Z1#5');
+M = load('../../data/TMS3_BI_1_1.15#5');
 plot(mean(M)*100, 'r')
 
 legend('Number advice', 'Advice Ratio');
 
-U = load('../../data/Z1#6');
+U = load('../../data/TMS3_BI_1_1.15#6');
 ( size(Y, 2) * size(W, 2) ) / mean(U)
  size(Y, 2) * size(W, 2) 
  mean(U)
