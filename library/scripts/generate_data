@@ -71,7 +71,7 @@ fi
 # launch_test "TBMS3_IEA 300 100" 1 300 
 # launch_test "TBMS3_IIA 300 100 24 24" 1 100
 # launch_test "TBMS3_IMC 300 100 12 12" 1 100
-launch_test "TMS3_BI 1 1.15" 1 3
+launch_test "TMS3_BI 5003 1.25" 1 4
 
 
 # 

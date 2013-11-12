@@ -39,7 +39,7 @@ QTable::QTable(const QTable& q):stmpl(q.stmpl), atmpl(q.atmpl) {
 
 QTable::~QTable() {
     if(shouldDeleteStmpl)
-      delete stmpl;
+        delete stmpl;
     delete map;
 }
 
@@ -59,9 +59,9 @@ DAction* QTable::argmax(const DState& name) const {
 DAction* QTable::argmax() const {
 
 //     unsigned int imax = rand() % atmpl->sizeNeeded();
-       unsigned int imax = 0;
+    unsigned int imax = 0;
 //     LOG_DEBUG(imax << " " << hashState << " " << atmpl->sizeNeeded() << " " << name["angle"] << " " << name["distance"] );
-    for(unsigned int j=0; j< atmpl->sizeNeeded(); j++)
+    for(unsigned int j=0; j < atmpl->sizeNeeded(); j++)
         if(map->at(imax) < map->at(j) )
             imax = j;
 

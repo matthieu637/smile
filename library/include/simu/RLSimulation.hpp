@@ -43,7 +43,7 @@ public:
     virtual ~Simulation() {}
     virtual void init() = 0;
     virtual stats run(bool random=false) = 0;
-    virtual std::list<stats>* keepRun(int additional_step, bool random_init=false) = 0;
+    virtual std::list<stats>* keepRun(int additional_step, bool random_init=false, bool display_progress=false) = 0;
 };
 
 template<typename EnvState, typename PolicyState, typename StateType>
@@ -74,17 +74,20 @@ public:
         assert(agentSet);
 
         stats s = local_run(0, random);
-        best_policy = agent->copyPolicy();
-        bestPolicySet = true;
+        if(!bestPolicySet) {
+            best_policy = agent->copyPolicy();
+            bestPolicySet = true;
+        }
         return s;
     }
 
-    std::list<stats>* keepRun(int additional_step, bool random_init=false) {
+    std::list<stats>* keepRun(int additional_step, bool random_init=false, bool display_progress=false) {
         assert(agentSet);
         std::list<stats>* stats_history = new std::list<stats>;
 
         additional_step--;
         stats s = local_run(0, random_init);
+        int max_reward = s.total_reward;
         int min_step = s.min_step;
         int index_min = 0;
         int index = 1;
@@ -102,8 +105,8 @@ public:
             additional_step--;
             stats s = local_run(index, random_init);
 
-            if(s.nbStep <= min_step) {
-                min_step = s.nbStep;
+            if(s.total_reward <= max_reward) {
+                max_reward = s.total_reward;
                 index_min = index;
                 delete best_policy;
                 best_policy = agent->copyPolicy();
@@ -113,8 +116,11 @@ public:
 //             LOG_INFO(s.nbStep << " " << s.total_reward << " " << s.min_step << " " << additional_step);
             stats_history->push_back( s);
             index++;
+
+            if(display_progress)
+                LOG_DEBUG("progress " << index);
         }
-        while(additional_step > 0);
+        while(additional_step > 0 && !boost::filesystem::exists( "canal#stop" ));
 
         return stats_history;
     }
@@ -172,8 +178,6 @@ public:
             no_learn_knowledge = true;
 
             for(int i=0; i<forNtime; i++) {
-//                 std::list<stats>* hist = keepRun(STEP_REACH_RND_BEST_POL, true);
-//                 delete hist;
                 std::list<stats>* hist = keepRun(STEP_REACH_BEST_POL, false);
                 if(score > hist->back().nbStep) {
                     delete sbest_policy;
@@ -187,6 +191,8 @@ public:
             }
 
             LOG_DEBUG("choosed : " << score );
+            if(bestPolicySet)
+                delete best_policy;
             best_policy = sbest_policy->copyPolicy();
             LOG_DEBUG(run_best(0).total_reward);
             sbest_policy->write(chemin);
@@ -195,10 +201,13 @@ public:
         else //exists
         {
             sbest_policy->read(chemin);
+            if(bestPolicySet)
+                delete best_policy;
             best_policy = sbest_policy->copyPolicy();
             LOG_DEBUG(run_best(0).total_reward);
         }
 
+        bestPolicySet = true;
         return sbest_policy;
     }
 
@@ -225,18 +234,28 @@ protected:
     virtual stats local_run_l(int index, bool learn) {
         DAction* ac = fac;
         double total_reward = 0;
+        DAction* b = new DAction(prob->getActions(), (int) false );
         do
         {
             prob->apply(*ac);
             total_reward += prob->reward();
 
-            if(learn)
-                ac = this->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
+            if(learn) {
+                if(!prob->restrictedAction().restricted)
+                    this->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
+                else {
+                    agent->had_choosed(getState(prob), *b, prob->reward(), false, prob->done(), prob->goal());
+                    ac = b;
+                }
+//                 ac = this->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
+            }
             else
                 ac = this->agent->decision(getState(prob), false);
         }
         while(!prob->done());
 
+	delete b;
+	
         return {prob->step, total_reward, prob->step, index};
     }
 

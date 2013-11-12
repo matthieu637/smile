@@ -8,6 +8,11 @@ namespace simu {
 
 using namespace sml;
 
+struct RAction{
+  bool restricted;
+  list<int>* possible_actions;
+};
+
 template <typename State>
 class Environnement
 {
@@ -17,6 +22,9 @@ public:
     virtual bool goal() const = 0;
     virtual unsigned int maxStep() const = 0;
     virtual void computeDState(const State& s, DState* dst, const StateTemplate* repr) = 0;
+    virtual RAction restrictedAction(){
+	return {false, nullptr};
+    }
 protected:
     virtual void applyOn(const DAction& ac) = 0;
     virtual void initState(bool random=false) = 0;

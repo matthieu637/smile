@@ -20,7 +20,7 @@ QLearning::~QLearning() {
     delete da;
 }
 
-LearnReturn QLearning::_learn(const DState& s, double r, bool done, bool)
+LearnReturn QLearning::_learn(const DState& s, double r, bool, bool)
 {
     DAction *ap = Q.argmax(s);
     Q(ds,da) = Q(ds,da) + param.alpha*(r+param.gamma*Q(s, *ap) - Q(ds, da) );

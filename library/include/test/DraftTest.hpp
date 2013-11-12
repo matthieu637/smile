@@ -22,9 +22,11 @@ public:
 
     template<typename EnvState>
     featureData<EnvState> createFeatures(RLParam param) {
+      
+	f_crea_list<EnvState> begin = Factory::additionnalFeature<EnvState>(param);
 
-        featuredList<EnvState> *features = new featuredList<EnvState>();
-        list<Functor1D* >* instances = new list<Functor1D* >;
+        featuredList<EnvState> *features = begin.f;
+        list<Functor1D* >* instances = begin.inst_call;
 
         for(int i=0; i < param.tiling; i++) {
             f_crea<EnvState> fct = Factory::createFeature<EnvState>(i);
@@ -131,46 +133,56 @@ public:
 
         CCTeacher< EnvState, TeacherState<EnvState>>* teach = new CCTeacher< EnvState, TeacherState<EnvState>>(learner_agent, *learner_env->getStates(), cost, as, sea);
 
-        RLGradient<TeacherState<EnvState>> r(algo, teach, paramLearn, tfeatures.func, nbTFeature, learn_knowledge, None);
+        RLGradient<TeacherState<EnvState>> r(algo, teach, paramTeach, tfeatures.func, nbTFeature, learn_knowledge, None);
         r.init();
         teach->setTeacherPolicy(r.get_policy());
 
         bib::Logger::getInstance()->enableBuffer();
 
-        std::list<stats>* l = r.keepRun(numberRun);
-        r.run_best(0);
+        std::list<stats>* l = r.keepRun(numberRun, false, true);
 
         LOG("#1");
         for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
             LOG(it->nbStep);
         bib::Logger::getInstance()->flushBuffer();
 
-        LOG("#2");
-        const list<Tstats>& s = teach->get_learner_stats();
-        for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
-            LOG(it->treward);
-        bib::Logger::getInstance()->flushBuffer();
-
-        LOG("#3");
-        for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
-            LOG(it->lstep);
-        bib::Logger::getInstance()->flushBuffer();
-
-        LOG("#4");
-        for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
-            LOG(it->nbAdvice);
-        bib::Logger::getInstance()->flushBuffer();
-
-        LOG("#5");
-        for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
-            LOG(it->ratio_ad_ch);
-        bib::Logger::getInstance()->flushBuffer();
-
-        LOG("#6");
-        LOG(teach->get_given_advice());
+        LOG("#7");
+        for(std::list<stats>::iterator it = l->begin(); it != l->end(); ++it)
+            LOG(it->total_reward);
         bib::Logger::getInstance()->flushBuffer();
 
         delete l;
+
+
+        for(int i=0; i<30; i++) {
+            r.run_best(0);
+
+            LOG("#2");
+            const list<Tstats>& s = teach->get_learner_stats();
+            for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
+                LOG(it->treward);
+            bib::Logger::getInstance()->flushBuffer();
+
+            LOG("#3");
+            for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
+                LOG(it->lstep);
+            bib::Logger::getInstance()->flushBuffer();
+
+            LOG("#4");
+            for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
+                LOG(it->nbAdvice);
+            bib::Logger::getInstance()->flushBuffer();
+
+            LOG("#5");
+            for(list<Tstats>::const_iterator it = s.cbegin(); it != s.cend(); ++it)
+                LOG(it->ratio_ad_ch);
+            bib::Logger::getInstance()->flushBuffer();
+
+            LOG("#6");
+            LOG(teach->get_given_advice());
+            bib::Logger::getInstance()->flushBuffer();
+
+        }
 
         delete teach;
         delete learner_agent;
@@ -190,8 +202,6 @@ public:
             delete *it;
         delete tfeatures.func;
         delete tfeatures.inst;
-
-        delete learner_env;
     }
 
     template<typename EnvState>
@@ -242,10 +252,9 @@ public:
             delete *it;
         delete features.func;
         delete features.inst;
-
-        delete learner_env;
     }
 };
 
 #endif
+
 

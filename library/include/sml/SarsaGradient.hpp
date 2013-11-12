@@ -71,11 +71,10 @@ public:
             gotGreedy = true;
         }
 
-
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        if(!done || goal)
+        if(!done || goal || !this->param.trick)
             this->updateWeights(delta);
 
         this->decayTraces();
@@ -107,7 +106,7 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        if(!done || goal)
+        if(!done || goal || !this->param.trick)
             this->updateWeights(delta);
 
         this->decayTraces();
@@ -131,7 +130,7 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        if(!done || goal)
+        if(!done || goal || !this->param.trick)
             this->updateWeights(delta);
 
         this->decayTraces();

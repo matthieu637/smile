@@ -208,7 +208,11 @@ int main(int argc, char* argv[])
 //         debug();
     }
 
-
+    
+    delete car;
+    delete grid;
+    delete gridls;
+    
     bib::Logger::endInstance();
     return 0;
 }
