@@ -74,8 +74,7 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        if(!done || goal || !this->param.trick)
-            this->updateWeights(delta);
+        this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -106,8 +105,7 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        if(!done || goal || !this->param.trick)
-            this->updateWeights(delta);
+        this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -130,8 +128,7 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        if(!done || goal || !this->param.trick)
-            this->updateWeights(delta);
+	this->updateWeights(delta);
 
         this->decayTraces();
 

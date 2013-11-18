@@ -22,7 +22,6 @@ struct RLParam {
     bool accumu;
     float initial;
     float tiling;
-    bool trick;
 };
 
 enum StrategyEffectsAdvice {

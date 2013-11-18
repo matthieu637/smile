@@ -20,11 +20,11 @@ using namespace simu;
 #define G_K2 5.
 #define G_M  1.
 
-static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., true, -250., (int) M, true};
-static const RLParam GridWorldParam= {0.05, 0.03, 0.9, 0.9, true, 0., (int) G_M, false};
+static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., true, -250., (int) M};
+static const RLParam GridWorldParam= {0.05, 0.03, 0.9, 0.9, true, 0., (int) G_M};
 
-static const RLParam GridWorldLSParam= {0.05, 0.08, 0.9, 0.6, false, 0., (int) M, false};
-static const RLParam DefaultParam= {0.002, 0.02, 0.999, 0.999, false, 0., (int) M, false};
+static const RLParam GridWorldLSParam= {0.05, 0.08, 0.9, 0.6, false, 0., (int) M};
+static const RLParam DefaultParam= {0.002, 0.02, 0.999, 0.999, false, 0., (int) M};
 
 
 class Functor1DMCarState : public Functor1D
