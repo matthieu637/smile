@@ -24,7 +24,7 @@ static const RLParam MCarParam = {0.05, 0.08, 0.9, 1., true, -250., (int) M};
 static const RLParam GridWorldParam= {0.05, 0.03, 0.9, 0.9, true, 0., (int) G_M};
 
 static const RLParam GridWorldLSParam= {0.05, 0.08, 0.9, 0.6, false, 0., (int) M};
-static const RLParam DefaultParam= {0.002, 0.02, 0.999, 0.999, false, 0., (int) M};
+static const RLParam DefaultParam= {0.0001, 0.02, 0.999, 0.999, false, 0., (int) M};
 
 
 class Functor1DMCarState : public Functor1D
@@ -281,7 +281,7 @@ f_crea_list<TeacherState<MCarState>> Factory::additionnalFeature(RLParam param) 
         Functor1DTeacherStateMCarState* inst_call = new Functor1DTeacherStateMCarState(i);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor1 = boost::bind(&Functor1DTeacherStateMCarState::callEpisod, inst_call, _1, _2);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor2 = boost::bind(&Functor1DTeacherStateMCarState::callAction, inst_call, _1, _2);
-        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {50, 100, 2, 2}, inst_call);
+        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {100, 100, 2, 2}, inst_call);
         begin.f->push_back(f);
         begin.inst_call->push_back(inst_call);
     }
@@ -290,7 +290,7 @@ f_crea_list<TeacherState<MCarState>> Factory::additionnalFeature(RLParam param) 
         Functor1DTeacherStateMCarState* inst_call = new Functor1DTeacherStateMCarState(i);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor1 = boost::bind(&Functor1DTeacherStateMCarState::callGivenFdb, inst_call, _1, _2);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor2 = boost::bind(&Functor1DTeacherStateMCarState::callAction, inst_call, _1, _2);
-        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {50, 100, 2, 2}, inst_call);
+        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {100, 100, 2, 2}, inst_call);
         begin.f->push_back(f);
         begin.inst_call->push_back(inst_call);
     }

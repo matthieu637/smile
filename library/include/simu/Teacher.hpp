@@ -102,21 +102,21 @@ public:
 
     double reward() const {
         if(prob->goal())
-            return sml::Utils::transform(- prob->step, -500, 0, 10, 50);
-
-        float based = -1.;
-        if(!giveAdvise) { //don't give advice
-            if(tookBestAction) //agent take the best action , no need to advice
-                return 0.;
-            return based;
-
-        }
-        return based*advice_cost;
-
+            return sml::Utils::transform(- prob->step, -500, 0, 50, 500);
+	
+//         float based = -2.;
+//         if(!giveAdvise) { //don't give advice
+//             if(tookBestAction) //agent take the best action , no need to advice
+//                 return 0;
+// //             return based;
+// 
+//         }
+// //         return based*advice_cost;
+	return -1;
     }
 
     DAction* getInitialAction() const {
-        return new DAction(this->getActions(), 1);
+        return new DAction(this->getActions(), (int) true);
     }
 
     RAction restrictedAction() {
@@ -146,7 +146,7 @@ protected:
     virtual void applyOn(const DAction& ac) {
 //         giveAdvise = sml::Utils::rand01() <= 10./100. ;
         giveAdvise = ac[FDB];
-//         giveAdvise = true;
+//         giveAdvise = advice_budget > 0;
 // 	giveAdvise = false;
 
         if(prob->done()) {
@@ -160,7 +160,7 @@ protected:
                 learner->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
 
             learner_prob_init();
-            giveAdvise = false ; //TODO:ok?
+            giveAdvise = true ; //TODO:ok?
 //             if(astart == before)
 //                 delete learner_next_action;
 //             learner_next_action = computePossibleNextAction();;

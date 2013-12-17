@@ -105,7 +105,8 @@ public:
             additional_step--;
             stats s = local_run(index, random_init);
 
-            if(s.total_reward <= max_reward) {
+            if(s.total_reward >= max_reward) {
+// 		LOG_DEBUG("reacher better "<< s.total_reward << " " <<max_reward);
                 max_reward = s.total_reward;
                 index_min = index;
                 delete best_policy;
@@ -128,14 +129,25 @@ public:
     stats local_run(int index, bool random_init) {
         prob->init(random_init);
         agent->startEpisode(getState(prob), *fac);
-        if(no_learn_knowledge) {
-            local_run_l(index, true);
-            prob->init(random_init);
-            agent->startEpisode(getState(prob), *fac);
-            return local_run_l(index, false);
-        }
+//         if(no_learn_knowledge) {
+        local_run_l(index, true);
+        prob->init(random_init);
+        agent->startEpisode(getState(prob), *fac);
+        stats s1 = local_run_l(index, false);
+        prob->init(random_init);
+        agent->startEpisode(getState(prob), *fac);
+        stats s2 = local_run_l(index, false);
 
-        return local_run_l(index, true);
+        stats s3 = {
+            (s1.nbStep + s2.nbStep) /2,
+            (s1.total_reward + s2.total_reward)/2,
+            (s1.min_step + s2.min_step) / 2,
+            (s1.index_min+s2.index_min) / 2
+        };
+        return s3;
+//         }
+
+//         return local_run_l(index, true);
     }
 
     Policy<PolicyState>* get_best_policy() {
@@ -242,20 +254,26 @@ protected:
 
             if(learn) {
                 if(!prob->restrictedAction().restricted)
-                    this->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
+                    ac = this->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
                 else {
                     agent->had_choosed(getState(prob), *b, prob->reward(), false, prob->done(), prob->goal());
                     ac = b;
                 }
 //                 ac = this->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
             }
-            else
+            else {
+                if(ac != fac)
+                    delete ac;
                 ac = this->agent->decision(getState(prob), false);
+            }
         }
         while(!prob->done());
 
-	delete b;
-	
+        if(!learn)
+            delete ac;
+
+        delete b;
+
         return {prob->step, total_reward, prob->step, index};
     }
 
