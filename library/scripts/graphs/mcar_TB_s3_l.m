@@ -39,11 +39,11 @@ print('mcar_TB_l_s3.png')
 
 
 
-k=1
-n=0:4:190
+k=1;
+n=0:2:250;
 QQ=zeros(size(n,2), 2);
 for i=n
-    q = load( cstrcat('../../data/TBMS3_IMC_300_100_',
+    q = load( cstrcat('../../data/TBMS3TIIA_300_100_',
 		num2str(i),'_',num2str(i)));
 	QQ(k,1) = mean(mean(q));
 	QQ(k,2) = i;
@@ -58,4 +58,4 @@ QQ;
 figure
 
 plot(QQ(:,2),QQ(:,1))
-
+axis([0 250 -220 -150])

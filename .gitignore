@@ -49,6 +49,8 @@ build/
 doc/
 
 library/data
+library/scripts/bpolicy
+library/scripts/graphs/*.png
 
 octave-core
 
