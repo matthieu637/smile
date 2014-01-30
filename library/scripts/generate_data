@@ -64,14 +64,18 @@ fi
 # launch_test "FMQ3_ 300" 1 300
 # 
 # # S3T
-# launch_test "TBMS3TIEA 300 100" 1 200
+# launch_test "TBMS3TIEA 300 100" 1 100
 # launch_test "TBMS3TIIA 300 100" 1 100
 # launch_test "TBMS3TIMC 300 100" 1 100
 # # S3_
-# launch_test "TBMS3_IEA 300 100" 1 300 
+# launch_test "TBMS3_IEA 300 100" 1 100 
 # launch_test "TBMS3_IIA 300 100 24 24" 1 100
 # launch_test "TBMS3_IMC 300 100 12 12" 1 100
-launch_test "TMS3_BI 5003 1.25" 1 4
+###### 
+#launch_test "TBMS3_IEA 300 50" 1 100
+#launch_test "TMS3_BI 8000 18" 1 3
+launch_test "TMS3_BI 8000 20" 1 3
+#launch_test "TMS3_BI 3 1.601" 1 3
 
 
 # 
@@ -87,13 +91,13 @@ launch_test "TMS3_BI 5003 1.25" 1 4
 
 # 
 # k="0"
-# incr="4"
-# end="190"
+# incr="2"
+# end="250"
 # 
 # while [ `echo "$k <= $end" | bc` -eq 1 ]
 # do
 # 	echo $k
-#  	launch_test "TBMS3TIIA 300 100 $k $k" 1 50
+#  	launch_test "TBMS3_IIA 300 50 $k $k" 1 50
 #  	k=`echo $k + $incr | bc`
 # done
 # 
@@ -102,7 +106,7 @@ launch_test "TMS3_BI 5003 1.25" 1 4
 # while [ `echo "$k <= $end" | bc` -eq 1 ]
 # do
 # 	echo $k
-#  	launch_test "TBMS3TIMC 300 100 $k $k" 1 50
+#  	launch_test "TBMS3_IMC 300 50 $k $k" 1 50
 #  	k=`echo $k + $incr | bc`
 # done
 

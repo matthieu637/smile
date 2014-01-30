@@ -96,7 +96,8 @@ public:
         float p = sml::Utils::randin(0.,(2.*1.7)/K) ;
         float v = sml::Utils::randin(0.,(2.*0.14)/K) ;
         float episod = sml::Utils::randin(0.,(2.*100.)/30.);
-        float fdb = sml::Utils::randin(0.,(2.*100.)/30.);
+        float fdb = sml::Utils::randin(0.,(2.*100.)/33.);
+// 	float fdb = sml::Utils::randin(0.,(2.*50.)/15.);
         float stimport = sml::Utils::randin(0.,(2.*100.)/30.);
         float lstep = sml::Utils::randin(0.,(2.*500.)/100.);
         randomize.push_back(p);
@@ -138,16 +139,17 @@ public:
 
     double callGivenFdb(const TeacherState<MCarState>& st, const DAction&)
     {
-        return st.givenFdb - (100./30.) + randomize[3];
+         return st.givenFdb - (100./33.) + randomize[3];
+//	  return st.givenFdb - (50./15.) + randomize[3];
     }
 
-    double callStateImportance(const TeacherState<MCarState>& st, const DAction&) {
-        return st.state_importance - (100./30.) + randomize[4];
-    }
-
-    double callLearnerStep(const TeacherState<MCarState>& st, const DAction&) {
-        return st.lstep - (500./100.) + randomize[5];
-    }
+//     double callStateImportance(const TeacherState<MCarState>& st, const DAction&) {
+//         return st.state_importance - (100./30.) + randomize[4];
+//     }
+// 
+//     double callLearnerStep(const TeacherState<MCarState>& st, const DAction&) {
+//         return st.lstep - (500./100.) + randomize[5];
+//     }
 
     int i;
 };
@@ -268,10 +270,11 @@ f_crea_list<TeacherState<MCarState>> Factory::additionnalFeature(RLParam param) 
 
     for(int i=0; i < param.tiling; i++) {
         Functor1DTeacherStateMCarState* inst_call = new Functor1DTeacherStateMCarState(i);
-        typename Feature<TeacherState<MCarState>>::featuring1D fonctor1 = boost::bind(&Functor1DTeacherStateMCarState::callTakeBestAction, inst_call, _1, _2);
+//         typename Feature<TeacherState<MCarState>>::featuring1D fonctor1 = boost::bind(&Functor1DTeacherStateMCarState::callTakeBestAction, inst_call, _1, _2);
+	typename Feature<TeacherState<MCarState>>::featuring1D fonctor1 = boost::bind(&Functor1DTeacherStateMCarState::callLearnerAction, inst_call, _1, _2);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor2 = boost::bind(&Functor1DTeacherStateMCarState::callAction, inst_call, _1, _2);
 
-        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {2, 2, 2, 2}, inst_call);
+        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {3, 3, 2, 2}, inst_call);
         begin.f->push_back(f);
         begin.inst_call->push_back(inst_call);
 
@@ -281,7 +284,7 @@ f_crea_list<TeacherState<MCarState>> Factory::additionnalFeature(RLParam param) 
         Functor1DTeacherStateMCarState* inst_call = new Functor1DTeacherStateMCarState(i);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor1 = boost::bind(&Functor1DTeacherStateMCarState::callEpisod, inst_call, _1, _2);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor2 = boost::bind(&Functor1DTeacherStateMCarState::callAction, inst_call, _1, _2);
-        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {100, 100, 2, 2}, inst_call);
+        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {30, 100, 2, 2}, inst_call);
         begin.f->push_back(f);
         begin.inst_call->push_back(inst_call);
     }
@@ -290,7 +293,8 @@ f_crea_list<TeacherState<MCarState>> Factory::additionnalFeature(RLParam param) 
         Functor1DTeacherStateMCarState* inst_call = new Functor1DTeacherStateMCarState(i);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor1 = boost::bind(&Functor1DTeacherStateMCarState::callGivenFdb, inst_call, _1, _2);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor2 = boost::bind(&Functor1DTeacherStateMCarState::callAction, inst_call, _1, _2);
-        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {100, 100, 2, 2}, inst_call);
+//         Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {15, 50, 2, 2}, inst_call);
+	Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {33, 100, 2, 2}, inst_call);
         begin.f->push_back(f);
         begin.inst_call->push_back(inst_call);
     }

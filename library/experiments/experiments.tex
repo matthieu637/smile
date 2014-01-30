@@ -36,34 +36,34 @@
 \rhead{ %\rightmark 
 }
 
-\usepackage[style=authoryear,backend=bibtex,sortlocale=fr_FR]{biblatex}
-\addbibresource{dependance/biblio.bib}
+% \usepackage[style=authoryear,backend=bibtex,sortlocale=fr_FR]{biblatex}
+% \addbibresource{dependance/biblio.bib}
+% 
+% 
+% \newrobustcmd*{\parentexttrack}[1]{%
+%   \begingroup
+%   \blx@blxinit
+%   \blx@setsfcodes
+%   \blx@bibopenparen#1\blx@bibcloseparen
+%   \endgroup}
+% 
+% \AtEveryCite{%
+%   \let\parentext=\parentexttrack%
+%   \let\bibopenparen=\bibopenbracket%
+%   \let\bibcloseparen=\bibclosebracket}
+% 
+% \renewbibmacro*{cite}{%
+%   \iffieldundef{shorthand}
+%     {\ifthenelse{\ifnameundef{labelname}\OR\iffieldundef{labelyear}}
+%        {\usebibmacro{cite:label}%
+%         \setunit{\addspace}}
+%        {\printnames{labelname}%
+%         \setunit{\nameyeardelim}}%
+% %     \usebibmacro{cite:labelyear+extrayear}}% DELETED
+%      \printtext{(\usebibmacro{cite:labelyear+extrayear})}}% ADDED
+%     {\usebibmacro{cite:shorthand}}}
 
-
-\newrobustcmd*{\parentexttrack}[1]{%
-  \begingroup
-  \blx@blxinit
-  \blx@setsfcodes
-  \blx@bibopenparen#1\blx@bibcloseparen
-  \endgroup}
-
-\AtEveryCite{%
-  \let\parentext=\parentexttrack%
-  \let\bibopenparen=\bibopenbracket%
-  \let\bibcloseparen=\bibclosebracket}
-
-\renewbibmacro*{cite}{%
-  \iffieldundef{shorthand}
-    {\ifthenelse{\ifnameundef{labelname}\OR\iffieldundef{labelyear}}
-       {\usebibmacro{cite:label}%
-        \setunit{\addspace}}
-       {\printnames{labelname}%
-        \setunit{\nameyeardelim}}%
-%     \usebibmacro{cite:labelyear+extrayear}}% DELETED
-     \printtext{(\usebibmacro{cite:labelyear+extrayear})}}% ADDED
-    {\usebibmacro{cite:shorthand}}}
-
-    
+\bibliographystyle{apalike}
     
 
 
@@ -105,6 +105,11 @@
   \renewcommand{\labelitemiv}{$\ast$}
   
 %   \section{Cadre : Apprentissage non supervisé par apprentissage des densités}
+
+  \section{Introduction}
+  
+  
+  The only assumption we made here is that the learner and the teacher have the same action set.
 
   \clearpage
   \section{Environnement}
@@ -286,7 +291,7 @@ Here, we introduce an other problem where rewards will be different according to
       \end{center}
       Approximation version :
       \begin{center}
-	$\vec\theta(f(s,a)) = \vec\theta(f(s,a'))$
+	$\vec\theta(f(s,a)) = \vec\theta(f(s,a')) + \delta$
 	
 	$with\ a' = \underset{b}{\operatorname{argmax}}\ Q(s,b) $ 
 	\end{center}
@@ -305,7 +310,7 @@ Here, we introduce an other problem where rewards will be different according to
 	$\pi(s)=a$ \newline
 	$Q(s,a) = max(Q(s,\_) + \delta$
 
-      \subsection{Advice after acting}
+%       \subsection{Advice after acting}
 %       In this experiment, we have two agent, a teacher (QLearning) and a learner (QLearning).
 %       The teacher is favored to advice (it is done to compare advice effects) : +10 if advice
 %       else -10. With this reward function, it is not important to display the algorithm ``advice before''
@@ -415,13 +420,13 @@ Here, we introduce an other problem where rewards will be different according to
       Our first model will decide if the teacher have to advice with the best action or not.
       $Teacher\_Actions = \{\neg F, F\}$
       
-      \subsubsection{Learn the action}
-      
-      In this section, we will change the model of the teacher, instead of having to choose to give a feedback or not,
-      he can choose which action he wants to advice.
-      
-       $Teacher\_Actions = \{ \neg F\} \cup Learner\_Actions $
-     
+%       \subsubsection{Learn the action}
+%       
+%       In this section, we will change the model of the teacher, instead of having to choose to give a feedback or not,
+%       he can choose which action he wants to advice.
+%       
+%        $Teacher\_Actions = \{ \neg F\} \cup Learner\_Actions $
+%      
       
       \subsection{Comparaisons}
       
@@ -436,7 +441,16 @@ Here, we introduce an other problem where rewards will be different according to
       
       \subsection{Main results}
       
+      \begin{itemize}
+       
       
+
+      \item If the number of advice is too big, early advice is the better strategy to adopt for a teacher.
+      
+      \item However, if the number of advice isn't that big, mistake correction and importance advice can
+      do better. In addition, we showed that the best strategy in this case, is our method.
+      
+      \end{itemize}
 %       \begin{itemize}
 %        \item Max
 %        
@@ -614,7 +628,13 @@ Here, we introduce an other problem where rewards will be different according to
 
   \clearpage
   
-  \printbibliography
+  %\printbibliography
+  
+    \renewcommand\refname{Bibliographie}
+%   \section{Bibliographie}
+   \addcontentsline{toc}{section}{Bibliographie}
+  \bibliography{dependance/biblio}{}
+  
   
 %   \clearpage
 %   \section{Performances}

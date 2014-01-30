@@ -133,18 +133,7 @@ public:
         local_run_l(index, true);
         prob->init(random_init);
         agent->startEpisode(getState(prob), *fac);
-        stats s1 = local_run_l(index, false);
-        prob->init(random_init);
-        agent->startEpisode(getState(prob), *fac);
-        stats s2 = local_run_l(index, false);
-
-        stats s3 = {
-            (s1.nbStep + s2.nbStep) /2,
-            (s1.total_reward + s2.total_reward)/2,
-            (s1.min_step + s2.min_step) / 2,
-            (s1.index_min+s2.index_min) / 2
-        };
-        return s3;
+        return local_run_l(index, false);
 //         }
 
 //         return local_run_l(index, true);
