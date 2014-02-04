@@ -27,11 +27,11 @@
 #include <math.h>
 
 #include "QLearnDiscr.hpp"
-#include "QLearnDiscr2.hpp"
+// #include "QLearnDiscr2.hpp"
 #include "QLearnGen.hpp"
-#include "QLearnGenCmplx.hpp"
-#include <QLearnGenFdb.hpp>
-#include <SarsaFdb.hpp>
+// #include "QLearnGenCmplx.hpp"
+// #include <QLearnGenFdb.hpp>
+// #include <SarsaFdb.hpp>
 
 #define NBBOTS 6
 
@@ -89,19 +89,19 @@ static int InitFuncPt(int index, void *pt)
         driver[index] = new QLearnDiscr(index);
         break;
     case 1:
-        driver[index] = new QLearnDiscr2(index);
+//         driver[index] = new QLearnDiscr2(index);
         break;
     case 2:
 	driver[index] = new QLearnGen(index);
 	break;
     case 3:
-	driver[index] = new QLearnGenCmplx(index);
+// 	driver[index] = new QLearnGenCmplx(index);
 	break;
     case 4:
- 	driver[index] = new QLearnGenFdb(index);
+//  	driver[index] = new QLearnGenFdb(index);
 	break;
     case 5:
- 	driver[index] = new SarsaFdb(index);
+//  	driver[index] = new SarsaFdb(index);
 	break;
 	
     }

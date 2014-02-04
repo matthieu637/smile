@@ -12,6 +12,7 @@
 #include <sml/Action.hpp>
 #include <sml/QLearnGradient.hpp>
 #include <sml/Q.hpp>
+#include <sml/SarsaGradient.hpp>
 #include "TWorld.hpp"
 
 using sml::DAction;
@@ -39,10 +40,6 @@ public:
     /* callback functions called from TORCS */  
     void newRace(tCarElt* car, tSituation *s);
     void endRace();
-    
-///
-///\brief Retourner l'algorithme d'apprendissage
-    sml::LearnStat* getAlgo();
 
 private:
   
@@ -52,29 +49,27 @@ private:
 ///	  car : la voiture
     void applyActionOn(const DAction& ac, tCarElt* car);
 
-private:
+public:
     static const int DECISION_EACH = 3;
 
-    static const int ACTIONS_DIRECTION = 8;
+    static const int ACTIONS_DIRECTION = 13;
 
-    const double lamda = 0.95;
-    const double lrate = 0.0001;
-    const double discount = 0.75;
-    const double epsilon = 0.01;
-
+    static const sml::RLParam conf;
+    
     static const double road_width;
     static const double total_angle;
 
-    static const int nbXinter = 14;
-    static const int nbYinter = 16;
+    static const double nbXinter;
+    static const double nbYinter;
     
-    static const bool learn = true;
-    sml::LearnConfig conf = {true, 0.1, 4000};
+    static const bool learn = false;
+    
     static const unsigned int simu_time = 10; //in minutes
 
     static const sml::ActionTemplate ACTION_TEMPLATE;
 
-    QLearnGradient<State>* qlg;
+//     QLearnGradient<State>* qlg;
+    SarsaGradient<State>* qlg;
 };
 
 #endif // QLEARNDISCR_HPP

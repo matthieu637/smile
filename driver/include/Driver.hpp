@@ -11,6 +11,9 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
@@ -20,7 +23,8 @@
 #include <car.h>
 #include <robottools.h>
 #include <robot.h>
-#include <sml/LearnStat.hpp>
+#include <utility>
+#include <string>
 
 class Driver {
 public:
@@ -41,6 +45,14 @@ public:
     virtual void newRace(tCarElt* car, tSituation *s);
     virtual void drive(tSituation *s);
     virtual void endRace();
+    
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int) {
+	int d = (int)(globalReward/1000.);
+        ar << boost::serialization::make_nvp("globalReward", d);
+    };
+    
+    void writePerf(const std::string& s);
 
 ///
 ///\brief Fonction à redéfinir pour contrôler la voiture
@@ -84,7 +96,7 @@ protected:
     
 ///
 ///\brief Retourner l'algorithme d'apprendissage
-    virtual sml::LearnStat* getAlgo() = 0;
+//     virtual sml::LearnStat* getAlgo() = 0;
     
     double reward;
     double globalReward;
@@ -95,6 +107,7 @@ protected:
     tCarElt *car;			/* pointer to tCarElt struct */
     float lastDistance = -1;
     float lastDammage = 0;
+    double stime;
 
 private:
     

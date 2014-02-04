@@ -11,7 +11,8 @@
 #define FDB "feedbacks"
 
 #define LEARNER_STEP 100
-#define MAX_NUMBER_ADVICE 100
+// #define MAX_NUMBER_ADVICE 100
+#define MAX_NUMBER_ADVICE 50
 
 namespace simu {
 
@@ -157,7 +158,7 @@ protected:
 
             //called last time to get a +1
             if(astart == before)
-                learner->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
+                learner->computeNextAction(getState(prob), prob->reward(), prob->goal());
 
             learner_prob_init();
             giveAdvise = true ; //TODO:ok?
@@ -186,7 +187,7 @@ protected:
             case before:
                 if(giveAdvise && sea != None && advice_budget > 0) {
                     DAction* best_action = best_policy->decision(state_learner, false);
-                    learner->get_policy()->should_do(state_learner, *best_action, prob->reward(), prob->done(), prob->goal());
+                    learner->get_policy()->should_do(state_learner, *best_action, prob->reward(), prob->goal());
 
                     tookBestAction = (*best_action == *this->state->learner_action);
 
@@ -199,7 +200,7 @@ protected:
                 {
 // 		take greeding in consideration
                     DAction* la = this->state->learner_action;
-                    learner->get_policy()->had_choosed(state_learner, *la, prob->reward(), gotGreedy, prob->done(), prob->goal());
+                    learner->get_policy()->had_choosed(state_learner, *la, prob->reward(), gotGreedy, prob->goal());
 
                     prob->apply(*la);
                 }
@@ -219,7 +220,7 @@ protected:
         if(astart == before)
             this->state->learner_action = computePossibleNextAction();
         else //after
-            this->state->learner_action = new DAction(*learner->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal()));
+            this->state->learner_action = new DAction(*learner->computeNextAction(getState(prob), prob->reward(), prob->goal()));
 
         setStatelearnerTakeBestAction();
     }
@@ -245,7 +246,7 @@ protected:
     DAction* computePossibleNextAction() {
         DAction* learner_next_action;
         Policy<PolicyState>* cp =  learner->get_policy()->copyPolicy();
-        LearnReturn lr = cp->_learn(getState(prob), prob->reward(), prob->done(), prob->goal());
+        LearnReturn lr = cp->_learn(getState(prob), prob->reward(), prob->goal());
         learner_next_action = new DAction(*lr.ac);
         gotGreedy = lr.gotGreedy;
         delete cp;

@@ -1,16 +1,17 @@
 #ifndef DRAFTTEST_HPP
 #define DRAFTTEST_HPP
 
-#include "bib/Logger.hpp"
+#include <boost/bind.hpp>
 #include <simu/RLTable.hpp>
 #include <simu/Teacher.hpp>
 #include <simu/GridWorldLS.hpp>
 #include <simu/GridWorld.hpp>
 #include <simu/Teacher.hpp>
 #include <sml/Utils.hpp>
-#include "TeachingBudget.hpp"
-#include <boost/bind.hpp>
+#include "bib/Logger.hpp"
 #include "FeaturesImpl.hpp"
+#include "TeachingBudget.hpp"
+#include "sml/Feature.hpp"
 
 using namespace simu;
 
@@ -21,23 +22,6 @@ class DraftTest
 public:
 
     template<typename EnvState>
-    featureData<EnvState> createFeatures(RLParam param) {
-      
-	f_crea_list<EnvState> begin = Factory::additionnalFeature<EnvState>(param);
-
-        featuredList<EnvState> *features = begin.f;
-        list<Functor1D* >* instances = begin.inst_call;
-
-        for(int i=0; i < param.tiling; i++) {
-            f_crea<EnvState> fct = Factory::createFeature<EnvState>(i);
-            features->push_back(fct.f);
-            instances->push_back(fct.inst_call);
-        }
-
-        return {features, instances};
-    }
-
-    template<typename EnvState>
     void F_run_simple(Algo a, Environnement<EnvState>* env, RLParam p, int numberRun, bool no_learn_knowledge) {
         Utils::srand_mili();
 
@@ -46,7 +30,7 @@ public:
 
         if(a == simu::QL_gen || a == simu::Sarsa_gen ) {
             unsigned int nbFeature = 0;
-            features = createFeatures<EnvState>(p);
+            features = Factory::createFeatures<EnvState>(p);
             for(fLiterator<EnvState> flist = features.func->begin() ; flist != features.func->end(); ++flist) {
                 nbFeature += (*flist)->getSize();
             }
@@ -117,12 +101,12 @@ public:
 // 	Utils::srand_mili(true);
 
         unsigned int nbFeature = 0;
-        featureData<EnvState> features = createFeatures<EnvState>(paramLearn);
+        featureData<EnvState> features = Factory::createFeatures<EnvState>(paramLearn);
         for(fLiterator<EnvState> flist = features.func->begin() ; flist != features.func->end(); ++flist) {
             nbFeature += (*flist)->getSize();
         }
         unsigned int nbTFeature = 0;
-        featureData<TeacherState<EnvState>> tfeatures = createFeatures<TeacherState<EnvState>>(paramTeach);
+        featureData<TeacherState<EnvState>> tfeatures = Factory::createFeatures<TeacherState<EnvState>>(paramTeach);
         for(fLiterator<TeacherState<EnvState>> flist = tfeatures.func->begin() ; flist != tfeatures.func->end(); ++flist) {
             nbTFeature += (*flist)->getSize();
         }
@@ -211,7 +195,7 @@ public:
 // 	Utils::srand_mili(true);
 
         unsigned int nbFeature = 0;
-        featureData<EnvState> features = createFeatures<EnvState>(paramLearn);
+        featureData<EnvState> features = Factory::createFeatures<EnvState>(paramLearn);
         for(fLiterator<EnvState> flist = features.func->begin() ; flist != features.func->end(); ++flist) {
             nbFeature += (*flist)->getSize();
         }

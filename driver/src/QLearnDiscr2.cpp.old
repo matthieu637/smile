@@ -1,0 +1,71 @@
+#include "QLearnDiscr2.hpp"
+#include <TWorld.hpp>
+#include <sml/Utils.hpp>
+#include <iostream>
+#include <bib/Logger.hpp>
+
+const sml::ActionTemplate QLearnDiscr2::ACTION_TEMPLATE = sml::ActionTemplate( {ACC, DIRE}, {TWorld::ACTIONS_ACC, QLearnDiscr2::ACTIONS_DIRECTION});
+
+// const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {AGL, RDST, LDST}, {QLearnDiscr2::STATES_ALPHA, STATES_DISTANCE, STATES_DISTANCE});
+const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {AGL, DST}, {QLearnDiscr2::STATES_ALPHA, QLearnDiscr2::STATES_DISTANCE});
+// const sml::StateTemplate QLearnDiscr2::STATE_TEMPLATE = sml::StateTemplate( {AGL, DST, SPD}, {QLearnDiscr2::STATES_ALPHA, QLearnDiscr2::STATES_DISTANCE*2, 3});
+
+QLearnDiscr2::QLearnDiscr2(int index):Driver(index, DECISION_EACH, simu_time)
+{
+    State st = *TWorld::initialState();
+    DState* dst = discretize(st);
+    q = new sml::QLearningLamb(&STATE_TEMPLATE, &ACTION_TEMPLATE, *dst, *TWorld::initialAction(&ACTION_TEMPLATE), conf);
+}
+
+QLearnDiscr2::~QLearnDiscr2()
+{
+
+}
+
+void QLearnDiscr2::endRace() {
+    Driver::endRace();
+    q->write("smile1.data");
+}
+
+void QLearnDiscr2::decision()
+{
+    DAction* a;
+
+    if(car->_speed_x < 9 && car->_distRaced < 10) {
+        a = TWorld::initialAction(&ACTION_TEMPLATE);
+        a->set(ACC, 3);
+    }
+    else {
+        State st = *TWorld::observe(*this);
+        DState* dst = discretize(st);
+        if(learn) {
+            a = q->learn(*dst,reward,lrate,espilon,discount, lambda, false);
+            LOG_DEBUG("etat " << *dst << " action " << *a << " recomp : " << reward);
+        }
+        else
+            a = q->decision(*dst);
+    }
+
+    applyActionOn(*a, car);
+}
+
+void QLearnDiscr2::newRace(tCarElt* car, tSituation *s) {
+    Driver::newRace(car,s);
+
+    q->read("smile1.data");
+}
+
+
+DState* QLearnDiscr2::discretize(const State& st) {
+    DState* dst = new DState(&STATE_TEMPLATE, 0) ;
+
+    dst->set(AGL, TWorld::discretizeAngle(st.angle, STATES_ALPHA));
+    dst->set(DST, TWorld::discretizeDistance(st.distanceFromMiddle, STATES_DISTANCE, -6., 6.));
+    return dst;
+}
+
+void QLearnDiscr2::applyActionOn(const DAction& ac, tCarElt* car) {
+    car->ctrl.steer = TWorld::computeSteering(ac[DIRE], ACTIONS_DIRECTION, -0.4, 0.4);
+    TWorld::applyAcceleration(car, ac[ACC]);
+}
+

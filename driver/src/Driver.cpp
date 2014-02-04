@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <bib/Logger.hpp>
+#include <bib/XMLEngine.hpp>
 #include "Driver.hpp"
 #include <TWorld.hpp>
 
@@ -81,8 +82,11 @@ void Driver::drive(tSituation *s)
 void Driver::endRace()
 {
     LOG_DEBUG("Global Perf : " << globalReward/1000);
-    getAlgo()->setPerf(globalReward/1000);
-    getAlgo()->increaseEpisode();
+}
+
+void Driver::writePerf(const std::string& s)
+{
+    bib::XMLEngine::save(*this, "Perfs", s+".perf");
 }
 
 /***************************************************************************
@@ -159,6 +163,8 @@ void Driver::update(tSituation *s)
     NORM_PI_PI(angle);
 
     updateStuck();
+    
+    stime = s->currentTime;
 
     decision_each++;
 }

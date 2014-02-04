@@ -56,7 +56,7 @@ public:
 ///	  lambda : importance de l'historique
 ///	  discount : importance du prochain état de la récompense
 ///	  accumulative : si les traces est accumulative ou non
-    LearnReturn _learn(const State& state, double r, bool, bool)
+    LearnReturn _learn(const State& state, double r, bool)
     {
         DAction* a;
         a = this->lastAction;
@@ -83,7 +83,7 @@ public:
     }
 
 
-    void had_choosed(const State& state, const DAction& ba, double r, bool did_greedy, bool, bool) {
+    void had_choosed(const State& state, const DAction& ba, double r, bool did_greedy, bool) {
         DAction* a;
         a = this->lastAction;
 
@@ -106,7 +106,7 @@ public:
         this->lastAction = a;
     }
 
-    void should_do(const State& s, const DAction& ba, double r, bool, bool) {
+    void should_do(const State& s, const DAction& ba, double r, bool) {
         DAction* a;
         a = this->lastAction;
 

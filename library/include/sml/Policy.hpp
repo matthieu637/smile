@@ -45,12 +45,12 @@ public:
     virtual DAction* decision(const State& st, bool greedy) = 0;
     virtual void startEpisode(const State& s, const DAction& a) = 0;
     virtual void should_done(const State& s, const DAction& a) = 0;
-    virtual void should_do(const State& s, const DAction& a, double reward, bool done, bool goal) = 0;
-    virtual void had_choosed(const State& s, const DAction& a, double reward, bool did_greedy, bool done, bool goal) = 0;
-    virtual LearnReturn _learn(const State& s, double reward, bool done, bool goal) = 0;
+    virtual void should_do(const State& s, const DAction& a, double reward, bool goal) = 0;
+    virtual void had_choosed(const State& s, const DAction& a, double reward, bool did_greedy, bool goal) = 0;
+    virtual LearnReturn _learn(const State& s, double reward, bool goal) = 0;
     virtual float getStateImportance(const State& s) = 0;
-    DAction* learn(const State& s, double reward, bool done, bool goal) {
-        return _learn(s, reward, done, goal).ac;
+    DAction* learn(const State& s, double reward, bool goal) {
+        return _learn(s, reward, goal).ac;
     }
 
     virtual Policy<State>* copyPolicy() = 0;

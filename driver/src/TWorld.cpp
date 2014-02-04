@@ -80,7 +80,7 @@ double TWorld::reward(const Driver& d) {
 State* TWorld::observe(const Driver& d) {
     const tCarElt* car = d.getCar();
     State* s = new State;
-//     s->stuck = d.isStuck();
+    s->stuck = d.isStuck();
     s->angle = d.getAngle();
     s->speed = car->_speed_x;
     s->distanceFromMiddle = car->_trkPos.toMiddle;

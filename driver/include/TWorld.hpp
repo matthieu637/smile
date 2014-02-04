@@ -28,7 +28,7 @@ using sml::ActionTemplate;
 ///\struct State
 ///\brief l'état de la voiture 
 struct State {
-//     bool stuck;  // 0 1
+    bool stuck;  // 0 1
     float angle; // -pi / pi
     float distanceFromMiddle; // -20 / 20
     float leftDistance; // -4 / 9

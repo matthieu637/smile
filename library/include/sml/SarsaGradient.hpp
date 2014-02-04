@@ -26,7 +26,7 @@ public:
 ///       initial : l'action initiale
 ///       conf : la configuration d'apprentissage
     SarsaGradient(featuredList<State>* features, unsigned int nbFeature, const ActionTemplate* atmp, const State& s,
-                  const DAction& a, RLParam param, StrategyEffectsAdvice sea) :
+                  const DAction& a, RLParam param, StrategyEffectsAdvice sea=None) :
         RLGradientDescent<State>(features, nbFeature/*12288*/, atmp, s, a, param, sea)
     {
         this->startEpisode(s, a);
@@ -53,7 +53,7 @@ public:
 ///	  discount : importance du prochain état de la récompense
 ///	  accumulative : si les traces est accumulative ou non
 
-    LearnReturn _learn(const State& state, double r, bool, bool goal)
+    LearnReturn _learn(const State& state, double r, bool goal)
     {
         DAction* a = this->lastAction;
 
@@ -74,7 +74,8 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        this->updateWeights(delta);
+        if(updateNext)
+            this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -83,6 +84,8 @@ public:
         //take action a, observe reward, and next state
         delete this->lastAction;
         this->lastAction = ap;
+
+        updateNext = true;
         return {ap, gotGreedy};
     }
 
@@ -90,10 +93,12 @@ public:
         this->decayTraces();
 
         this->addTraces(s, a);
+
+        updateNext = true;
     }
 
 
-    void had_choosed(const State& state, const DAction& ba, double r, bool, bool, bool goal) {
+    void had_choosed(const State& state, const DAction& ba, double r, bool, bool goal) {
         DAction* a = this->lastAction;
 
         float delta = r - this->Qa(*a);
@@ -105,7 +110,8 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        this->updateWeights(delta);
+        if(updateNext)
+            this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -114,9 +120,11 @@ public:
         //take action a, observe reward, and next state
         delete this->lastAction;
         this->lastAction = ap;
+
+        updateNext = true;
     }
 
-    void should_do(const State& state, const DAction& ba, double r, bool, bool goal) {
+    void should_do(const State& state, const DAction& ba, double r, bool goal) {
         DAction* a = this->lastAction;
         float delta = r - this->Qa(*a);
 
@@ -128,7 +136,8 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-	this->updateWeights(delta);
+        if(updateNext)
+            this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -137,6 +146,15 @@ public:
         //take action a, observe reward, and next state
         delete this->lastAction;
         this->lastAction = ap;
+
+
+        // that was the default update of Q(s,a)
+        //now take advise in consideration
+        if(this->adviceStrat == Max) {
+            adviceMax(state, ba);
+            updateNext = false;
+        }
+        else updateNext = true;
     }
 
 
@@ -147,41 +165,51 @@ public:
 
 private:
 
+//     void adviceMax(const State& state, const DAction& ba) {
+//         this->computeQa(state);
+//         DAction* amax = this->Qa.argmax();
+//         list<int>* f_amax = this->extractFeatures(state, *amax);
+//         list<int>* f_ba = this->extractFeatures(state, ba);
+// 
+// // 	LOG_DEBUG(f_amax->size() << " " << f_ba->size());
+// 
+//         list<int>::iterator it=f_ba->begin();
+//         for(list<int>::iterator it2=f_amax->begin(); it2 != f_amax->end(); ++it2) {
+//             this->teta[*it] = this->teta[*it] + this->param.alpha/this->param.tiling * 2. * (this->teta[*it] - this->teta[*it2]) ;
+//             ++it;
+//         }
+// 
+//         delete amax;
+//         delete f_amax;
+//         delete f_ba;
+// 
+//     }
+
+
     void adviceMax(const State& state, const DAction& ba) {
         this->computeQa(state);
-        DAction* amax = this->Qa.argmax();
+//         DAction* amax = this->Qa.argmaxGreaterThan();
+	DAction* amax = this->Qa.argmax();
         list<int>* f_amax = this->extractFeatures(state, *amax);
         list<int>* f_ba = this->extractFeatures(state, ba);
 
 // 	LOG_DEBUG(f_amax->size() << " " << f_ba->size());
-// 	bib::Logger::PRINT_ELEMENTS<list<int>>(*f_amax);
-// 	bib::Logger::PRINT_ELEMENTS<list<int>>(*f_ba);
-        assert(f_amax->size() == f_ba->size());
 
-//         float tot = Qa(*amax) - Qa(ba);
-//         tot = tot / f_ba->size();
-
-// 	for(list<int>::iterator it2=f_ba->begin(); it2 != f_ba->end(); ++it2) {
-//             teta[*it2] = teta[*it2] + tot + 0.0001;
-//         }
-
-//         list<int>::iterator it=f_ba->begin();
-//         for(list<int>::iterator it2=f_amax->begin(); it2 != f_amax->end(); ++it2) {
-//             teta[*it] = teta[*it2] + 0.0001;
-//             ++it;
-//         }
+        list<int>::iterator it=f_ba->begin();
+        for(list<int>::iterator it2=f_amax->begin(); it2 != f_amax->end(); ++it2) {
+            this->teta[*it] = this->teta[*it2];
+            ++it;
+        }
 
         delete amax;
         delete f_amax;
         delete f_ba;
 
-// 	computeQa(state);
-// 	LOG_DEBUG(*Qa.argmax() << " " << ba);
-// 	assert(*Qa.argmax() == ba);
     }
 
 
-
+private:
+    bool updateNext;
 
 };
 

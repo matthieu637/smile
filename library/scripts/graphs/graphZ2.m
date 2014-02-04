@@ -1,5 +1,7 @@
 close all
 clear all
+
+graphics_toolkit("gnuplot")
 % NUMBER ADVICE -> 50
 %TMS3_BI_8000_13.5 reward 2 line, base working from reunion5
 %TMS3_BI_8000_14 took best action reward -> 0 
@@ -7,6 +9,8 @@ clear all
 %TMS3_BI_8000_16 took best action reward -> 0 (worst)
 %TMS3_BI_8000_17 rm 16 + augment stat 3 action instead best action (best)
 %TMS3_BI_8000_18 rm callEpisod (bad)
+
+
 
 X = load('../../data/FMS3__300');
 %XP = load('../../data/TBMS3_IEA_300_50');
@@ -30,7 +34,7 @@ xlabel('Learner episodes');
 ylabel('Average episode reward');
 title('Learner rewards after the teacher learned');
 
-print('Z1_1.png')
+saveas(h , 'Z1_1.png')
 
 h2b = figure
 
@@ -56,7 +60,7 @@ xlabel('Teacher episodes');
 ylabel('Average episode reward');
 
 
-print('Z1_2.png')
+%print('Z1_2.png')
 
 h3 = figure ;
 

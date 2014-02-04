@@ -103,7 +103,7 @@ public:
 
             ///
             Policy<PolicyState>* cp =  agent->copyPolicy();
-            LearnReturn lr = cp->_learn(getState(prob), prob->reward(), prob->done(), prob->goal());
+            LearnReturn lr = cp->_learn(getState(prob), prob->reward(), prob->goal());
             ac = new DAction(*lr.ac);
             delete cp;
 
@@ -131,9 +131,9 @@ public:
                 delete ac;
                 ac = new DAction(*best_action);
                 nn--;
-                agent->should_do(getState(prob), *ac, prob->reward(), prob->done(), prob->goal());
+                agent->should_do(getState(prob), *ac, prob->reward(), prob->goal());
             } else {
-                agent->had_choosed(getState(prob), *ac, prob->reward(), lr.gotGreedy, prob->done(), prob->goal());
+                agent->had_choosed(getState(prob), *ac, prob->reward(), lr.gotGreedy, prob->goal());
             }
             delete best_action;
 

@@ -44,10 +44,6 @@ public:
     void newRace(tCarElt* car, tSituation *s);
     void endRace();
     
-///
-///\brief Retourner l'algorithme d'apprendissage
-    sml::LearnStat* getAlgo();
-    
 private:
 
 ///
@@ -68,12 +64,10 @@ private:
     static const int STATES_DISTANCE = 12;
     static const int ACTIONS_DIRECTION = 8;
     
-    const float lrate = 0.001;
-    const float discount = 0.95;
-    const float espilon = 0.01;
+    static const sml::RLParam conf;
     
     static const bool learn = true;
-    sml::LearnConfig conf = {true, 0.1, 2000};
+    
     static const unsigned int simu_time = 10; //in minutes
     
     static const sml::ActionTemplate ACTION_TEMPLATE;

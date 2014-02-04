@@ -18,23 +18,13 @@ file="smile${index}.data"
 
 for i in {1..900000}
 do 
-  torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null &
-  pid1=$!
+  torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null
 
-  if [ $# -eq 2 ] ; then
-    torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null &
-    pid2=$!
-    torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null &
-    pid3=$!
-    torcs -r ~/.torcs/config/dtmrace${index}.xml > /dev/null &
-    pid4=$!
-    wait $pid2 $pid3 $pid4
-  fi
+  #episod=`cat $path/$file  | grep episode | sed 's/[^0-9]*//g'`
+  episod=$i
+  #perf=`cat $path/$file  | grep perf | sed 's/[^-0-9]*//g'`
+  perf=`cat $path/$file.perf  | grep global | sed 's/[^-0-9]*//g'`
 
-  wait $pid1
-
-  episod=`cat $path/$file  | grep episode | sed 's/[^0-9]*//g'`
-  perf=`cat $path/$file  | grep perf | sed 's/[^-0-9]*//g'`
   lsize=`cat $path/$file | grep -ve '\([^0-9]\|^\)0\([.]\|<\)' | wc -l`
   if [ $perf -ne $lperf  ] ; then
   	echo "episod : $episod | state learned : $lsize | perf : $perf"

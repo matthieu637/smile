@@ -7,8 +7,8 @@
 #include "Policy.hpp"
 #include <boost/serialization/list.hpp>
 
-void GetTiles(int tiles[],int num_tilings,float variables[], int num_variables,
-              int memory_size,int hash1=-1, int hash2=-1, int hash3=-1);
+// void GetTiles(int tiles[],int num_tilings,float variables[], int num_variables,
+//               int memory_size,int hash1=-1, int hash2=-1, int hash3=-1);
 
 
 

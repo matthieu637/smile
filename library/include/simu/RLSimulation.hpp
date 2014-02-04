@@ -164,8 +164,8 @@ public:
 
     virtual Policy<PolicyState>* createAgent(const PolicyState& s, const DAction& a) = 0;
 
-    virtual DAction* computeNextAction(const PolicyState& s, double reward, bool done, bool goal) {
-        return agent->learn(s, reward, done, goal);
+    virtual DAction* computeNextAction(const PolicyState& s, double reward, bool goal) {
+        return agent->learn(s, reward, goal);
     }
 
     Policy<PolicyState>* search_best_policy(int forNtime) {
@@ -243,12 +243,12 @@ protected:
 
             if(learn) {
                 if(!prob->restrictedAction().restricted)
-                    ac = this->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
+                    ac = this->computeNextAction(getState(prob), prob->reward(), prob->goal());
                 else {
-                    agent->had_choosed(getState(prob), *b, prob->reward(), false, prob->done(), prob->goal());
+                    agent->had_choosed(getState(prob), *b, prob->reward(), false, prob->goal());
                     ac = b;
                 }
-//                 ac = this->computeNextAction(getState(prob), prob->reward(), prob->done(), prob->goal());
+//                 ac = this->computeNextAction(getState(prob), prob->reward(), prob->goal());
             }
             else {
                 if(ac != fac)

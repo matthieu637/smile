@@ -23,7 +23,7 @@ public:
 ///       s : l'état
 ///       a : l'action
 ///       conf : la configuration d'apprentissage
-    QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, RLParam param, StrategyEffectsAdvice sea);
+    QLearning(const StateTemplate* stmp, const ActionTemplate* atmp, const DState& s, const DAction& a, RLParam param, StrategyEffectsAdvice sea=None);
     
     QLearning(const QLearning& q);
     
@@ -36,7 +36,7 @@ public:
 ///       lrate : le taux d'apprentissage
 ///	  epsilon : politique "epsilon-greedy"
 ///	  discount : importance du prochain état de la récompense 
-    LearnReturn _learn(const DState& s, double r, bool done, bool);
+    LearnReturn _learn(const DState& s, double r, bool);
     
 ///
 ///\brief Retourner l'action à faire selon l'algorithme QLearning sans apprentissage 
@@ -47,9 +47,9 @@ public:
     void startEpisode(const DState& ds, const DAction& da);
     
     void should_done(const DState& s, const DAction& a);
-    void had_choosed(const DState&, const DAction&, double, bool, bool, bool);
+    void had_choosed(const DState&, const DAction&, double, bool, bool);
     bool learn_gotGreeding() const;
-    void should_do(const DState& s, const DAction& a, double reward, bool done, bool);
+    void should_do(const DState& s, const DAction& a, double reward, bool);
     float getStateImportance(const DState& s);
     const QTable& getPolicy();
     Policy<DState>* copyPolicy();

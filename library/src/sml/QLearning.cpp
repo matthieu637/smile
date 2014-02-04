@@ -20,7 +20,7 @@ QLearning::~QLearning() {
     delete da;
 }
 
-LearnReturn QLearning::_learn(const DState& s, double r, bool, bool)
+LearnReturn QLearning::_learn(const DState& s, double r, bool)
 {
     DAction *ap = Q.argmax(s);
     Q(ds,da) = Q(ds,da) + param.alpha*(r+param.gamma*Q(s, *ap) - Q(ds, da) );
@@ -101,14 +101,14 @@ void QLearning::startEpisode(const DState& s, const DAction& a)
     da = new DAction(a);
 }
 
-void QLearning::should_do(const DState& s, const DAction& a, double reward, bool, bool) {
+void QLearning::should_do(const DState& s, const DAction& a, double reward, bool) {
     (void) reward;
     should_done(s, a);
 
     startEpisode(s, a);
 }
 
-void QLearning::had_choosed(const DState&, const DAction&, double, bool, bool, bool){
+void QLearning::had_choosed(const DState&, const DAction&, double, bool, bool){
   
 }
 

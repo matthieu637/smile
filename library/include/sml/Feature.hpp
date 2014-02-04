@@ -8,12 +8,17 @@
 
 #include <boost/function.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include "sml/Policy.hpp"
 #include "sml/Action.hpp"
 #include "bib/Logger.hpp"
 
 using std::pair;
 using std::vector;
 
+namespace sml {
+  
 class Functor1D
 {
 public:/*
@@ -40,8 +45,6 @@ public:/*
 protected:
     vector<double> randomize;
 };
-
-namespace sml {
 
 template<typename S>
 class Feature
@@ -188,7 +191,59 @@ using featuredList = std::list< Feature<State>* > ;
 template<typename State>
 using fLiterator = typename std::list< Feature<State>* >::iterator ;
 
+template<typename EnvState>
+struct featureData {
+    featuredList<EnvState>* func;
+    list< Functor1D* >* inst;
+};
+
+template<typename EnvState>
+struct f_crea {
+    Feature<EnvState>* f;
+    Functor1D* inst_call;
+};
+
+template<typename EnvState>
+struct f_crea_list {
+    list<Feature<EnvState>*> *f;
+    list<Functor1D*> *inst_call;
+};
+
 }
+
+class Factory {
+
+public:
+  
+    template<typename EnvState>
+    static sml::f_crea<EnvState> createFeature(int) {
+        LOG_ERROR("env fonctions not implemented");
+        return {nullptr, nullptr};
+    }
+
+    template<typename EnvState>
+    static sml::f_crea_list<EnvState> additionnalFeature(sml::RLParam) {
+        return {new sml::featuredList<EnvState>(), new std::list<sml::Functor1D* >};
+    }
+    
+    template<typename EnvState>
+    static sml::featureData<EnvState> createFeatures(sml::RLParam param) {
+      
+	sml::f_crea_list<EnvState> begin = Factory::additionnalFeature<EnvState>(param);
+
+        sml::featuredList<EnvState> *features = begin.f;
+        list<sml::Functor1D* >* instances = begin.inst_call;
+
+        for(int i=0; i < param.tiling; i++) {
+            sml::f_crea<EnvState> fct = Factory::createFeature<EnvState>(i);
+            features->push_back(fct.f);
+            instances->push_back(fct.inst_call);
+        }
+
+        return {features, instances};
+    }
+
+};
 
 #endif // FEATURE_HPP
 
