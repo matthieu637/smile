@@ -11,8 +11,10 @@
 #define FDB "feedbacks"
 
 #define LEARNER_STEP 100
-// #define MAX_NUMBER_ADVICE 100
-#define MAX_NUMBER_ADVICE 50
+// #define MAX_NUMBER_ADVICE 100.
+#define MAX_NUMBER_ADVICE 50.
+// #define MAX_NUMBER_ADVICE 75.
+// #define MAX_NUMBER_ADVICE 25.
 
 namespace simu {
 

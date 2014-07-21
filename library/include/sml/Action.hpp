@@ -40,6 +40,7 @@ public:
 /// 	  value : le hash des actions  
 ///
     DAction(const ActionTemplate* temp, int value);
+    //DAction(){}//TODO:carefull
    
     DAction(const DAction& a);
     ~DAction();

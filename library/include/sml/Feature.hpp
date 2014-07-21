@@ -32,12 +32,14 @@ public:/*
     };*/
     
     void save(boost::archive::xml_oarchive* xml, int num) {
+      LOG_DEBUG("WRITE");
         std::ostringstream oss;
         oss << "randomize" << num;
         *xml << make_nvp(oss.str().c_str(), randomize);
     }
 
     void load(boost::archive::xml_iarchive* xml, int num) {
+	LOG_DEBUG("READ");
         std::ostringstream oss;
         oss << "randomize" << num;
         *xml >> make_nvp(oss.str().c_str(), randomize);
@@ -223,11 +225,13 @@ public:
 
     template<typename EnvState>
     static sml::f_crea_list<EnvState> additionnalFeature(sml::RLParam) {
+      
         return {new sml::featuredList<EnvState>(), new std::list<sml::Functor1D* >};
     }
     
     template<typename EnvState>
     static sml::featureData<EnvState> createFeatures(sml::RLParam param) {
+	
       
 	sml::f_crea_list<EnvState> begin = Factory::additionnalFeature<EnvState>(param);
 

@@ -20,6 +20,13 @@ struct MCarState {
     float velocity;
 };
 
+// bool operator<(const MCarState& s1, const MCarState& s2){
+//     if( s1.position < s2.position)
+//       return true;
+//     
+//     return s1.velocity < s2.velocity;
+// }
+
 class MCar : public Environnement<MCarState> {
 
 #define POS "position"
@@ -39,6 +46,7 @@ public:
     DAction* getInitialAction() const;
     bool goal() const;
     unsigned int maxStep() const;
+    
 protected:
     void applyOn(const DAction& ac);
     void computeDState(const MCarState& s, DState* dst, const StateTemplate* repr);

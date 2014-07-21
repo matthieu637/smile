@@ -96,8 +96,9 @@ public:
         float p = sml::Utils::randin(0.,(2.*1.7)/K) ;
         float v = sml::Utils::randin(0.,(2.*0.14)/K) ;
         float episod = sml::Utils::randin(0.,(2.*100.)/30.);
-//         float fdb = sml::Utils::randin(0.,(2.*100.)/33.);
-	float fdb = sml::Utils::randin(0.,(2.*50.)/15.);
+//      float fdb = sml::Utils::randin(0.,(2.*100.)/33.);
+// 	float fdb = sml::Utils::randin(0.,(2.*50.)/15.);
+	float fdb = sml::Utils::randin(0.,(2.*MAX_NUMBER_ADVICE)/(MAX_NUMBER_ADVICE/3.));
         float stimport = sml::Utils::randin(0.,(2.*100.)/30.);
         float lstep = sml::Utils::randin(0.,(2.*500.)/100.);
         randomize.push_back(p);
@@ -140,7 +141,7 @@ public:
     double callGivenFdb(const TeacherState<MCarState>& st, const DAction&)
     {
 //          return st.givenFdb - (100./33.) + randomize[3];
-	  return st.givenFdb - (50./15.) + randomize[3];
+	  return st.givenFdb - (MAX_NUMBER_ADVICE/(MAX_NUMBER_ADVICE/3.)) + randomize[3];
     }
 
 //     double callStateImportance(const TeacherState<MCarState>& st, const DAction&) {
@@ -191,6 +192,7 @@ public:
 
 template<>
 f_crea<MCarState> Factory::createFeature(int tiling) {
+    LOG_DEBUG("CREATE F MCAR");
     Functor1DMCarState* inst_call = new Functor1DMCarState(tiling);
     typename Feature<MCarState>::featuring1D fonctor1 = boost::bind(&Functor1DMCarState::callPosition, inst_call, _1, _2);
     typename Feature<MCarState>::featuring1D fonctor2 = boost::bind(&Functor1DMCarState::callVelocity, inst_call, _1, _2);
@@ -215,6 +217,7 @@ f_crea<MCarState> Factory::createFeature(int tiling) {
 //
 template<>
 f_crea<TeacherState<MCarState>> Factory::createFeature(int tiling) {
+    LOG_DEBUG("CREATE FT");
 
     Functor1DTeacherStateMCarState* inst_call = new Functor1DTeacherStateMCarState(tiling);
     typename Feature<TeacherState<MCarState>>::featuring1D fonctor1 = boost::bind(&Functor1DTeacherStateMCarState::callPosition, inst_call, _1, _2);
@@ -257,10 +260,11 @@ f_crea_list<TeacherState<MCarState>> Factory::additionnalFeature(RLParam param) 
     }
 
     for(int i=0; i < param.tiling; i++) {
+
         Functor1DTeacherStateMCarState* inst_call = new Functor1DTeacherStateMCarState(i);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor1 = boost::bind(&Functor1DTeacherStateMCarState::callGivenFdb, inst_call, _1, _2);
         typename Feature<TeacherState<MCarState>>::featuring1D fonctor2 = boost::bind(&Functor1DTeacherStateMCarState::callAction, inst_call, _1, _2);
-        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {15, 50, 2, 2}, inst_call);
+        Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {(int)(MAX_NUMBER_ADVICE/3.), MAX_NUMBER_ADVICE, 2, 2}, inst_call);
 // 	Feature<TeacherState<MCarState>>* f = new Feature<TeacherState<MCarState>>( {fonctor1, fonctor2}, {33, 100, 2, 2}, inst_call);
         begin.f->push_back(f);
         begin.inst_call->push_back(inst_call);
