@@ -75,8 +75,8 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-//         if(updateNext)
-        this->updateWeights(delta);
+        if(updateNext)
+	    this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -114,8 +114,8 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-//         if(updateNext)
-        this->updateWeights(delta);
+        if(updateNext)
+            this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -141,8 +141,8 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-//         if(updateNext)
-        this->updateWeights(delta);
+        if(updateNext)
+	    this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -168,10 +168,10 @@ public:
 //             }
 //             delete activeIndex;
 
-            //updateNext = false;
+            updateNext = false;
 
         }
-//         else updateNext = true;
+        else updateNext = true;
 
         adviceMaxUpdate();
     }
