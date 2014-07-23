@@ -75,8 +75,7 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        if(updateNext)
-	    this->updateWeights(delta);
+	this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -86,7 +85,6 @@ public:
         delete this->lastAction;
         this->lastAction = ap;
 
-        updateNext = true;
         adviceMaxUpdate();
         return {ap, gotGreedy};
     }
@@ -96,7 +94,6 @@ public:
 
         this->addTraces(s, a);
 
-        updateNext = true;
         historique_max.clear();
         //LOG_DEBUG("reset");
     }
@@ -114,8 +111,7 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        if(updateNext)
-            this->updateWeights(delta);
+        this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -125,7 +121,6 @@ public:
         delete this->lastAction;
         this->lastAction = ap;
 
-        updateNext = true;
         adviceMaxUpdate();
     }
 
@@ -141,8 +136,7 @@ public:
         if(!goal)
             delta = delta + this->param.gamma * this->Qa(*ap);
 
-        if(updateNext)
-	    this->updateWeights(delta);
+	this->updateWeights(delta);
 
         this->decayTraces();
 
@@ -168,10 +162,8 @@ public:
 //             }
 //             delete activeIndex;
 
-            updateNext = false;
 
         }
-        else updateNext = true;
 
         adviceMaxUpdate();
     }
@@ -256,7 +248,6 @@ private:
 
 
 private:
-    bool updateNext;
     deque<pair<State, DAction* >> historique_max;
     dbvector e2;
 
