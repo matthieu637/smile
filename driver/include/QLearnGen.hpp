@@ -62,7 +62,7 @@ public:
     static const double nbXinter;
     static const double nbYinter;
     
-    static const bool learn = false;
+    static const bool learn = true;
     
     static const unsigned int simu_time = 10; //in minutes
 
